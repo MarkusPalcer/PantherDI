@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using PantherDI.Registry.Registration;
+using PantherDI.Registry.Registration.Dependency;
 
 namespace PantherDI.Tests.Helpers
 {
@@ -17,6 +18,11 @@ namespace PantherDI.Tests.Helpers
         {
             _executor = executor;
             Dependencies = dependencies;
+        }
+
+        public Factory(params IDependency[] dependencies)
+            : this(_ => null, dependencies)
+        {
         }
 
         public IEnumerable<IDependency> Dependencies { get; }

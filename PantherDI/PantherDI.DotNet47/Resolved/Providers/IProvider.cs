@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using PantherDI.Registry.Registration;
+using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Resolved
 {
@@ -23,19 +25,11 @@ namespace PantherDI.Resolved
         /// The contracts this provider fulfills as provided by the <see cref="IRegistration"/>
         /// </summary>
         ISet<object> FulfilledContracts { get; }
-    }
 
-    /// <summary>
-    /// Represents a factory which has had its dependencies resolved and is now ready for use within a container
-    /// </summary>
-    /// <typeparam name="T">The type of the returned type</typeparam>
-    public interface IProvider<out T> : IProvider
-    {
         /// <summary>
         /// Creates an instance of the provided type
         /// </summary>
         /// <param name="resolvedDependencies">The resolved objects for the dependencies which could not be resolved by the container.</param>
-        /// <returns></returns>
-        T CreateInstance(object[] resolvedDependencies);
+        object CreateInstance(Dictionary<IDependency, object> resolvedDependencies);
     }
 }

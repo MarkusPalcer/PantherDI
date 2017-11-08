@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Registry.Registration
 {

@@ -1,19 +1,22 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
-using PantherDI.Extensions;
 using PantherDI.Registry.Catalog;
+using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration.Registration;
 using PantherDI.Tests.Helpers;
 
 namespace PantherDI.Tests
 {
     [TestClass]
-    public class Tests
+    public class SystemTests
     {
         [TestMethod]
         public void WithoutRegistrationResolvingFails()
         {
-            var sut = Container.Create(new Catalog());
+            var sut = new ContainerBuilder(new Catalog()).Build();
 
             sut.Invoking(cnt => cnt.Resolve<string>()).ShouldThrow<NoSuitableRegistrationException>();
             sut.Invoking(cnt => cnt.Resolve<object>(typeof(string))).ShouldThrow<NoSuitableRegistrationException>();
@@ -31,12 +34,12 @@ namespace PantherDI.Tests
                 return instance;
             }
 
-            var sut = Container.Create(new Catalog(new Registration()
+            var sut = new ContainerBuilder(new Catalog(new ManualRegistration()
             {
                 FulfilledContracts = { typeof(ICatalog), "SomeContract" },
                 Factories = { new Factory(Factory) },
                 RegisteredType = typeof(Catalog)
-            }));
+            })).Build();
 
             object resolved = sut.Resolve<ICatalog>();
             invokeCounter.Should().Be(1);
@@ -62,10 +65,12 @@ namespace PantherDI.Tests
         public void DependencyInjection()
         {
             var factoryCounter = 0;
+            var dependencyMock = new Mock<ICatalog>().Object;
 
             string Factory(object[] p)
             {
-                p.Should().BeEquivalentTo(string.Empty);
+                p.Should().HaveCount(1);
+                p[0].Should().Be(dependencyMock);
 
                 factoryCounter++;
                 return string.Empty;
@@ -73,28 +78,28 @@ namespace PantherDI.Tests
 
             var dependencyCounter = 0;
 
-            string Dependency(object[] p)
+            ICatalog Dependency(object[] p)
             {
                 p.Should().BeEmpty();
                 dependencyCounter++;
-                return string.Empty;
+                return dependencyMock;
             }
 
-            var sut = Container.Create(new Catalog(new Registration
+            var sut = new ContainerBuilder(new Catalog(new ManualRegistration
             {
                 RegisteredType = typeof(string),
                 Factories =
                 {
-                    new Factory(Factory, new Dependency(typeof(int)))
+                    new Factory(Factory, new Dependency(typeof(ICatalog)))
                 }
-            }, new Registration
+            }, new ManualRegistration
             {
-                RegisteredType = typeof(int),
+                RegisteredType = typeof(ICatalog),
                 Factories =
                 {
                     new Factory(Dependency)
                 }
-            }));
+            })).Build();
 
             sut.Resolve<string>();
             factoryCounter.Should().Be(1);
@@ -104,35 +109,17 @@ namespace PantherDI.Tests
         [TestMethod]
         public void TooManySuitableFactoriesThrows()
         {
-            var sut = Container.Create(new Catalog(new Registration
+            var sut = new ContainerBuilder(new Catalog(new ManualRegistration
+            {
+                RegisteredType = typeof(object),
+                Factories = {new Factory(_ => null)}
+            }, new ManualRegistration
             {
                 RegisteredType = typeof(object),
                 Factories = { new Factory(_ => null) }
-            }, new Registration()
-            {
-                RegisteredType = typeof(object),
-                Factories = { new Factory(_ => null) }
-            }));
+            })).Build();
 
             sut.Invoking(x => x.Resolve<object>()).ShouldThrow<TooManySuitableRegistrationsException>();
-        }
-
-        [TestMethod]
-        public void DetectCircularDependencies()
-        {
-            var sut = Container.Create(new Catalog(new Registration
-            {
-                RegisteredType = typeof(object),
-                FulfilledContracts = {"A"},
-                Factories = {new Factory(_ => null, new Dependency(typeof(object), "B"))}
-            }, new Registration()
-            {
-                RegisteredType = typeof(object),
-                FulfilledContracts = {"B"},
-                Factories = {new Factory(_ => null, new Dependency(typeof(object), "A"))}
-            }));
-
-            sut.Invoking(x => x.Resolve<object>("A")).ShouldThrow<CircularDependencyException>();
         }
     }
 }

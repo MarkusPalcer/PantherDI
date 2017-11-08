@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using PantherDI.Registry.Registration;
+using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Registry.Catalog
 {

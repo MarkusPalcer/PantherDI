@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using PantherDI.Exceptions;
+using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Resolved;
+using PantherDI.Resolvers;
+
+namespace PantherDI
+{
+    public class Container : IContainer
+    {
+        private readonly IKnowledgeBase _knowledgeBase;
+        private readonly MergedResolver _rootResolver;
+
+        public Container(IKnowledgeBase knowledgeBase, IEnumerable<IResolver> resolvers)
+        {
+            if (resolvers == null) throw new ArgumentNullException(nameof(resolvers));
+            _knowledgeBase = knowledgeBase ?? throw new ArgumentNullException(nameof(knowledgeBase));
+            _rootResolver = new MergedResolver(resolvers);
+        }
+
+        public T Resolve<T>(params object[] contracts)
+        {
+            var providers = ResolveInternal(new Dependency(typeof(T),contracts))
+                .Where(p => !p.UnresolvedDependencies.Any())
+                .ToArray();
+
+            if (providers.Length == 0)
+            {
+                throw new NoSuitableRegistrationException();
+            }
+            if (providers.Length > 1)
+            {
+                throw new TooManySuitableRegistrationsException();
+            }
+
+            return (T)providers.Single().CreateInstance(new Dictionary<IDependency, object>());
+        }
+
+        private IEnumerable<IProvider> ResolveInternal(IDependency dependency)
+        {
+            var result = _knowledgeBase.Resolve(ResolveInternal, dependency).ToArray();
+            if (result.Any())
+            {
+                return result;
+            }
+
+            // The provider is not yet in the knowledge base. Resolve it and then store it there, so it is cached
+            result = _rootResolver.Resolve(ResolveInternal, dependency).ToArray();
+            foreach (var provider in result)
+            {
+                _knowledgeBase.Add(provider);
+            }
+
+            return result;
+        }
+    }
+}

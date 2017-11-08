@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PantherDI.Registry.Registration
+namespace PantherDI.Registry.Registration.Registration
 {
     /// <summary>
     /// Represents a registered type which will be known to a created container

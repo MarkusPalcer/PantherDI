@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using PantherDI.Resolved;
 
-namespace PantherDI.Registry.Registration
+namespace PantherDI.Registry.Registration.Dependency
 {
     /// <summary>
     /// Describes a dependency, that is a parameter of a <see cref="IFactory"/> or <see cref="IProvider"/>
