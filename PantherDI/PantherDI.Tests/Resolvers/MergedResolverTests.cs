@@ -7,6 +7,7 @@ using Moq;
 using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved;
+using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 
 namespace PantherDI.Tests.Resolvers

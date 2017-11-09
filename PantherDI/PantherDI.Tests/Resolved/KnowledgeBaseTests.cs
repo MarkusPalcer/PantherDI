@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved;
+using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Tests.Resolved
 {

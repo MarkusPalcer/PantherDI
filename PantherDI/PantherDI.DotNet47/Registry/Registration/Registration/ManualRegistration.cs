@@ -8,6 +8,7 @@ namespace PantherDI.Registry.Registration.Registration
         public Type RegisteredType { get; set; }
         public ISet<object> FulfilledContracts { get; }
         public ISet<IFactory> Factories { get; }
+        public bool Singleton { get; set; }
 
         public ManualRegistration()
         {
@@ -15,9 +16,8 @@ namespace PantherDI.Registry.Registration.Registration
             Factories = new HashSet<IFactory>();
         }
 
-        public ManualRegistration(Type registeredType, ISet<object> fulfilledContracts, ISet<IFactory> factories)
+        public ManualRegistration(ISet<object> fulfilledContracts, ISet<IFactory> factories)
         {
-            RegisteredType = registeredType;
             FulfilledContracts = fulfilledContracts;
             Factories = factories;
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using PantherDI.Resolved;
+using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Registry.Registration.Dependency
 {

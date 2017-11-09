@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
+using PantherDI.Resolved.Providers;
 using PantherDI.Tests.Helpers;
 
 namespace PantherDI.Tests.Resolved.Providers

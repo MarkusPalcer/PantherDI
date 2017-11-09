@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 
 namespace PantherDI.Resolved

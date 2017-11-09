@@ -6,6 +6,7 @@ using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
+using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 
 namespace PantherDI.ContainerCreation
@@ -123,7 +124,7 @@ namespace PantherDI.ContainerCreation
 
             // Create copies of all registrations and add the registered type to the fulfilled contracts in the process
             var registrations = catalog.Registrations
-                .Select(x => new ManualRegistration(x.RegisteredType, new HashSet<object>(x.FulfilledContracts){x.RegisteredType}, new HashSet<IFactory>(x.Factories)));
+                .Select(CloneRegistration);
 
             foreach (var registration in registrations)
             {
@@ -139,6 +140,15 @@ namespace PantherDI.ContainerCreation
             }
 
             return unprocessed;
+        }
+
+        private static ManualRegistration CloneRegistration(IRegistration x)
+        {
+            return new ManualRegistration(new HashSet<object>(x.FulfilledContracts){x.RegisteredType}, new HashSet<IFactory>(x.Factories))
+            {
+                RegisteredType = x.RegisteredType,
+                Singleton = x.Singleton
+            };
         }
     }
 }

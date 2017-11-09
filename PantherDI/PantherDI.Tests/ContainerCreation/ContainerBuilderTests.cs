@@ -43,6 +43,7 @@ namespace PantherDI.Tests.ContainerCreation
             result.FulfilledContracts.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog));
             result.ResultType.Should().Be(typeof(Catalog));
             result.UnresolvedDependencies.Should().BeEmpty();
+            result.Singleton.Should().BeFalse();
 
             results = sut.KnowledgeBase["SomeContract"].ToArray();
             results.Should().HaveCount(1);
@@ -50,6 +51,7 @@ namespace PantherDI.Tests.ContainerCreation
             result.FulfilledContracts.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog));
             result.ResultType.Should().Be(typeof(Catalog));
             result.UnresolvedDependencies.Should().BeEmpty();
+            result.Singleton.Should().BeFalse();
         }
 
         [TestMethod]
@@ -68,7 +70,8 @@ namespace PantherDI.Tests.ContainerCreation
                 Factories =
                 {
                     new Factory()
-                }
+                },
+                Singleton = true
             });
 
             var sut = new ContainerBuilder(catalog);
@@ -82,6 +85,7 @@ namespace PantherDI.Tests.ContainerCreation
             result.FulfilledContracts.Should().BeEquivalentTo(typeof(string));
             result.ResultType.Should().Be(typeof(string));
             result.UnresolvedDependencies.Should().BeEmpty();
+            result.Singleton.Should().BeFalse();
 
             results = sut.KnowledgeBase[typeof(int)].ToArray();
             results.Should().HaveCount(1);
@@ -89,6 +93,7 @@ namespace PantherDI.Tests.ContainerCreation
             result.FulfilledContracts.Should().BeEquivalentTo(typeof(int));
             result.ResultType.Should().Be(typeof(int));
             result.UnresolvedDependencies.Should().BeEmpty();
+            result.Singleton.Should().BeTrue();
         }
 
         [TestMethod]

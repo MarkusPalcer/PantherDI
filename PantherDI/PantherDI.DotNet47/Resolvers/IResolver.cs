@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved;
+using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {

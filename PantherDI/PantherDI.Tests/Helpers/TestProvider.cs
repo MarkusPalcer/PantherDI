@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using PantherDI.Registry.Registration.Dependency;
-using PantherDI.Resolved;
+using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Tests.Helpers
 {
@@ -32,6 +32,6 @@ namespace PantherDI.Tests.Helpers
             return _delegate(resolvedDependencies);
         }
 
-
+        public bool Singleton { get; set; }
     }
 }

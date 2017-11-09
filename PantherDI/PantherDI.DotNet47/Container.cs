@@ -4,6 +4,7 @@ using System.Linq;
 using PantherDI.Exceptions;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved;
+using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 
 namespace PantherDI
@@ -12,6 +13,7 @@ namespace PantherDI
     {
         private readonly IKnowledgeBase _knowledgeBase;
         private readonly MergedResolver _rootResolver;
+        private readonly Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
 
         public Container(IKnowledgeBase knowledgeBase, IEnumerable<IResolver> resolvers)
         {
@@ -43,7 +45,7 @@ namespace PantherDI
             var result = _knowledgeBase.Resolve(ResolveInternal, dependency).ToArray();
             if (result.Any())
             {
-                return result;
+                return WrapSingletonProviders(result);
             }
 
             // The provider is not yet in the knowledge base. Resolve it and then store it there, so it is cached
@@ -53,7 +55,22 @@ namespace PantherDI
                 _knowledgeBase.Add(provider);
             }
 
-            return result;
+            return WrapSingletonProviders(result);
+        }
+
+        private IEnumerable<IProvider> WrapSingletonProviders(IEnumerable<IProvider> source)
+        {
+            foreach (var provider in source)
+            {
+                if (provider.Singleton)
+                {
+                    yield return new SingletonProvider(provider, _singletons);
+                }
+                else
+                {
+                    yield return provider;
+                }
+            }
         }
     }
 }

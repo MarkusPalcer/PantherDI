@@ -8,6 +8,7 @@ using Moq;
 using PantherDI.Exceptions;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved;
+using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 using PantherDI.Tests.Helpers;
 
@@ -75,6 +76,8 @@ namespace PantherDI.Tests
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
 
             sut.Invoking(x => x.Resolve<string>()).ShouldThrow<NoSuitableRegistrationException>();
+
+            provider.InvocationCounter.Should().Be(0);
         }
 
         [TestMethod]
@@ -103,6 +106,8 @@ namespace PantherDI.Tests
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
 
             sut.Resolve<string>().Should().Be(ProviderResult + "1");
+            provider1.InvocationCounter.Should().Be(1);
+            provider2.InvocationCounter.Should().Be(0);
         }
 
         [TestMethod]
@@ -129,6 +134,8 @@ namespace PantherDI.Tests
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
 
             sut.Invoking(x => x.Resolve<string>()).ShouldThrow<TooManySuitableRegistrationsException>();
+            provider1.InvocationCounter.Should().Be(0);
+            provider2.InvocationCounter.Should().Be(0);
         }
 
         [TestMethod]
@@ -159,6 +166,31 @@ namespace PantherDI.Tests
             var sut = new Container(kb.Object, new[] {resolver2.Object });
 
             sut.Resolve<string>().Should().Be(ProviderResult);
+        }
+
+        [TestMethod]
+        public void Singletons()
+        {
+            var kb = new Mock<IKnowledgeBase>(MockBehavior.Strict);
+            var provider = new TestProvider(ProviderResult)
+            {
+                FulfilledContracts = { typeof(string) },
+                ResultType = typeof(string).GetTypeInfo(),
+                Singleton = true
+            };
+
+            kb
+                .Setup(x => x.Resolve(
+                    It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
+                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(string))))))
+                .Returns(new IProvider[] { provider });
+
+            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+
+            sut.Resolve<string>().Should().Be(ProviderResult);
+            sut.Resolve<string>().Should().Be(ProviderResult);
+
+            provider.InvocationCounter.Should().Be(1);
         }
     }
 }

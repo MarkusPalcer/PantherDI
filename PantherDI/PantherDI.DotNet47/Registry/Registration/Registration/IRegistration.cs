@@ -22,5 +22,10 @@ namespace PantherDI.Registry.Registration.Registration
         /// Gets an <see cref="ISet{T}"/> which contains all <see cref="IFactory"/>'s usable to create this registered type
         /// </summary>
         ISet<IFactory> Factories { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether only a single instance of this registered type should be created
+        /// </summary>
+        bool Singleton { get; }
     }
 }

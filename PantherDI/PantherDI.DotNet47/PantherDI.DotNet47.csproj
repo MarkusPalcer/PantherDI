@@ -59,6 +59,7 @@
     <Compile Include="Resolved\IKnowledgeBase.cs" />
     <Compile Include="Resolved\Providers\IProvider.cs" />
     <Compile Include="Resolved\KnowledgeBase.cs" />
+    <Compile Include="Resolved\Providers\Provider.cs" />
     <Compile Include="Resolvers\IResolver.cs" />
     <Compile Include="Resolvers\MergedResolver.cs" />
   </ItemGroup>

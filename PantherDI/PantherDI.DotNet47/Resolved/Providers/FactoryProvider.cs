@@ -6,7 +6,7 @@ using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Registration;
 
-namespace PantherDI.Resolved
+namespace PantherDI.Resolved.Providers
 {
 
     /// <summary>
@@ -41,8 +41,10 @@ namespace PantherDI.Resolved
 
             ResultType = providedRegistration.RegisteredType.GetTypeInfo();
 
-            FulfilledContracts = new HashSet<object>(providedRegistration.FulfilledContracts);
-            FulfilledContracts.Add(providedRegistration.RegisteredType);
+            FulfilledContracts =
+                new HashSet<object>(providedRegistration.FulfilledContracts) {providedRegistration.RegisteredType};
+
+            Singleton = providedRegistration.Singleton;
         }
 
         public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
@@ -75,5 +77,6 @@ namespace PantherDI.Resolved
             return _factory.Execute(resolvedParameters.ToArray());
         }
 
+        public bool Singleton { get; }
     }
 }

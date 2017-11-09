@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved;
+using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {
