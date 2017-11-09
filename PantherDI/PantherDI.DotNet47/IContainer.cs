@@ -1,9 +1,11 @@
-﻿namespace PantherDI
+﻿using System;
+
+namespace PantherDI
 {
     /// <summary>
     /// The core of PantherDI. It is where instances can be pulled from with their dependencies resolved
     /// </summary>
-    public interface IContainer
+    public interface IContainer : IDisposable
     {
         /// <summary>
         /// Creates an instance of a type that satisfies the given constraints.

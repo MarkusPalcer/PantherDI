@@ -192,5 +192,60 @@ namespace PantherDI.Tests
 
             provider.InvocationCounter.Should().Be(1);
         }
+
+        [TestMethod]
+        public void DisposingSingletons()
+        {
+            var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
+            var kb = new Mock<IKnowledgeBase>(MockBehavior.Strict);
+            var provider = new TestProvider(disposableMock.Object)
+            {
+                FulfilledContracts = { typeof(IDisposable) },
+                ResultType = typeof(IDisposable).GetTypeInfo(),
+                Singleton = true
+            };
+
+            kb
+                .Setup(x => x.Resolve(
+                    It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
+                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(IDisposable))))))
+                .Returns(new IProvider[] { provider });
+
+            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+
+            sut.Resolve<IDisposable>();
+
+            disposableMock.Setup(x => x.Dispose());
+
+            sut.Dispose();
+
+            disposableMock.Verify(x => x.Dispose(), Times.Once);
+        }
+
+        [TestMethod]
+        public void NotDisposingNonSingletons()
+        {
+            var disposableMock = new Mock<IDisposable>(MockBehavior.Strict);
+            var kb = new Mock<IKnowledgeBase>(MockBehavior.Strict);
+            var provider = new TestProvider(disposableMock.Object)
+            {
+                FulfilledContracts = { typeof(IDisposable) },
+                ResultType = typeof(IDisposable).GetTypeInfo(),
+                Singleton = false
+            };
+
+            kb
+                .Setup(x => x.Resolve(
+                    It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
+                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(IDisposable))))))
+                .Returns(new IProvider[] { provider });
+
+            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+
+            sut.Resolve<IDisposable>();
+
+            sut.Dispose();
+        }
+
     }
 }
