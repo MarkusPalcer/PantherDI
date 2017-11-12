@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Comparers\SetComparer.cs" />
     <Compile Include="Container.cs" />
     <Compile Include="ContainerCreation\ContainerBuilder.cs" />
     <Compile Include="Exceptions\CircularDependencyException.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Resolved\Providers\IProvider.cs" />
     <Compile Include="Resolved\KnowledgeBase.cs" />
     <Compile Include="Resolved\Providers\Provider.cs" />
+    <Compile Include="Resolvers\EnumerableResolver.cs" />
     <Compile Include="Resolvers\IResolver.cs" />
     <Compile Include="Resolvers\MergedResolver.cs" />
   </ItemGroup>

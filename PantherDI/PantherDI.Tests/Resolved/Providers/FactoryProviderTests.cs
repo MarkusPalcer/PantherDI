@@ -119,7 +119,7 @@ namespace PantherDI.Tests.Resolved.Providers
             sut.FulfilledContracts.Should().BeEquivalentTo(FulfilledContract, typeof(string));
             sut.ResultType.Should().Be(typeof(string).GetTypeInfo());
             sut.UnresolvedDependencies.Count.Should().Be(1);
-            Dependency.EqualityComparer.Instance.Equals(sut.UnresolvedDependencies.Select(x => x).First(),
+            new Dependency.EqualityComparer().Equals(sut.UnresolvedDependencies.Select(x => x).First(),
                 new Dependency(typeof(string), "Dependency 3")).Should().BeTrue();
 
             var result = sut.CreateInstance(new Dictionary<IDependency, object>

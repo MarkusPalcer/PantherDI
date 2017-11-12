@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using PantherDI.Comparers;
 
 namespace PantherDI.Registry.Registration.Dependency
 {
@@ -18,45 +21,51 @@ namespace PantherDI.Registry.Registration.Dependency
             }
 
             ExpectedType = expectedType;
-            RequiredContracts = requiredContracts;
+            RequiredContracts = new HashSet<object>(requiredContracts);
         }
 
         public Type ExpectedType { get; }
 
-        public IEnumerable<object> RequiredContracts { get; }
+        public ISet<object> RequiredContracts { get; }
 
-        public sealed class EqualityComparer : IEqualityComparer<IDependency>
+        public class EqualityComparer : IEqualityComparer, IEqualityComparer<IDependency>
         {
+            bool IEqualityComparer.Equals(object x, object y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (ReferenceEquals(null, x) != ReferenceEquals(null, y)) return false;
+
+                if (!x.GetType().GetTypeInfo().IsInstanceOfType(typeof(IDependency)))
+                    throw new ArgumentException("Compared items must be of type IDependency", nameof(x));
+
+                if (!y.GetType().GetTypeInfo().IsInstanceOfType(typeof(IDependency)))
+                    throw new ArgumentException("Compared items must be of type IDependency", nameof(y));
+
+                return Equals((IDependency)x, (IDependency)y);
+            }
+
+            int IEqualityComparer.GetHashCode(object x)
+            {
+                if (!x.GetType().GetTypeInfo().IsInstanceOfType(typeof(IDependency)))
+                    throw new ArgumentException("Compared items must be of type IDependency", nameof(x));
+
+                return GetHashCode((IDependency) x);
+            }
+
             public bool Equals(IDependency x, IDependency y)
             {
                 if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                if (!(x.ExpectedType == y.ExpectedType)) return false;
-                if (x.RequiredContracts.Count() != y.RequiredContracts.Count()) return false;
-                foreach (var pairs in x.RequiredContracts.Zip(y.RequiredContracts, Tuple.Create))
-                {
-                    if (!pairs.Item1.Equals(pairs.Item2))
-                    {
-                        return false;
-                    }
-                }
+                if (ReferenceEquals(null, x) || ReferenceEquals(null, y)) return false;
+                if (x.ExpectedType != y.ExpectedType) return false;
+                if (!SetComparer<object>.Instance.Equals(x.RequiredContracts, y.RequiredContracts)) return false;
 
                 return true;
             }
 
             public int GetHashCode(IDependency obj)
             {
-                unchecked
-                {
-                    return obj.RequiredContracts.Aggregate(obj.ExpectedType.GetHashCode(), (current, contract) => (current * 397) ^ contract.GetHashCode());
-                }
+                return ((obj.ExpectedType != null ? obj.ExpectedType.GetHashCode() : 0) * 397) ^ SetComparer<object>.Instance.GetHashCode(obj.RequiredContracts);
             }
-
-            public static IEqualityComparer<IDependency> Instance { get; } = new EqualityComparer();
         }
-
-        
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using PantherDI.Exceptions;
@@ -17,9 +18,9 @@ namespace PantherDI.Resolved.Providers
         private readonly IFactory _factory;
         private readonly Dictionary<IDependency, IProvider> _dependencyProviders;
 
-        public ISet<IDependency> UnresolvedDependencies { get; }
+        public HashSet<IDependency> UnresolvedDependencies { get; }
 
-        public TypeInfo ResultType { get; }
+        public Type ResultType { get; }
 
         public ISet<object> FulfilledContracts { get; }
 
@@ -27,13 +28,13 @@ namespace PantherDI.Resolved.Providers
         public FactoryProvider(IRegistration providedRegistration, IFactory factory, Dictionary<IDependency, IProvider> dependencyProviders) 
         {
             _factory = factory;
-            _dependencyProviders = new Dictionary<IDependency, IProvider>(dependencyProviders, Dependency.EqualityComparer.Instance);
+            _dependencyProviders = new Dictionary<IDependency, IProvider>(dependencyProviders, new Dependency.EqualityComparer());
 
-            UnresolvedDependencies = new HashSet<IDependency>(Dependency.EqualityComparer.Instance);
+            UnresolvedDependencies = new HashSet<IDependency>(new Dependency.EqualityComparer());
             
             foreach (var dependency in _factory.Dependencies)
             {
-                if (!_dependencyProviders.Any(x => Dependency.EqualityComparer.Instance.Equals(dependency, x.Key)))
+                if (!_dependencyProviders.Any(x => new Dependency.EqualityComparer().Equals(dependency, x.Key)))
                 {
                     UnresolvedDependencies.Add(dependency);
                 }
@@ -49,19 +50,19 @@ namespace PantherDI.Resolved.Providers
 
         public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
         {
-            resolvedDependencies = new Dictionary<IDependency, object>(resolvedDependencies, Dependency.EqualityComparer.Instance);
+            resolvedDependencies = new Dictionary<IDependency, object>(resolvedDependencies, new Dependency.EqualityComparer());
 
             var resolvedParameters = new List<object>();
             foreach (var dependency in _factory.Dependencies)
             {
                 var resolvedParameter = resolvedDependencies
-                    .Where(x => Dependency.EqualityComparer.Instance.Equals(dependency, x.Key))
+                    .Where(x => new Dependency.EqualityComparer().Equals(dependency, x.Key))
                     .Select(x => x.Value)
                     .FirstOrDefault();
                 if (resolvedParameter == null)
                 {
                     resolvedParameter = _dependencyProviders
-                        .Where(x => Dependency.EqualityComparer.Instance.Equals(dependency, x.Key))
+                        .Where(x => new Dependency.EqualityComparer().Equals(dependency, x.Key))
                         .Select(x => x.Value.CreateInstance(resolvedDependencies))
                         .FirstOrDefault();
                 }

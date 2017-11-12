@@ -9,8 +9,8 @@ namespace PantherDI.Resolved.Providers
     {
         private readonly IProvider _originalProvider;
         private readonly Dictionary<Type, object> _cache;
-        public ISet<IDependency> UnresolvedDependencies => _originalProvider.UnresolvedDependencies;
-        public TypeInfo ResultType => _originalProvider.ResultType;
+        public HashSet<IDependency> UnresolvedDependencies => _originalProvider.UnresolvedDependencies;
+        public Type ResultType => _originalProvider.ResultType;
         public ISet<object> FulfilledContracts => _originalProvider.FulfilledContracts;
 
         public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)

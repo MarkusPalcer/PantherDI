@@ -17,8 +17,8 @@ namespace PantherDI.Registry.Registration.Dependency
         Type ExpectedType { get; }
         
         /// <summary>
-        /// Gets an <see cref="IEnumerable{T}"/> containing all contracts that need to be fulifilled in order to satisfy this dependency
+        /// Gets an <see cref="ISet{T}"/> containing all contracts that need to be fulifilled in order to satisfy this dependency
         /// </summary>
-        IEnumerable<object> RequiredContracts { get; }
+        ISet<object> RequiredContracts { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Registration;
@@ -13,12 +14,12 @@ namespace PantherDI.Resolved.Providers
         /// <summary>
         /// All dependencies which cannot be resolved by the container
         /// </summary>
-        ISet<IDependency> UnresolvedDependencies { get; }
+        HashSet<IDependency> UnresolvedDependencies { get; }
 
         /// <summary>
         /// The type of the actual implementation as provided by the <see cref="IRegistration"/>
         /// </summary>
-        TypeInfo ResultType { get; }
+        Type ResultType { get; }
 
         /// <summary>
         /// The contracts this provider fulfills as provided by the <see cref="IRegistration"/>

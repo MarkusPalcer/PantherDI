@@ -32,7 +32,7 @@ namespace PantherDI.Tests
             kb
                 .Setup(x => x.Resolve(
                     It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
-                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(string))))))
+                    It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[]{provider});
 
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
@@ -48,7 +48,7 @@ namespace PantherDI.Tests
             kb
                 .Setup(x => x.Resolve(
                     It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
-                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(string))))))
+                    It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(Enumerable.Empty<IProvider>());
 
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
@@ -70,7 +70,7 @@ namespace PantherDI.Tests
             kb
                 .Setup(x => x.Resolve(
                     It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
-                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(string))))))
+                    It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[] { provider });
 
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
@@ -100,7 +100,7 @@ namespace PantherDI.Tests
             kb
                 .Setup(x => x.Resolve(
                     It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
-                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(string))))))
+                    It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[] { provider1, provider2 });
 
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
@@ -128,7 +128,7 @@ namespace PantherDI.Tests
             kb
                 .Setup(x => x.Resolve(
                     It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
-                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(string))))))
+                    It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[] { provider1, provider2 });
 
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
@@ -152,13 +152,13 @@ namespace PantherDI.Tests
             kb
                 .Setup(x => x.Resolve(
                     It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
-                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(string))))))
+                    It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(Enumerable.Empty<IProvider>());
 
             resolver2
                 .Setup(x => x.Resolve(
                     It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
-                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(string))))))
+                    It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[] { provider });
 
             kb.Setup(x => x.Add(provider));
@@ -182,7 +182,7 @@ namespace PantherDI.Tests
             kb
                 .Setup(x => x.Resolve(
                     It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
-                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(string))))))
+                    It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[] { provider });
 
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
@@ -208,7 +208,7 @@ namespace PantherDI.Tests
             kb
                 .Setup(x => x.Resolve(
                     It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
-                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(IDisposable))))))
+                    It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(IDisposable))))))
                 .Returns(new IProvider[] { provider });
 
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
@@ -237,7 +237,7 @@ namespace PantherDI.Tests
             kb
                 .Setup(x => x.Resolve(
                     It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),
-                    It.Is<IDependency>(d => Dependency.EqualityComparer.Instance.Equals(d, new Dependency(typeof(IDisposable))))))
+                    It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(IDisposable))))))
                 .Returns(new IProvider[] { provider });
 
             var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());

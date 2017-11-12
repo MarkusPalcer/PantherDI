@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved.Providers;
+using PantherDI.Tests.Resolvers;
 
 namespace PantherDI.Tests.Helpers
 {
@@ -22,8 +23,10 @@ namespace PantherDI.Tests.Helpers
 
         public int InvocationCounter { get; set; } = 0;
 
-        public ISet<IDependency> UnresolvedDependencies { get; set;  } = new HashSet<IDependency>();
-        public TypeInfo ResultType { get; set; }
+        public HashSet<IDependency> UnresolvedDependencies { get; set;  } = new HashSet<IDependency>(new Dependency.EqualityComparer());
+
+        public Type ResultType { get; set; }
+
         public ISet<object> FulfilledContracts { get; set; } = new HashSet<object>();
 
         public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)

@@ -19,10 +19,14 @@ namespace PantherDI.ContainerCreation
         private readonly List<object> _resolutionStack = new List<object>();
         internal KnowledgeBase KnowledgeBase { get; } = new KnowledgeBase();
 
-        public ContainerBuilder(ICatalog catalog)
+        public ContainerBuilder(ICatalog catalog, params IResolver[] resolvers)
         {
             _catalog = catalog;
             _resolvers.Add(KnowledgeBase);
+            foreach (var resolver in resolvers)
+            {
+                _resolvers.Add(resolver);
+            }
         }
 
         public IContainer Build()
