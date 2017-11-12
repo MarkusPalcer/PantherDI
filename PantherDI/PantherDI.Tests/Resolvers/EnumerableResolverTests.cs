@@ -2,6 +2,7 @@
 using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PantherDI.Comparers;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
@@ -48,6 +49,26 @@ namespace PantherDI.Tests.Resolvers
             instance.As<IEnumerable<string>>().Should().HaveCount(1);
             instance.As<IEnumerable<string>>().Should().BeEquivalentTo("1");
             registrations[0].InvocationCounter.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void WrongRequest()
+        {
+            var registrations = new[]{
+                new TestProvider("1")
+                {
+                    ResultType = typeof(string),
+                    FulfilledContracts =
+                    {
+                        typeof(string)
+                    }
+                }
+            };
+
+            var sut = new EnumerableResolver();
+            var result = sut.Resolve(_ => registrations, new Dependency(typeof(SetComparer<string>))).ToArray();
+
+            result.Should().BeEmpty();
         }
 
         [TestMethod]

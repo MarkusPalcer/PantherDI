@@ -71,6 +71,7 @@
     <Compile Include="Resolved\KnowledgeBaseTests.cs" />
     <Compile Include="Resolved\Providers\FactoryProviderTests.cs" />
     <Compile Include="Resolvers\EnumerableResolverTests.cs" />
+    <Compile Include="Resolvers\LazyResolverTests.cs" />
     <Compile Include="Resolvers\MergedResolverTests.cs" />
     <Compile Include="SystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

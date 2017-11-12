@@ -1,52 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using PantherDI.Comparers;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {
-    public class EnumerableResolver : IResolver
+    public class EnumerableResolver : GenericResolver
     {
-        public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver,
-            IDependency dependency)
+        public EnumerableResolver() : base(typeof(IEnumerable<>), typeof(InnerResolver<>))
         {
-            // Only handle IEnumerable<T>
-            if (dependency.ExpectedType.GetTypeInfo().IsGenericType &&
-                dependency.ExpectedType.GetTypeInfo().GetGenericTypeDefinition() != typeof(IEnumerable<>))
-            {
-                return Enumerable.Empty<IProvider>();
-            }
-
-            var innerType = dependency.ExpectedType.GenericTypeArguments[0];
-            var innerDependency = new Dependency(innerType, dependency.RequiredContracts);
-
-            var providerType = typeof(EnumerableProvider<>).MakeGenericType(innerType);
-            var constructor = providerType.GetConstructors()[0];
-
-            var result = new List<EnumerableProvider>();
-
-            foreach (var provider in dependencyResolver(innerDependency))
-            {
-                var enumerableProvider = result.FirstOrDefault(x =>SetComparer<IDependency>.Instance.Equals(x.UnresolvedDependencies, provider.UnresolvedDependencies));
-                if (enumerableProvider == null)
-                {
-                    result.Add((EnumerableProvider) constructor.Invoke(new object[] {provider}));
-                }
-                else
-                {
-                    enumerableProvider.Add(provider);
-                }
-            }
-
-            return result;
         }
 
-        private abstract class EnumerableProvider : IProvider
+        private class InnerResolver<T> : IResolver
         {
-            protected readonly List<IProvider> _innerProviders = new List<IProvider>();
+            public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+            {
+                var result = new List<EnumerableProvider<T>>();
+
+                foreach (var provider in dependencyResolver(new Dependency(typeof(T), dependency.RequiredContracts)))
+                {
+                    var enumerableProvider = result.FirstOrDefault(x => SetComparer<IDependency>.Instance.Equals(x.UnresolvedDependencies, provider.UnresolvedDependencies));
+                    if (enumerableProvider == null)
+                    {
+                        result.Add(new EnumerableProvider<T>(provider));
+                    }
+                    else
+                    {
+                        enumerableProvider.Add(provider);
+                    }
+                }
+
+                return result;
+            }
+        }
+
+        private class EnumerableProvider<T> : IProvider
+        {
+            private readonly List<IProvider> _innerProviders = new List<IProvider>();
 
             public EnumerableProvider(IProvider provider)
             {
@@ -71,16 +63,7 @@ namespace PantherDI.Resolvers
 
             public bool Singleton => _innerProviders.All(x => x.Singleton);
 
-            public abstract object CreateInstance(Dictionary<IDependency, object> resolvedDependencies);
-        }
-
-        private class EnumerableProvider<T> : EnumerableProvider
-        {
-            public EnumerableProvider(IProvider provider) : base(provider)
-            {
-            }
-
-            public override object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
+            public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
             {
                 IEnumerable<object> Creator()
                 {

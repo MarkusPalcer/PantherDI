@@ -56,13 +56,16 @@
     <Compile Include="Registry\Registration\IFactory.cs" />
     <Compile Include="Registry\Registration\Registration\IRegistration.cs" />
     <Compile Include="Registry\Registration\Registration\ManualRegistration.cs" />
+    <Compile Include="Resolved\Providers\DelegateProvider.cs" />
     <Compile Include="Resolved\Providers\FactoryProvider.cs" />
     <Compile Include="Resolved\IKnowledgeBase.cs" />
     <Compile Include="Resolved\Providers\IProvider.cs" />
     <Compile Include="Resolved\KnowledgeBase.cs" />
     <Compile Include="Resolved\Providers\Provider.cs" />
     <Compile Include="Resolvers\EnumerableResolver.cs" />
+    <Compile Include="Resolvers\GenericResolver.cs" />
     <Compile Include="Resolvers\IResolver.cs" />
+    <Compile Include="Resolvers\LazyResolver.cs" />
     <Compile Include="Resolvers\MergedResolver.cs" />
   </ItemGroup>
   <ItemGroup>
