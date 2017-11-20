@@ -72,6 +72,7 @@
     <Compile Include="Resolved\Providers\FactoryProviderTests.cs" />
     <Compile Include="Resolvers\EnumerableResolverTests.cs" />
     <Compile Include="Resolvers\Func0ResolverTests.cs" />
+    <Compile Include="Resolvers\Func1ResolverTests.cs" />
     <Compile Include="Resolvers\LazyResolverTests.cs" />
     <Compile Include="Resolvers\MergedResolverTests.cs" />
     <Compile Include="SystemTests.cs" />

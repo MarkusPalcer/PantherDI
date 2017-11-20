@@ -64,6 +64,7 @@
     <Compile Include="Resolved\Providers\Provider.cs" />
     <Compile Include="Resolvers\EnumerableResolver.cs" />
     <Compile Include="Resolvers\Func0Resolver.cs" />
+    <Compile Include="Resolvers\Func1Resolver.cs" />
     <Compile Include="Resolvers\GenericResolver.cs" />
     <Compile Include="Resolvers\IResolver.cs" />
     <Compile Include="Resolvers\LazyResolver.cs" />
