@@ -5,9 +5,9 @@ using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {
-    public class LazyResolver : GenericResolver
+    public class Func0Resolver : GenericResolver
     {
-        public LazyResolver() : base(typeof(Lazy<>), typeof(InnerResolver<>))
+        public Func0Resolver() : base(typeof(Func<>), typeof(InnerResolver<>))
         {
         }
 
@@ -16,22 +16,22 @@ namespace PantherDI.Resolvers
             public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
             {
                 var innerDependency = new Dependency(typeof(T), dependency.RequiredContracts);
-                innerDependency.RequiredContracts.Remove(typeof(Lazy<T>));
+                innerDependency.RequiredContracts.Remove(typeof(Func<T>));
                 innerDependency.RequiredContracts.Add(typeof(T));
 
                 foreach (var provider in dependencyResolver(innerDependency))
                 {
-                    var p = new DelegateProvider(x => new Lazy<T>(() => (T)provider.CreateInstance(x)))
+                    var p = new DelegateProvider(objects => (Func<T>)(() => (T)provider.CreateInstance(objects)))
                     {
                         FulfilledContracts = new HashSet<object>(provider.FulfilledContracts),
                         UnresolvedDependencies = provider.UnresolvedDependencies,
-                        ResultType = typeof(Lazy<T>),
+                        ResultType = typeof(Func<T>),
                         Singleton = provider.Singleton
                     };
 
                     p.FulfilledContracts.Remove(typeof(T));
-                    p.FulfilledContracts.Add(typeof(Lazy<T>));
-                    
+                    p.FulfilledContracts.Add(typeof(Func<T>));
+
                     yield return p;
                 }
             }

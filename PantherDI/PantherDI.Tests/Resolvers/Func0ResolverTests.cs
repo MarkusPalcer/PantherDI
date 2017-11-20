@@ -12,13 +12,13 @@ using PantherDI.Tests.Helpers;
 namespace PantherDI.Tests.Resolvers
 {
     [TestClass]
-    public class LazyResolverTests
+    public class Func0ResolverTests
     {
         [TestMethod]
         public void NoRegistration()
         {
-            var sut = new LazyResolver();
-            sut.Resolve(_ => Enumerable.Empty<IProvider>(), new Dependency(typeof(Lazy<string>))).Should().BeEmpty();
+            var sut = new Func0Resolver();
+            sut.Resolve(_ => Enumerable.Empty<IProvider>(), new Dependency(typeof(Func<string>))).Should().BeEmpty();
         }
 
         [TestMethod]
@@ -35,7 +35,7 @@ namespace PantherDI.Tests.Resolvers
                 }
             };
 
-            var sut = new LazyResolver();
+            var sut = new Func0Resolver();
             var result = sut.Resolve(_ => registrations, new Dependency(typeof(SetComparer<string>))).ToArray();
 
             result.Should().BeEmpty();
@@ -55,21 +55,20 @@ namespace PantherDI.Tests.Resolvers
                 }
             };
 
-            var sut = new LazyResolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Lazy<string>))).ToArray();
+            var sut = new Func0Resolver();
+            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<string>))).ToArray();
 
             result.Should().HaveCount(1);
-            result[0].FulfilledContracts.Should().BeEquivalentTo(typeof(Lazy<string>));
+            result[0].FulfilledContracts.Should().BeEquivalentTo(typeof(Func<string>));
             result[0].UnresolvedDependencies.Should().BeEmpty();
             result[0].Singleton.Should().BeFalse();
-            result[0].ResultType.Should().Be(typeof(Lazy<string>));
+            result[0].ResultType.Should().Be(typeof(Func<string>));
 
             registrations[0].InvocationCounter.Should().Be(0);
             var instance = result[0].CreateInstance(new Dictionary<IDependency, object>());
-            instance.Should().BeAssignableTo<Lazy<string>>();
-            instance.As<Lazy<string>>().IsValueCreated.Should().BeFalse();
+            instance.Should().BeAssignableTo<Func<string>>();
             registrations[0].InvocationCounter.Should().Be(0);
-            instance.As<Lazy<string>>().Value.Should().Be("1");
+            instance.As<Func<string>>()().Should().Be("1");
             registrations[0].InvocationCounter.Should().Be(1);
         }
 
@@ -96,25 +95,25 @@ namespace PantherDI.Tests.Resolvers
                 },
             };
 
-            var sut = new LazyResolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Lazy<string>))).ToArray();
+            var sut = new Func0Resolver();
+            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<string>))).ToArray();
 
             result.Should().HaveCount(2);
             var i = 0;
             foreach (var provider in result)
             {
-                provider.FulfilledContracts.Should().BeEquivalentTo(new[] {typeof(Lazy<string>)}, $"result[{i}] should have fulfilled contracts just as its source provider");
+                provider.FulfilledContracts.Should().BeEquivalentTo(new[] { typeof(Func<string>) }, $"result[{i}] should have fulfilled contracts just as its source provider");
                 provider.UnresolvedDependencies.Should().BeEmpty($"result[{i}]");
                 provider.Singleton.Should().BeFalse($"result[{i}]");
-                provider.ResultType.Should().Be(typeof(Lazy<string>), $"result[{i}]");
+                provider.ResultType.Should().Be(typeof(Func<string>), $"result[{i}]");
                 i++;
             }
 
             registrations.Should().OnlyContain(x => x.InvocationCounter == 0);
             var instances = result.Select(x => x.CreateInstance(new Dictionary<IDependency, object>())).ToArray();
-            instances.Should().AllBeAssignableTo<Lazy<string>>();
+            instances.Should().AllBeAssignableTo<Func<string>>();
             registrations.Should().OnlyContain(x => x.InvocationCounter == 0);
-            instances.Cast<Lazy<string>>().Select(x => x.Value).Should().BeEquivalentTo("1", "2");
+            instances.Cast<Func<string>>().Select(x => x()).Should().BeEquivalentTo("1", "2");
             registrations.Should().OnlyContain(x => x.InvocationCounter == 1);
         }
 
@@ -164,8 +163,8 @@ namespace PantherDI.Tests.Resolvers
                 },
             };
 
-            var sut = new LazyResolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Lazy<string>))).ToArray();
+            var sut = new Func0Resolver();
+            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<string>))).ToArray();
 
             registrations.Should().NotContain(x => x.InvocationCounter != 0);
 
@@ -173,19 +172,19 @@ namespace PantherDI.Tests.Resolvers
             var i = 0;
             foreach (var provider in result)
             {
-                provider.FulfilledContracts.Should().BeEquivalentTo(new[] { typeof(Lazy<string>) }, $"result[{i}] should have fulfilled contracts just as its source provider");
+                provider.FulfilledContracts.Should().BeEquivalentTo(new[] { typeof(Func<string>) }, $"result[{i}] should have fulfilled contracts just as its source provider");
                 provider.UnresolvedDependencies.Should().BeEquivalentTo(registrations[i].UnresolvedDependencies, $"result[{i}]");
                 provider.Singleton.Should().BeFalse($"result[{i}]");
-                provider.ResultType.Should().Be(typeof(Lazy<string>), $"result[{i}]");
+                provider.ResultType.Should().Be(typeof(Func<string>), $"result[{i}]");
                 i++;
             }
 
 
             var instances = result.Select(x => x.CreateInstance(new Dictionary<IDependency, object>())).ToArray();
 
-            instances.Should().AllBeAssignableTo<Lazy<string>>();
+            instances.Should().AllBeAssignableTo<Func<string>>();
             registrations.Should().OnlyContain(x => x.InvocationCounter == 0);
-            instances.Cast<Lazy<string>>().Select(x => x.Value).Should().BeEquivalentTo("1", "2", "3", "4");
+            instances.Cast<Func<string>>().Select(x => x()).Should().BeEquivalentTo("1", "2", "3", "4");
             registrations.Should().OnlyContain(x => x.InvocationCounter == 1);
         }
     }
