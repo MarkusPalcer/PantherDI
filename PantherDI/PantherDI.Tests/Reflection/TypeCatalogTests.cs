@@ -19,7 +19,6 @@ namespace PantherDI.Tests.Reflection
 
         private class TestClass1 { }
 
-
         [Contract, Contract("A")]
         private class TestClass2 { }
 

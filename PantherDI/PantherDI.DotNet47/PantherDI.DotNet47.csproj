@@ -53,6 +53,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="IContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Registry\Catalog\AssemblyCatalog.cs" />
     <Compile Include="Registry\Catalog\ICatalog.cs" />
     <Compile Include="Registry\Catalog\TypeCatalog.cs" />
     <Compile Include="Registry\Registration\Dependency\Dependency.cs" />

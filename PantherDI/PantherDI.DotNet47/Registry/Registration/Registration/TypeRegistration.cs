@@ -11,10 +11,12 @@ namespace PantherDI.Registry.Registration.Registration
     public class TypeRegistration : IRegistration
 
     {
-        public TypeRegistration(Type type)
+        public TypeRegistration(Type type) : this(type, type.GetFulfilledContracts()) { }
+
+        public TypeRegistration(Type type, IEnumerable<object> fulfilledContracts)
         {
             RegisteredType = type;
-            FulfilledContracts = new HashSet<object>(type.GetFulfilledContracts());
+            FulfilledContracts = new HashSet<object>(fulfilledContracts);
             Factories = new HashSet<IFactory>(type.GetTypeInfo().DeclaredConstructors.Select(x => new ConstructorFactory(x)));
             Singleton = type.GetTypeInfo().GetCustomAttributes<SingletonAttribute>().Any();
         }
