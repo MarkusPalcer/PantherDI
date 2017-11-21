@@ -15,7 +15,7 @@ namespace PantherDI.Extensions
             return result.Length == 0 ? new object[] {type} : result.Distinct();
         }
 
-        private static IEnumerable<object> ScanForContracts(this Type type)
+        public static IEnumerable<object> ScanForContracts(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
 
