@@ -68,6 +68,7 @@
     <Compile Include="Helpers\Catalog.cs" />
     <Compile Include="Helpers\Factory.cs" />
     <Compile Include="Helpers\TestProvider.cs" />
+    <Compile Include="Reflection\ConstructorFactoryTests.cs" />
     <Compile Include="Resolved\KnowledgeBaseTests.cs" />
     <Compile Include="Resolved\Providers\FactoryProviderTests.cs" />
     <Compile Include="Resolvers\EnumerableResolverTests.cs" />

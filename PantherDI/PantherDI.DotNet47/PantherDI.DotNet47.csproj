@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\ContractAttribute.cs" />
     <Compile Include="Comparers\SetComparer.cs" />
     <Compile Include="Container.cs" />
     <Compile Include="ContainerCreation\ContainerBuilder.cs" />
@@ -53,7 +54,8 @@
     <Compile Include="Registry\Catalog\ICatalog.cs" />
     <Compile Include="Registry\Registration\Dependency\Dependency.cs" />
     <Compile Include="Registry\Registration\Dependency\IDependency.cs" />
-    <Compile Include="Registry\Registration\IFactory.cs" />
+    <Compile Include="Registry\Registration\Factory\ConstructorFactory.cs" />
+    <Compile Include="Registry\Registration\Factory\IFactory.cs" />
     <Compile Include="Registry\Registration\Registration\IRegistration.cs" />
     <Compile Include="Registry\Registration\Registration\ManualRegistration.cs" />
     <Compile Include="Resolved\Providers\DelegateProvider.cs" />
