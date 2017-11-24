@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved.Providers;
-using PantherDI.Tests.Resolvers;
 
 namespace PantherDI.Tests.Helpers
 {
@@ -21,13 +19,13 @@ namespace PantherDI.Tests.Helpers
             _delegate = @delegate;
         }
 
-        public int InvocationCounter { get; set; } = 0;
+        public int InvocationCounter { get; set; }
 
-        public HashSet<IDependency> UnresolvedDependencies { get; set;  } = new HashSet<IDependency>(new Dependency.EqualityComparer());
+        public HashSet<IDependency> UnresolvedDependencies { get; } = new HashSet<IDependency>(new Dependency.EqualityComparer());
 
         public Type ResultType { get; set; }
 
-        public ISet<object> FulfilledContracts { get; set; } = new HashSet<object>();
+        public ISet<object> FulfilledContracts { get; } = new HashSet<object>();
 
         public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
         {

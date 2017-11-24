@@ -79,6 +79,7 @@
     <Compile Include="Resolvers\IResolver.cs" />
     <Compile Include="Resolvers\LazyResolver.cs" />
     <Compile Include="Resolvers\MergedResolver.cs" />
+    <Compile Include="Resolvers\ReflectionResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Diagnostics\" />

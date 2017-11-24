@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using PantherDI.Exceptions;
 using PantherDI.Extensions;
@@ -72,17 +73,21 @@ namespace PantherDI.ContainerCreation
 
             foreach (var factory in registration.Factories)
             {
-                ProcessFactory(registration, factory);
+                foreach (var provider in ProcessFactory(registration, factory, ResolveDependency))
+                {
+                    KnowledgeBase.Add(provider);
+                }
             }
         }
 
-        private void ProcessFactory(IRegistration registration, IFactory factory)
+        public static IEnumerable<IProvider> ProcessFactory(IRegistration registration, IFactory factory,
+            Func<IDependency, IEnumerable<IProvider>> resolveDependency)
         {
             // Cache all providers for a contryt
-            var allProviders = factory.Dependencies.ToDictionary(x => x, x => ResolveDependency(x).ToArray());
+            var allProviders = factory.Dependencies.ToDictionary(x => x, x => resolveDependency(x).ToArray()).Where(x => x.Value.Any());
 
             // Create all combinations possible
-            var allCombinations = new List<Dictionary<IDependency, IProvider>> {new Dictionary<IDependency, IProvider>()};
+            var allCombinations = new List<Dictionary<IDependency, IProvider>> { new Dictionary<IDependency, IProvider>() };
             foreach (var pair in allProviders)
             {
                 var newCombinations = new List<Dictionary<IDependency, IProvider>>();
@@ -102,11 +107,7 @@ namespace PantherDI.ContainerCreation
             }
 
             // Create a provider for each combination
-            foreach (var provider in allCombinations.Select(
-                combination => new FactoryProvider(registration, factory, combination)))
-            {
-                KnowledgeBase.Add(provider);
-            }
+            return allCombinations.Select(combination => new FactoryProvider(registration, factory, combination)).ToArray();
         }
 
         private IEnumerable<IProvider> ResolveDependency(IDependency dependency)
