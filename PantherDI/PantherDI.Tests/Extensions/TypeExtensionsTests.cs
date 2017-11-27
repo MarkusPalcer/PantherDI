@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Reflection;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.Attributes;
 using PantherDI.Extensions;
@@ -13,7 +14,7 @@ namespace PantherDI.Tests.Extensions
         [TestMethod]
         public void TypeWithoutContracts()
         {
-            typeof(TestClass1).GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestClass1));
+            typeof(TestClass1).GetTypeInfo().GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestClass1));
         }
 
         [Contract, Contract("A")]
@@ -22,7 +23,7 @@ namespace PantherDI.Tests.Extensions
         [TestMethod]
         public void DirectlyDecorated()
         {
-            typeof(TestClass2).GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestClass2), "A");
+            typeof(TestClass2).GetTypeInfo().GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestClass2), "A");
         }
 
         private class TestClass3 : TestClass1 { }
@@ -30,7 +31,7 @@ namespace PantherDI.Tests.Extensions
         [TestMethod]
         public void InheritingNonContracts()
         {
-            typeof(TestClass3).GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestClass3));
+            typeof(TestClass3).GetTypeInfo().GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestClass3));
         }
 
         private class TestClass4 : TestClass2 { }
@@ -38,7 +39,7 @@ namespace PantherDI.Tests.Extensions
         [TestMethod]
         public void InheritingContracts()
         {
-            typeof(TestClass4).GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestClass2), "A");
+            typeof(TestClass4).GetTypeInfo().GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestClass2), "A");
         }
 
         [Contract, Contract("B")]
@@ -47,7 +48,7 @@ namespace PantherDI.Tests.Extensions
         [TestMethod]
         public void MergingInheritingContracts()
         {
-            typeof(TestClass5).GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestClass2), typeof(TestClass5), "A", "B");
+            typeof(TestClass5).GetTypeInfo().GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestClass2), typeof(TestClass5), "A", "B");
         }
 
         [Contract, Contract("C")]
@@ -58,7 +59,7 @@ namespace PantherDI.Tests.Extensions
         [TestMethod]
         public void ImplementingContracts()
         {
-            typeof(TestClass6).GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestInterface1), "C");
+            typeof(TestClass6).GetTypeInfo().GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestInterface1), "C");
         }
 
         [Contract("D")]
@@ -69,7 +70,7 @@ namespace PantherDI.Tests.Extensions
         [TestMethod]
         public void ImplementingMultipleContracts()
         {
-            typeof(TestClass7).GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestInterface1), "C", "D");
+            typeof(TestClass7).GetTypeInfo().GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestInterface1), "C", "D");
         }
 
         [Contract]
@@ -80,7 +81,7 @@ namespace PantherDI.Tests.Extensions
         [TestMethod]
         public void ImplementingContractsIndirectly()
         {
-            typeof(TestClass8).GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestInterface3), "D");
+            typeof(TestClass8).GetTypeInfo().GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestInterface3), "D");
         }
     }
 

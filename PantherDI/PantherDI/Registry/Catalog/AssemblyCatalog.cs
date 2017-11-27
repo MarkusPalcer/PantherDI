@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using PantherDI.Extensions;
+using static PantherDI.Extensions.TypeExtensions;
 using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Registry.Catalog

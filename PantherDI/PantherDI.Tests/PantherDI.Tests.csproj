@@ -89,9 +89,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PantherDI.DotNet47\PantherDI.DotNet47.csproj">
-      <Project>{28179389-059d-47f5-a88c-c3ee35cd0674}</Project>
-      <Name>PantherDI.DotNet47</Name>
+    <ProjectReference Include="..\PantherDI\PantherDI.csproj">
+      <Project>{91a090a8-c7d8-4e42-8ad7-e2b97a40ee93}</Project>
+      <Name>PantherDI</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

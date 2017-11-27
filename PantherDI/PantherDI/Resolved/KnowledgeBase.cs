@@ -38,7 +38,7 @@ namespace PantherDI.Resolved
 
             return this[dependency.RequiredContracts.First()]
                 .Where(x => x.FulfilledContracts.IsSupersetOf(dependency.RequiredContracts))
-                .Where(x => dependency.ExpectedType.GetTypeInfo().IsAssignableFrom(x.ResultType))
+                .Where(x => dependency.ExpectedType.GetTypeInfo().IsAssignableFrom(x.ResultType.GetTypeInfo()))
                 .ToArray();
         }
     }

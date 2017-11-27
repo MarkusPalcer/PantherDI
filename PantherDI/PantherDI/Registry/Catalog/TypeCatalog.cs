@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Registry.Catalog
@@ -59,7 +60,7 @@ namespace PantherDI.Registry.Catalog
 
         #region Implementation of ICatalog
 
-        public IEnumerable<IRegistration> Registrations => this.Select(x => new TypeRegistration(x));
+        public IEnumerable<IRegistration> Registrations => this.Select(x => new TypeRegistration(x.GetTypeInfo()));
 
         #endregion
     }

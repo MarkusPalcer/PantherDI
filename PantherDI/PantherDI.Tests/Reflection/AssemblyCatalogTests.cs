@@ -12,7 +12,7 @@ namespace PantherDI.Tests.Reflection
         public void TestAssembly()
         {
             var sut = new AssemblyCatalog(typeof(AssemblyCatalogTests).Assembly);
-            sut.Registrations.Select(x => x.RegisteredType).Should().HaveCount(10);
+            sut.Registrations.Should().HaveCount(11);
         }
     }
 }

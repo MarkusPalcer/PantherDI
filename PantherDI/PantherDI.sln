@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PantherDI.Tests", "PantherDI.Tests\PantherDI.Tests.csproj", "{D999A680-1C02-44E1-8C7C-032C1F4DD6DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PantherDI.DotNet47", "PantherDI.DotNet47\PantherDI.DotNet47.csproj", "{28179389-059D-47F5-A88C-C3EE35CD0674}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PantherDI", "PantherDI\PantherDI.csproj", "{91A090A8-C7D8-4E42-8AD7-E2B97A40EE93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{D999A680-1C02-44E1-8C7C-032C1F4DD6DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D999A680-1C02-44E1-8C7C-032C1F4DD6DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D999A680-1C02-44E1-8C7C-032C1F4DD6DC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{28179389-059D-47F5-A88C-C3EE35CD0674}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{28179389-059D-47F5-A88C-C3EE35CD0674}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{28179389-059D-47F5-A88C-C3EE35CD0674}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{28179389-059D-47F5-A88C-C3EE35CD0674}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91A090A8-C7D8-4E42-8AD7-E2B97A40EE93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91A090A8-C7D8-4E42-8AD7-E2B97A40EE93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91A090A8-C7D8-4E42-8AD7-E2B97A40EE93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91A090A8-C7D8-4E42-8AD7-E2B97A40EE93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

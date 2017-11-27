@@ -28,7 +28,7 @@ namespace PantherDI.Resolvers
                 return Enumerable.Empty<IProvider>();
             }
 
-            var innerResolver = (IResolver)_resolverType.MakeGenericType(dependency.ExpectedType.GenericTypeArguments).GetConstructors().First().Invoke(new object[] { });
+            var innerResolver = (IResolver)_resolverType.MakeGenericType(dependency.ExpectedType.GenericTypeArguments).GetTypeInfo().DeclaredConstructors.First().Invoke(new object[] { });
 
             return innerResolver.Resolve(dependencyResolver, dependency);
         }

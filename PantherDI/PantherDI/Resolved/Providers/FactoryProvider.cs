@@ -40,7 +40,7 @@ namespace PantherDI.Resolved.Providers
                 }
             }
 
-            ResultType = providedRegistration.RegisteredType.GetTypeInfo();
+            ResultType = providedRegistration.RegisteredType;
 
             FulfilledContracts =
                 new HashSet<object>(providedRegistration.FulfilledContracts) {providedRegistration.RegisteredType};

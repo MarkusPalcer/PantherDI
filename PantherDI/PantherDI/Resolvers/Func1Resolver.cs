@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved.Providers;
 
@@ -22,7 +23,7 @@ namespace PantherDI.Resolvers
 
                 foreach (var provider in dependencyResolver(innerDependency))
                 {
-                    var givenDependencies = provider.UnresolvedDependencies.Where(x => x.ExpectedType.IsAssignableFrom(typeof(TIn))).ToArray();
+                    var givenDependencies = provider.UnresolvedDependencies.Where(x => x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn).GetTypeInfo())).ToArray();
 
                     if (!givenDependencies.Any()) continue;
 
@@ -42,7 +43,7 @@ namespace PantherDI.Resolvers
                         Singleton = provider.Singleton
                     };
 
-                    foreach (var unresolvedDependency in provider.UnresolvedDependencies.Where(x => !x.ExpectedType.IsAssignableFrom(typeof(TIn))))
+                    foreach (var unresolvedDependency in provider.UnresolvedDependencies.Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn).GetTypeInfo())))
                     {
                         p.UnresolvedDependencies.Add(unresolvedDependency);
                     }

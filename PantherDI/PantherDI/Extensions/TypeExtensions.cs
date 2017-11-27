@@ -8,33 +8,31 @@ namespace PantherDI.Extensions
 {
     public static class TypeExtensions
     {
-        public static IEnumerable<object> GetFulfilledContracts(this System.Type type)
+        public static IEnumerable<object> GetFulfilledContracts(this TypeInfo type)
         {
             var result = type.ScanForContracts().ToArray();
 
             return result.Length == 0 ? new object[] {type} : result.Distinct();
         }
 
-        public static IEnumerable<object> ScanForContracts(this Type type)
+        public static IEnumerable<object> ScanForContracts(this TypeInfo typeInfo)
         {
-            var typeInfo = type.GetTypeInfo();
-
             foreach (var attribute in typeInfo.GetCustomAttributes<ContractAttribute>())
             {
-                yield return attribute.Contract ?? type;
+                yield return attribute.Contract ?? typeInfo.AsType();
             }
 
             foreach (var implementedInterface in typeInfo.ImplementedInterfaces)
             {
-                foreach (var contract in ScanForContracts(implementedInterface))
+                foreach (var contract in ScanForContracts(implementedInterface.GetTypeInfo()))
                 {
                     yield return contract;
                 }
             }
 
-            if (type != typeof(object) && typeInfo.BaseType != null)
+            if (typeInfo.AsType() != typeof(object) && typeInfo.BaseType != null)
             {
-                foreach (var contract in ScanForContracts(typeInfo.BaseType))
+                foreach (var contract in ScanForContracts(typeInfo.BaseType.GetTypeInfo()))
                 {
                     yield return contract;
                 }

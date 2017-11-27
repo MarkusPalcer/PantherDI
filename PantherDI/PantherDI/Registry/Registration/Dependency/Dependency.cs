@@ -35,10 +35,10 @@ namespace PantherDI.Registry.Registration.Dependency
                 if (ReferenceEquals(x, y)) return true;
                 if (ReferenceEquals(null, x) != ReferenceEquals(null, y)) return false;
 
-                if (!x.GetType().GetTypeInfo().IsInstanceOfType(typeof(IDependency)))
+                if (!typeof(IDependency).GetTypeInfo().IsAssignableFrom(x.GetType().GetTypeInfo()))
                     throw new ArgumentException("Compared items must be of type IDependency", nameof(x));
 
-                if (!y.GetType().GetTypeInfo().IsInstanceOfType(typeof(IDependency)))
+                if (!typeof(IDependency).GetTypeInfo().IsAssignableFrom(y.GetType().GetTypeInfo()))
                     throw new ArgumentException("Compared items must be of type IDependency", nameof(y));
 
                 return Equals((IDependency)x, (IDependency)y);
@@ -46,7 +46,7 @@ namespace PantherDI.Registry.Registration.Dependency
 
             int IEqualityComparer.GetHashCode(object x)
             {
-                if (!x.GetType().GetTypeInfo().IsInstanceOfType(typeof(IDependency)))
+                if (!typeof(IDependency).GetTypeInfo().IsAssignableFrom(x.GetType().GetTypeInfo()))
                     throw new ArgumentException("Compared items must be of type IDependency", nameof(x));
 
                 return GetHashCode((IDependency) x);
