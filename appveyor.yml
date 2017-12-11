@@ -1,0 +1,86 @@
+-
+  branches:
+    only:
+      - master
+      
+  configuration: release
+  
+  version: 0.0.0.{build}
+  image: Visual Studio 2017
+  
+  cache:
+    - packages -> **\packages.config
+  
+  assembly_info:
+    patch: true
+    file: AssemblyInfo.*
+    assembly_version: "{version}"
+    assembly_file_version: "{version}"
+    assembly_informational_version: "{version}"
+
+  dotnet_csproj:
+    patch: true
+	  file: '**\*.csproj'
+	  version: '{version}'
+	  package_version: '{version}'
+	  assembly_version: '{version}'
+	  file_version: '{version}'
+	  informational_version: '{version}'
+
+  build:
+    verbosity: normal
+    publish_nuget: true
+    publish_nuget_symbols: true
+    project: PantherDI.sln
+  
+  before_build:
+    - cmd: nuget restore
+  
+  deploy:
+    - provider: NuGet
+      api_key:
+        secure: uPuXKM0rxdT6dpMSsTT/2EzISr7Xm6Fe/n5Oz7JCpV2YUbSu/tkU9IV63DDVmMfb
+
+  nuget:
+    account_feed: true
+    project_feed: true
+    disable_publish_on_pr: true
+ 
+-
+  configuration: debug
+
+  version: 0.0.0.{build}-{branch}
+  image: Visual Studio 2017
+  
+  cache:
+    - packages -> **\packages.config
+  
+  assembly_info:
+    patch: true
+    file: AssemblyInfo.*
+    assembly_version: "{version}"
+    assembly_file_version: "{version}"
+    assembly_informational_version: "{version}"
+
+  dotnet_csproj:
+    patch: true
+	  file: '**\*.csproj'
+	  version: '{version}'
+	  package_version: '{version}'
+	  assembly_version: '{version}'
+	  file_version: '{version}'
+	  informational_version: '{version}'
+
+  build:
+    verbosity: normal
+    publish_nuget: false
+    publish_nuget_symbols: false
+    project: PantherDI.sln
+  
+  before_build:
+    - cmd: nuget restore
+    
+  nuget:
+    account_feed: true
+    project_feed: true
+    disable_publish_on_pr: true
