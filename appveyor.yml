@@ -38,7 +38,7 @@ before_build:
 deploy:
   - provider: NuGet
     api_key:
-      secure: uPuXKM0rxdT6dpMSsTT/2EzISr7Xm6Fe/n5Oz7JCpV2YUbSu/tkU9IV63DDVmMfb
+      secure: dibSRZV3ymKVhvCw+HGe01juPuirxknhvtcTqJb71d4C0gI801hKgfy6fXUSGNpk
 
 nuget:
   account_feed: true
