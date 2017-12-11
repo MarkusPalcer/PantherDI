@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿    using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
 using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Registration;
+using PantherDI.Resolved;
 using PantherDI.Tests.Helpers;
 
 namespace PantherDI.Tests.ContainerCreation
@@ -18,10 +17,13 @@ namespace PantherDI.Tests.ContainerCreation
         [TestMethod]
         public void NoRegistrationYieldsEmptyKnowledgeBase()
         {
-            var sut = new ContainerBuilder(new Catalog());
-            sut.Build();
+            var sut = (Container)new ContainerBuilder
+            {
+                new Catalog()
+            }
+            .Build();
 
-            sut.KnowledgeBase.KnownProviders.Should().BeEmpty();
+            ((KnowledgeBase)sut._knowledgeBase).KnownProviders.Should().BeEmpty();
         }
 
         [TestMethod]
@@ -34,12 +36,16 @@ namespace PantherDI.Tests.ContainerCreation
                 RegisteredType = typeof(Catalog)
             });
 
-            var sut = new ContainerBuilder(catalog);
-            sut.Build();
+            var sut = (Container)new ContainerBuilder()
+            {
+                catalog
+            }
+            .Build();
 
-            sut.KnowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog));
+            var knowledgeBase = (KnowledgeBase)sut._knowledgeBase;
+            knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog));
 
-            var results = sut.KnowledgeBase[typeof(ICatalog)].ToArray();
+            var results = knowledgeBase[typeof(ICatalog)].ToArray();
             results.Should().HaveCount(1);
             var result = results[0];
             result.FulfilledContracts.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog));
@@ -47,7 +53,7 @@ namespace PantherDI.Tests.ContainerCreation
             result.UnresolvedDependencies.Should().BeEmpty();
             result.Singleton.Should().BeFalse();
 
-            results = sut.KnowledgeBase["SomeContract"].ToArray();
+            results = knowledgeBase["SomeContract"].ToArray();
             results.Should().HaveCount(1);
             result = results[0];
             result.FulfilledContracts.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog));
@@ -76,12 +82,12 @@ namespace PantherDI.Tests.ContainerCreation
                 Singleton = true
             });
 
-            var sut = new ContainerBuilder(catalog);
-            sut.Build();
+            var sut = (Container)new ContainerBuilder {catalog}.Build();
+            var knowledgeBase = (KnowledgeBase)sut._knowledgeBase;
 
-            sut.KnowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(string), typeof(int));
+            knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(string), typeof(int));
 
-            var results = sut.KnowledgeBase[typeof(string)].ToArray();
+            var results = knowledgeBase[typeof(string)].ToArray();
             results.Should().HaveCount(1);
             var result = results[0];
             result.FulfilledContracts.Should().BeEquivalentTo(typeof(string));
@@ -89,7 +95,7 @@ namespace PantherDI.Tests.ContainerCreation
             result.UnresolvedDependencies.Should().BeEmpty();
             result.Singleton.Should().BeFalse();
 
-            results = sut.KnowledgeBase[typeof(int)].ToArray();
+            results = knowledgeBase[typeof(int)].ToArray();
             results.Should().HaveCount(1);
             result = results[0];
             result.FulfilledContracts.Should().BeEquivalentTo(typeof(int));
@@ -101,7 +107,7 @@ namespace PantherDI.Tests.ContainerCreation
         [TestMethod]
         public void DetectCircularDependencies()
         {
-            var sut = new ContainerBuilder(new Catalog(new ManualRegistration
+            var sut = new ContainerBuilder{new Catalog(new ManualRegistration
             {
                 RegisteredType = typeof(object),
                 FulfilledContracts = { "A" },
@@ -111,7 +117,7 @@ namespace PantherDI.Tests.ContainerCreation
                 RegisteredType = typeof(object),
                 FulfilledContracts = { "B" },
                 Factories = { new Factory(_ => null, new Dependency(typeof(object), "A")) }
-            }));
+            })};
 
             sut.Invoking(x => x.Build()).ShouldThrow<CircularDependencyException>();
         }

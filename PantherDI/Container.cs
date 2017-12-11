@@ -11,7 +11,7 @@ namespace PantherDI
 {
     public class Container : IContainer
     {
-        private readonly IKnowledgeBase _knowledgeBase;
+        internal readonly IKnowledgeBase _knowledgeBase;
         private readonly MergedResolver _rootResolver;
         private readonly Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
 

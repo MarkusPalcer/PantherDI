@@ -16,7 +16,7 @@ namespace PantherDI.Tests
         [TestMethod]
         public void WithoutRegistrationResolvingFails()
         {
-            var sut = new ContainerBuilder(new Catalog()).Build();
+            var sut = new ContainerBuilder().Build();
 
             sut.Invoking(cnt => cnt.Resolve<string>()).ShouldThrow<NoSuitableRegistrationException>();
             sut.Invoking(cnt => cnt.Resolve<object>(typeof(string))).ShouldThrow<NoSuitableRegistrationException>();
@@ -34,12 +34,15 @@ namespace PantherDI.Tests
                 return instance;
             }
 
-            var sut = new ContainerBuilder(new Catalog(new ManualRegistration()
-            {
-                FulfilledContracts = { typeof(ICatalog), "SomeContract" },
-                Factories = { new Factory(Factory) },
-                RegisteredType = typeof(Catalog)
-            })).Build();
+            var sut = new ContainerBuilder()
+                .WithRegistration(
+                new ManualRegistration()
+                {
+                    FulfilledContracts = { typeof(ICatalog), "SomeContract" },
+                    Factories = { new Factory(Factory) },
+                    RegisteredType = typeof(Catalog)
+                })
+                .Build();
 
             object resolved = sut.Resolve<ICatalog>();
             invokeCounter.Should().Be(1);
@@ -85,21 +88,13 @@ namespace PantherDI.Tests
                 return dependencyMock;
             }
 
-            var sut = new ContainerBuilder(new Catalog(new ManualRegistration
-            {
-                RegisteredType = typeof(string),
-                Factories =
-                {
-                    new Factory(Factory, new Dependency(typeof(ICatalog)))
-                }
-            }, new ManualRegistration
-            {
-                RegisteredType = typeof(ICatalog),
-                Factories =
-                {
-                    new Factory(Dependency)
-                }
-            })).Build();
+            var builder = new ContainerBuilder();
+            builder.Register<string>()
+                .WithFactory(new Factory(Factory, new Dependency(typeof(ICatalog))));
+            builder.Register<Catalog>()
+                .As<ICatalog>()
+                .WithFactory(new Factory(Dependency));
+            var sut = builder.Build();
 
             sut.Resolve<string>();
             factoryCounter.Should().Be(1);
@@ -109,15 +104,16 @@ namespace PantherDI.Tests
         [TestMethod]
         public void TooManySuitableFactoriesThrows()
         {
-            var sut = new ContainerBuilder(new Catalog(new ManualRegistration
+            var sut = new ContainerBuilder{new ManualRegistration
             {
                 RegisteredType = typeof(object),
                 Factories = {new Factory(_ => null)}
             }, new ManualRegistration
             {
-                RegisteredType = typeof(object),
+                RegisteredType = typeof(string),
+                FulfilledContracts = { typeof(object) },
                 Factories = { new Factory(_ => null) }
-            })).Build();
+            }}.Build();
 
             sut.Invoking(x => x.Resolve<object>()).ShouldThrow<TooManySuitableRegistrationsException>();
         }

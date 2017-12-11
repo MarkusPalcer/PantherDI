@@ -1,153 +1,271 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using PantherDI.Exceptions;
-using PantherDI.Extensions;
+using System.Reflection;
 using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
-using PantherDI.Resolved;
-using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 
 namespace PantherDI.ContainerCreation
 {
-    public class ContainerBuilder
+    /// <summary>
+    /// Helper class to create a container from a configuration
+    /// </summary>
+    public class ContainerBuilder : IEnumerable
     {
-        private readonly ICatalog _catalog;
-        private Dictionary<object, List<IRegistration>> _unprocessed;
-        private readonly MergedResolver _resolvers = new MergedResolver();
-        private readonly List<object> _resolutionStack = new List<object>();
-        internal KnowledgeBase KnowledgeBase { get; } = new KnowledgeBase();
+        public List<ICatalog> Catalogs { get; } = new List<ICatalog>();
 
-        public ContainerBuilder(ICatalog catalog, params IResolver[] resolvers)
-        {
-            _catalog = catalog;
-            _resolvers.Add(KnowledgeBase);
-            foreach (var resolver in resolvers)
-            {
-                _resolvers.Add(resolver);
-            }
-        }
+        public List<IResolver> Resolvers { get; } = new List<IResolver>();
 
+        public List<IRegistration> Registrations { get; } = new List<IRegistration>();
+
+        private List<TypeRegistrationHelper> TypeRegistrationHelpers { get; } = new List<TypeRegistrationHelper>();
+
+        public bool IsStrict { get; set; } = true;
+
+        public List<Type> Types { get; } = new List<Type>();
+
+        /// <summary>
+        /// Creates the container configured so far
+        /// </summary>
         public IContainer Build()
         {
-            _unprocessed = CreateProcessQueue(_catalog);
-            CreateKnowledgeBase();
-            return new Container(KnowledgeBase, _resolvers.Except(new IResolver[]{KnowledgeBase}));
-        }
-
-        private void Process(object contract)
-        {
-            if (_resolutionStack.Contains(contract))
+            foreach (var typeRegistrationHelper in TypeRegistrationHelpers)
             {
-                throw new CircularDependencyException();
+                typeRegistrationHelper.RegisterTo(this);
             }
 
-            _resolutionStack.Add(contract);
+            var resolvers = Resolvers.ToArray();
 
-            // Process registrations and add to knowledge base
-            while (_unprocessed.TryGetValue(contract, out var registrations))
+            if (!IsStrict)
             {
-                ProcessRegistration(registrations.First());
+                resolvers = resolvers.Concat(new IResolver[] {new ReflectionResolver()}).ToArray();
             }
 
-            _resolutionStack.Remove(contract);
+            var catalogs = Catalogs
+                .Concat(new ICatalog[] { new TypeCatalog(Types), new ManualCatalog(Registrations.ToArray()) })
+                .ToArray();
+
+            var converter = new RegistrationConverter(new MergedCatalog(catalogs), resolvers);
+            converter.ProcessAll();
+
+            return new Container(converter.KnowledgeBase, resolvers);
         }
 
-        private void ProcessRegistration(IRegistration registration)
+        /// <summary>
+        /// Adds a catalog to the container configuration
+        /// </summary>
+        public void Add(ICatalog catalog)
         {
-            // Remove this registration completely (and remove empty entries)
-            foreach (var contract in registration.FulfilledContracts)
+            Catalogs.Add(catalog);
+        }
+
+        /// <summary>
+        /// Adds a resolver to the container configuration
+        /// </summary>
+        public void Add(IResolver resolver)
+        {
+            Resolvers.Add(resolver);
+        }
+
+        public void Add(IRegistration registration)
+        {
+            Registrations.Add(registration);
+        }
+
+        #region Implementation of IEnumerable
+
+        public IEnumerator GetEnumerator()
+        {
+            return Catalogs.Cast<object>().Concat(Resolvers).Concat(Registrations).GetEnumerator();
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Adds a catalog to the container configuration
+        /// </summary>
+        /// <returns>The ContainerBuilder for fluent access</returns>
+        public ContainerBuilder WithCatalog(ICatalog catalog)
+        {
+            Add(catalog);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a resolver to the container configuration
+        /// </summary>
+        /// <returns>The ContainerBuilder for fluent access</returns>
+        public ContainerBuilder WithResolver(IResolver resolver)
+        {
+            Add(resolver);
+            return this;
+        }
+
+        /// <summary>
+        /// Removes a resolver type from the configuration
+        /// </summary>
+        /// <typeparam name="TResolverToRemove">The type of resolver to remove</typeparam>
+        /// <returns>The ContainerBuilder for fluent access</returns>
+        public ContainerBuilder WithoutResolver<TResolverToRemove>()
+        {
+            Resolvers.RemoveAll(x => x.GetType() == typeof(TResolverToRemove));
+            return this;
+        }
+
+        /// <summary>
+        /// Adds all resolvers for generic types to the configuration
+        /// </summary>
+        /// <returns>The ContainerBuilder for fluent access</returns>
+        public ContainerBuilder WithGenericResolvers()
+        {
+            return this.WithResolver(new EnumerableResolver())
+                .WithResolver(new Func0Resolver())
+                .WithResolver(new Func1Resolver())
+                .WithResolver(new LazyResolver());
+        }
+
+        public ContainerBuilder WithSupportForUnregisteredTypes()
+        {
+            IsStrict = false;
+            return this;
+        }
+
+        public ContainerBuilder WithStrictRegistrationHandling()
+        {
+            IsStrict = true;
+            return this;
+        }
+
+        public ContainerBuilder WithAssembly(Assembly assembly)
+        {
+            return WithCatalog(new AssemblyCatalog(assembly));
+        }
+
+        public ContainerBuilder WithAssemblyOf(Type type)
+        {
+            return WithAssembly(type.GetTypeInfo().Assembly);
+        }
+
+        public ContainerBuilder WithAssemblyOf<T>()
+        {
+            return WithAssemblyOf(typeof(T));
+        }
+
+        public ContainerBuilder WithType(Type type)
+        {
+            Types.Add(type);
+            return this;
+        }
+
+        public ContainerBuilder WithType<T>()
+        {
+            return WithType(typeof(T));
+        }
+
+        public ContainerBuilder WithRegistration(IRegistration registration)
+        {
+            Add(registration);
+            return this;
+        }
+
+        public TypeRegistrationHelper Register<T>()
+        {
+            var result = new TypeRegistrationHelper(typeof(T));
+            TypeRegistrationHelpers.Add(result);
+            return result;
+        }
+
+        public class TypeRegistrationHelper
+        {
+            private readonly Type _type;
+
+            public TypeRegistrationHelper(Type type)
             {
-                if (_unprocessed.TryGetValue(contract, out var entries))
+                _type = type;
+                _registration = new ManualRegistration()
                 {
-                    entries.Remove(registration);
-                    if (!entries.Any())
+                    RegisteredType = _type
+                };
+            }
+
+            private readonly ManualRegistration _registration;
+
+            public ISet<object> Contracts => _registration.FulfilledContracts;
+
+            public bool RegisterWithReflection { get; set; } = false;
+
+            public ISet<IFactory> Factories => _registration.Factories;
+
+            public bool RegisterWithConstructors { get; set; } = false;
+
+            public bool IsSingleton { get; set; } = false;
+
+            internal void RegisterTo(ContainerBuilder cb)
+            {
+                if (RegisterWithReflection)
+                {
+                    cb.WithType(_type);
+                }
+
+                if (RegisterWithConstructors)
+                {
+                    foreach (var factory in _type.GetTypeInfo().DeclaredConstructors.Select(x => new ConstructorFactory(x)))
                     {
-                        _unprocessed.Remove(contract);
+                        Factories.Add(factory);
                     }
                 }
+
+                _registration.Singleton = IsSingleton;
+
+                cb.Registrations.Add(_registration);
             }
 
-            foreach (var factory in registration.Factories)
+            public TypeRegistrationHelper As<TContract>()
             {
-                foreach (var provider in ProcessFactory(registration, factory, ResolveDependency))
+                if (_type.GetTypeInfo().IsSubclassOf(typeof(TContract)))
                 {
-                    KnowledgeBase.Add(provider);
-                }
-            }
-        }
-
-        public static IEnumerable<IProvider> ProcessFactory(IRegistration registration, IFactory factory,
-            Func<IDependency, IEnumerable<IProvider>> resolveDependency)
-        {
-            // Cache all providers for a contryt
-            var allProviders = factory.Dependencies.ToDictionary(x => x, x => resolveDependency(x).ToArray()).Where(x => x.Value.Any());
-
-            // Create all combinations possible
-            var allCombinations = new List<Dictionary<IDependency, IProvider>> { new Dictionary<IDependency, IProvider>() };
-            foreach (var pair in allProviders)
-            {
-                var newCombinations = new List<Dictionary<IDependency, IProvider>>();
-
-                foreach (var oldCombination in allCombinations)
-                {
-                    foreach (var provider in pair.Value)
-                    {
-                        var newCombination = oldCombination.ToDictionary(x => x.Key, x => x.Value);
-                        newCombination.Add(pair.Key, provider);
-
-                        newCombinations.Add(newCombination);
-                    }
+                    throw new ArgumentException($"${_type.Name} is not assignable to  ${typeof(TContract).Name}, so it can't be registered as such.");
                 }
 
-                allCombinations = newCombinations;
+                Contracts.Add(typeof(TContract));
+
+                return this;
             }
 
-            // Create a provider for each combination
-            return allCombinations.Select(combination => new FactoryProvider(registration, factory, combination)).ToArray();
-        }
-
-        private IEnumerable<IProvider> ResolveDependency(IDependency dependency)
-        {
-            Process(dependency.RequiredContracts.First());
-            return _resolvers.Resolve(ResolveDependency, dependency);
-        }
-
-        private void CreateKnowledgeBase()
-        {
-            while (_unprocessed.Any())
+            public TypeRegistrationHelper WithContract(object contract)
             {
-                Process(_unprocessed.First().Key);
+                Contracts.Add(contract);
+
+                return this;
             }
-        }
 
-        private static Dictionary<object, List<IRegistration>> CreateProcessQueue(ICatalog catalog)
-        {
-            var unprocessed = new Dictionary<object, List<IRegistration>>();
-
-            // Create copies of all registrations and add the registered type to the fulfilled contracts in the process
-            var registrations = catalog.Registrations
-                .Select(RegistrationExtensions.Clone);
-
-            foreach (var registration in registrations)
+            public TypeRegistrationHelper UsingReflection()
             {
-                foreach (var contract in registration.FulfilledContracts)
-                {
-                    if (!unprocessed.ContainsKey(contract))
-                    {
-                        unprocessed.Add(contract, new List<IRegistration>());
-                    }
-
-                    unprocessed[contract].Add(registration);
-                }
+                RegisterWithReflection = true;
+                return this;
             }
 
-            return unprocessed;
+            public TypeRegistrationHelper WithConstructors()
+            {
+                RegisterWithConstructors = true;
+                return this;
+            }
+
+            public TypeRegistrationHelper AsSingleton()
+            {
+                IsSingleton = true;
+                return this;
+            }
+
+            public TypeRegistrationHelper WithFactory(IFactory factory)
+            {
+                Factories.Add(factory);
+                return this;
+            }
         }
-
-
     }
 }

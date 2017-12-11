@@ -9,7 +9,16 @@ namespace PantherDI.Registry.Catalog
 {
     public class TypeCatalog : ICollection<Type>, ICatalog
     {
-        private readonly List<Type> _types = new List<Type>();
+        private readonly List<Type> _types;
+
+        public TypeCatalog() : this(Enumerable.Empty<Type>())
+        {
+        }
+
+        public TypeCatalog(IEnumerable<Type> types)
+        {
+            _types = new List<Type>(types);
+        }
 
         #region Implementation of IEnumerable
 
