@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>PantherDI.DNF</id>
+    <version>$version$</version>
+    <title>PantherDI Extensions for .NET 4.x</title>
+    <authors>Markus Palcer</authors>
+    <owners>Markus Palcer</owners>
+    <projectUrl>https://github.com/MarkusPalcer/PantherDI</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A Dependency Injection Framework</description>
+    <copyright>Copyright 2017</copyright>
+    <tags>DependencyInjection</tags>
+  </metadata>
+</package>
