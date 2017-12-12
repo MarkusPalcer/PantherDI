@@ -1,15 +1,19 @@
 <?xml version="1.0"?>
-<package >
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>PantherDI.DNF</id>
     <version>$version$</version>
     <title>PantherDI Extensions for .NET 4.x</title>
     <authors>Markus Palcer</authors>
-    <owners>Markus Palcer</owners>
+    <owners>MasterOfVDL</owners>
     <projectUrl>https://github.com/MarkusPalcer/PantherDI</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A Dependency Injection Framework</description>
-    <copyright>Copyright 2017</copyright>
-    <tags>DependencyInjection</tags>
+    <description>.NET specific classes for the PantherDI Dependency Injection Framework</description>
+    <copyright>Copyright 2017 Markus Palcer</copyright>
+    <tags>DependencyInjection DI</tags>
+
+    <dependencies>
+        <dependency id="PantherDI" version="[1.0,2.0)" />
+    </dependencies>
   </metadata>
 </package>
