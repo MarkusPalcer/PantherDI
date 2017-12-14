@@ -117,5 +117,18 @@ namespace PantherDI.Tests
 
             sut.Invoking(x => x.Resolve<object>()).ShouldThrow<TooManySuitableRegistrationsException>();
         }
+
+        [TestMethod]
+        public void InstanceRegistration()
+        {
+            var instance = new Catalog();
+
+            var sut = new ContainerBuilder()
+                .WithInstance<ICatalog>(instance)
+                .Build();
+
+            sut.Resolve<ICatalog>().Should().BeSameAs(instance);
+            sut.Resolve<ICatalog>().Should().BeSameAs(instance);
+        }
     }
 }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using PantherDI.Registry.Catalog;
-using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolvers;
@@ -122,150 +121,119 @@ namespace PantherDI.ContainerCreation
         /// <returns>The ContainerBuilder for fluent access</returns>
         public ContainerBuilder WithGenericResolvers()
         {
-            return this.WithResolver(new EnumerableResolver())
+            return WithResolver(new EnumerableResolver())
                 .WithResolver(new Func0Resolver())
                 .WithResolver(new Func1Resolver())
                 .WithResolver(new LazyResolver());
         }
 
+        /// <summary>
+        /// Switches to non-strict handling of requests for not registered types.
+        /// 
+        /// In non-strict mode the container will register an unregistered type as soon as its being resolved.
+        /// </summary>
         public ContainerBuilder WithSupportForUnregisteredTypes()
         {
             IsStrict = false;
             return this;
         }
 
+        /// <summary>
+        /// Switches to strict handling of requests for not registered types.
+        /// 
+        /// In strict mode the container will throw an exception when an unregistered type is being resolved.
+        /// </summary>
         public ContainerBuilder WithStrictRegistrationHandling()
         {
             IsStrict = true;
             return this;
         }
 
+        /// <summary>
+        /// Uses reflection to add the content of an assembly to the container.
+        /// </summary>
+        /// <param name="assembly">The assembly to add</param>
         public ContainerBuilder WithAssembly(Assembly assembly)
         {
             return WithCatalog(new AssemblyCatalog(assembly));
         }
 
+        /// <summary>
+        /// Uses reflection to add the content of the assembly that contains the given type
+        /// </summary>
         public ContainerBuilder WithAssemblyOf(Type type)
         {
             return WithAssembly(type.GetTypeInfo().Assembly);
         }
 
+        /// <summary>
+        /// Uses reflection to add the content of the assembly that contains the given type
+        /// </summary>
         public ContainerBuilder WithAssemblyOf<T>()
         {
             return WithAssemblyOf(typeof(T));
         }
 
+        /// <summary>
+        /// Uses reflection to add a type to the container
+        /// </summary>
         public ContainerBuilder WithType(Type type)
         {
             Types.Add(type);
             return this;
         }
 
+        /// <summary>
+        /// Uses reflection to add a type to the container
+        /// </summary>
         public ContainerBuilder WithType<T>()
         {
             return WithType(typeof(T));
         }
 
+        /// <summary>
+        /// Adds a registration to the container
+        /// </summary>
         public ContainerBuilder WithRegistration(IRegistration registration)
         {
             Add(registration);
             return this;
         }
 
+        /// <summary>
+        /// Adds an instance to the container
+        /// </summary>
+        public ContainerBuilder WithInstance<T>(T instance)
+        {
+            RegisterInstance(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a type to the container
+        /// </summary>
         public TypeRegistrationHelper Register<T>()
         {
-            var result = new TypeRegistrationHelper(typeof(T));
+            return Register(typeof(T));
+        }
+
+        /// <summary>
+        /// Registers a type to the container
+        /// </summary>
+        public TypeRegistrationHelper Register(Type t)
+        {
+            var result = new TypeRegistrationHelper(t);
             TypeRegistrationHelpers.Add(result);
             return result;
         }
 
-        public class TypeRegistrationHelper
+
+        /// <summary>
+        /// Adds an instance to the container
+        /// </summary>
+        public TypeRegistrationHelper RegisterInstance<T>(T instance)
         {
-            private readonly Type _type;
-
-            public TypeRegistrationHelper(Type type)
-            {
-                _type = type;
-                _registration = new ManualRegistration()
-                {
-                    RegisteredType = _type
-                };
-            }
-
-            private readonly ManualRegistration _registration;
-
-            public ISet<object> Contracts => _registration.FulfilledContracts;
-
-            public bool RegisterWithReflection { get; set; } = false;
-
-            public ISet<IFactory> Factories => _registration.Factories;
-
-            public bool RegisterWithConstructors { get; set; } = false;
-
-            public bool IsSingleton { get; set; } = false;
-
-            internal void RegisterTo(ContainerBuilder cb)
-            {
-                if (RegisterWithReflection)
-                {
-                    cb.WithType(_type);
-                }
-
-                if (RegisterWithConstructors)
-                {
-                    foreach (var factory in _type.GetTypeInfo().DeclaredConstructors.Select(x => new ConstructorFactory(x)))
-                    {
-                        Factories.Add(factory);
-                    }
-                }
-
-                _registration.Singleton = IsSingleton;
-
-                cb.Registrations.Add(_registration);
-            }
-
-            public TypeRegistrationHelper As<TContract>()
-            {
-                if (_type.GetTypeInfo().IsSubclassOf(typeof(TContract)))
-                {
-                    throw new ArgumentException($"${_type.Name} is not assignable to  ${typeof(TContract).Name}, so it can't be registered as such.");
-                }
-
-                Contracts.Add(typeof(TContract));
-
-                return this;
-            }
-
-            public TypeRegistrationHelper WithContract(object contract)
-            {
-                Contracts.Add(contract);
-
-                return this;
-            }
-
-            public TypeRegistrationHelper UsingReflection()
-            {
-                RegisterWithReflection = true;
-                return this;
-            }
-
-            public TypeRegistrationHelper WithConstructors()
-            {
-                RegisterWithConstructors = true;
-                return this;
-            }
-
-            public TypeRegistrationHelper AsSingleton()
-            {
-                IsSingleton = true;
-                return this;
-            }
-
-            public TypeRegistrationHelper WithFactory(IFactory factory)
-            {
-                Factories.Add(factory);
-                return this;
-            }
+            return Register(instance.GetType()).As<T>().WithFactory(new InstanceFactory<T>(instance));
         }
     }
 }
