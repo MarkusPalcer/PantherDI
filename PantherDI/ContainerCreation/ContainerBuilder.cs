@@ -25,6 +25,8 @@ namespace PantherDI.ContainerCreation
 
         public bool IsStrict { get; set; } = true;
 
+        public bool UseLateProcessing { get; set; } = false;
+
         public List<Type> Types { get; } = new List<Type>();
 
         /// <summary>
@@ -49,9 +51,17 @@ namespace PantherDI.ContainerCreation
                 .ToArray();
 
             var converter = new RegistrationConverter(new MergedCatalog(catalogs), resolvers);
-            converter.ProcessAll();
 
-            return new Container(new MergedResolver(new IResolver[] {converter.KnowledgeBase}.Concat(resolvers)));
+            if (!UseLateProcessing)
+            {
+                converter.ProcessAll();
+                return new Container(new MergedResolver(new IResolver[] {converter.KnowledgeBase}.Concat(resolvers)));
+            }
+            else
+            {
+                return new Container(new MergedResolver(new IResolver[] {new RegistrationProcessingResolver(converter)}
+                                                            .Concat(resolvers)));
+            }
         }
 
         /// <summary>
@@ -70,6 +80,9 @@ namespace PantherDI.ContainerCreation
             Resolvers.Add(resolver);
         }
 
+        /// <summary>
+        /// Adds a registraion to the container configuration
+        /// </summary>
         public void Add(IRegistration registration)
         {
             Registrations.Add(registration);
@@ -206,6 +219,17 @@ namespace PantherDI.ContainerCreation
         public ContainerBuilder WithInstance<T>(T instance)
         {
             RegisterInstance(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Enables late processing on the container
+        /// 
+        /// This means registrations are processed on the first request
+        /// </summary>
+        public ContainerBuilder WithLateProcessing()
+        {
+            UseLateProcessing = true;
             return this;
         }
 

@@ -37,12 +37,12 @@ namespace PantherDI.Tests
 
             var sut = new ContainerBuilder()
                 .WithRegistration(
-                new ManualRegistration()
-                {
-                    FulfilledContracts = { typeof(ICatalog), "SomeContract" },
-                    Factories = { new Factory(Factory) },
-                    RegisteredType = typeof(Catalog)
-                })
+                                  new ManualRegistration()
+                                  {
+                                      FulfilledContracts = {typeof(ICatalog), "SomeContract"},
+                                      Factories = {new Factory(Factory)},
+                                      RegisteredType = typeof(Catalog)
+                                  })
                 .Build();
 
             object resolved = sut.Resolve<ICatalog>();
@@ -91,10 +91,10 @@ namespace PantherDI.Tests
 
             var builder = new ContainerBuilder();
             builder.Register<string>()
-                .WithFactory(new Factory(Factory, new Dependency(typeof(ICatalog))));
+                   .WithFactory(new Factory(Factory, new Dependency(typeof(ICatalog))));
             builder.Register<Catalog>()
-                .As<ICatalog>()
-                .WithFactory(new Factory(Dependency));
+                   .As<ICatalog>()
+                   .WithFactory(new Factory(Dependency));
             var sut = builder.Build();
 
             sut.Resolve<string>();
@@ -105,16 +105,20 @@ namespace PantherDI.Tests
         [TestMethod]
         public void TooManySuitableFactoriesThrows()
         {
-            var sut = new ContainerBuilder{new ManualRegistration
+            var sut = new ContainerBuilder
             {
-                RegisteredType = typeof(object),
-                Factories = {new Factory(_ => null)}
-            }, new ManualRegistration
-            {
-                RegisteredType = typeof(string),
-                FulfilledContracts = { typeof(object) },
-                Factories = { new Factory(_ => null) }
-            }}.Build();
+                new ManualRegistration
+                {
+                    RegisteredType = typeof(object),
+                    Factories = {new Factory(_ => null)}
+                },
+                new ManualRegistration
+                {
+                    RegisteredType = typeof(string),
+                    FulfilledContracts = {typeof(object)},
+                    Factories = {new Factory(_ => null)}
+                }
+            }.Build();
 
             sut.Invoking(x => x.Resolve<object>()).ShouldThrow<TooManySuitableRegistrationsException>();
         }
@@ -132,11 +136,14 @@ namespace PantherDI.Tests
             sut.Resolve<ICatalog>().Should().BeSameAs(instance);
         }
 
-        public class TestClass1 { }
+        public class TestClass1
+        {
+        }
 
         public class TestClass2
         {
             public TestClass1 ResolvedDependency { get; }
+
             public TestClass2(TestClass1 resolvedDependency)
             {
                 ResolvedDependency = resolvedDependency;
@@ -173,7 +180,8 @@ namespace PantherDI.Tests
         public class TestClass3
         {
             public TestClass1 ResolvedDependency { get; }
-            public TestClass3([Attributes.Ignore]TestClass1 resolvedDependency)
+
+            public TestClass3([Attributes.Ignore] TestClass1 resolvedDependency)
             {
                 ResolvedDependency = resolvedDependency;
             }
@@ -199,13 +207,16 @@ namespace PantherDI.Tests
         public class TestClass4
         {
             public TestClass1 ResolvedDependency { get; }
+
             public TestClass4(TestClass1 resolvedDependency)
             {
                 ResolvedDependency = resolvedDependency;
             }
 
             [Attributes.Ignore]
-            public TestClass4() { }
+            public TestClass4()
+            {
+            }
         }
 
         [TestMethod]
@@ -223,6 +234,47 @@ namespace PantherDI.Tests
             var dependency = new TestClass1();
             var resolvedInstance = resolvedFunction(dependency);
             resolvedInstance.ResolvedDependency.Should().BeSameAs(dependency);
+        }
+
+        private class TestClass5
+        {
+            public TestClass5(TestClass6 d) { }
+        }
+
+        private class TestClass6
+        {
+            public TestClass6(TestClass5 d) { }
+        }
+
+        [TestMethod]
+        public void CircularDependency()
+        {
+            var sut = new ContainerBuilder()
+                .WithType<TestClass1>()
+                .WithType<TestClass5>()
+                .WithType<TestClass6>();
+
+            sut.Invoking(x => x.Build()).ShouldThrow<CircularDependencyException>();
+        }
+
+        [TestMethod]
+        public void LateProcessing()
+        {
+            /* 
+             * If TestClass5 or TestClass6 were processed
+             * a circular dependency would be found
+             */
+
+            var sut = new ContainerBuilder()
+                .WithType<TestClass1>()
+                .WithType<TestClass5>()
+                .WithType<TestClass6>()
+                .WithLateProcessing()
+                .Build();
+
+            sut.Invoking(x => x.Resolve<TestClass1>()).ShouldNotThrow();
+            sut.Invoking(x => x.Resolve<TestClass5>()).ShouldThrow<CircularDependencyException>();
+            sut.Invoking(x => x.Resolve<TestClass6>()).ShouldThrow<CircularDependencyException>();
         }
     }
 }

@@ -39,11 +39,11 @@ namespace PantherDI.ContainerCreation
         {
             while (_unprocessed.Any())
             {
-                ProcessContract(_unprocessed.First().Key);
+                ProcessContract(_unprocessed.First().Key, ResolveDependency);
             }
         }
 
-        private void ProcessContract(object contract)
+        public void ProcessContract(object contract, Func<IDependency, IEnumerable<IProvider>> dependencyResolver)
         {
             if (_resolutionStack.Contains(contract))
             {
@@ -55,13 +55,13 @@ namespace PantherDI.ContainerCreation
             // Process registrations and add to knowledge base
             while (_unprocessed.TryGetValue(contract, out var registrations))
             {
-                ProcessRegistration(registrations.First());
+                ProcessRegistration(registrations.First(), dependencyResolver);
             }
 
             _resolutionStack.Remove(contract);
         }
 
-        private void ProcessRegistration(IRegistration registration)
+        private void ProcessRegistration(IRegistration registration, Func<IDependency, IEnumerable<IProvider>> dependencyResolver)
         {
             // Remove this registration completely (and remove empty entries)
             foreach (var contract in registration.FulfilledContracts)
@@ -78,7 +78,7 @@ namespace PantherDI.ContainerCreation
 
             foreach (var factory in registration.Factories)
             {
-                foreach (var provider in ProcessFactory(registration, factory, ResolveDependency))
+                foreach (var provider in ProcessFactory(registration, factory, dependencyResolver))
                 {
                     KnowledgeBase.Add(provider);
                 }
@@ -120,7 +120,7 @@ namespace PantherDI.ContainerCreation
 
         private IEnumerable<IProvider> ResolveDependency(IDependency dependency)
         {
-            ProcessContract(dependency.RequiredContracts.First());
+            ProcessContract(dependency.RequiredContracts.First(), ResolveDependency);
             return _resolvers.Resolve(ResolveDependency, dependency);
         }
 
