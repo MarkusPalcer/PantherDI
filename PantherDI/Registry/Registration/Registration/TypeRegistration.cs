@@ -17,7 +17,10 @@ namespace PantherDI.Registry.Registration.Registration
         {
             RegisteredType = type.AsType();
             FulfilledContracts = new HashSet<object>(fulfilledContracts);
-            Factories = new HashSet<IFactory>(type.DeclaredConstructors.Select(x => new ConstructorFactory(x)));
+            var constructorFactories = type.DeclaredConstructors
+                                           .Where(x => !x.GetCustomAttributes<IgnoreAttribute>().Any())
+                                           .Select(x => new ConstructorFactory(x));
+            Factories = new HashSet<IFactory>(constructorFactories);
             Singleton = type.GetCustomAttributes<SingletonAttribute>().Any();
         }
 

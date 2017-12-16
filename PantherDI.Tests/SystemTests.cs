@@ -195,5 +195,34 @@ namespace PantherDI.Tests
             var resolvedInstance = resolvedFunction(dependency);
             resolvedInstance.ResolvedDependency.Should().BeSameAs(dependency);
         }
+
+        public class TestClass4
+        {
+            public TestClass1 ResolvedDependency { get; }
+            public TestClass4(TestClass1 resolvedDependency)
+            {
+                ResolvedDependency = resolvedDependency;
+            }
+
+            [Attributes.Ignore]
+            public TestClass4() { }
+        }
+
+        [TestMethod]
+        public void IgnoreConstructors()
+        {
+            var sut = new ContainerBuilder()
+                .WithType<TestClass4>()
+                .WithGenericResolvers()
+                .Build();
+
+            // Empty constructor should be ignored
+            sut.Invoking(x => x.Resolve<TestClass4>()).ShouldThrow<NoSuitableRegistrationException>();
+
+            var resolvedFunction = sut.Resolve<Func<TestClass1, TestClass4>>();
+            var dependency = new TestClass1();
+            var resolvedInstance = resolvedFunction(dependency);
+            resolvedInstance.ResolvedDependency.Should().BeSameAs(dependency);
+        }
     }
 }
