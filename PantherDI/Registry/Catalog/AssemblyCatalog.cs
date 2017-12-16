@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using PantherDI.Attributes;
 using static PantherDI.Extensions.TypeExtensions;
 using PantherDI.Registry.Registration.Registration;
 
@@ -16,6 +17,7 @@ namespace PantherDI.Registry.Catalog
                 .Where(x => x.Type.DeclaredConstructors.Any())
                 .Where(x => !x.Type.IsAbstract)
                 .Where(x => !x.Type.IsInterface)
+                .Where(x => !x.Type.GetCustomAttributes<IgnoreAttribute>().Any())
                 .Select(x => new TypeRegistration(x.Type, x.Contracts))
                 .ToArray();
         }

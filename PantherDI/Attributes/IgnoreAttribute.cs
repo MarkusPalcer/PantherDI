@@ -9,7 +9,7 @@ namespace PantherDI.Attributes
     /// If placed on a constructor, it will not be used as factory for the type
     /// If placed on a parameter of a factory, that parameter will not be resolved when converting the factory to a provider
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Constructor | AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Constructor | AttributeTargets.Parameter, Inherited = false)]
     public class IgnoreAttribute : Attribute
     {
     }
