@@ -23,7 +23,7 @@ namespace PantherDI.Tests.ContainerCreation
             }
             .Build();
 
-            ((KnowledgeBase)sut._knowledgeBase).KnownProviders.Should().BeEmpty();
+            ((KnowledgeBase)sut.KnowledgeBase()).KnownProviders.Should().BeEmpty();
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace PantherDI.Tests.ContainerCreation
             }
             .Build();
 
-            var knowledgeBase = (KnowledgeBase)sut._knowledgeBase;
+            var knowledgeBase = (KnowledgeBase)sut.KnowledgeBase();
             knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog));
 
             var results = knowledgeBase[typeof(ICatalog)].ToArray();
@@ -83,7 +83,7 @@ namespace PantherDI.Tests.ContainerCreation
             });
 
             var sut = (Container)new ContainerBuilder {catalog}.Build();
-            var knowledgeBase = (KnowledgeBase)sut._knowledgeBase;
+            var knowledgeBase = (KnowledgeBase)sut.KnowledgeBase();
 
             knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(string), typeof(int));
 

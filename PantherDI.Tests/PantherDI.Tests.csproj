@@ -67,6 +67,7 @@
     <Compile Include="ContainerTests.cs" />
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
     <Compile Include="Helpers\Catalog.cs" />
+    <Compile Include="Helpers\ContainerExtensions.cs" />
     <Compile Include="Helpers\Factory.cs" />
     <Compile Include="Helpers\TestProvider.cs" />
     <Compile Include="MergedCatalogTests.cs" />

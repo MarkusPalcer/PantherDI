@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using PantherDI.Resolved;
+using PantherDI.Registry.Registration.Factory;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Registry.Registration.Dependency

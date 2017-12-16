@@ -51,7 +51,7 @@ namespace PantherDI.ContainerCreation
             var converter = new RegistrationConverter(new MergedCatalog(catalogs), resolvers);
             converter.ProcessAll();
 
-            return new Container(converter.KnowledgeBase, resolvers);
+            return new Container(new MergedResolver(new IResolver[] {converter.KnowledgeBase}.Concat(resolvers)));
         }
 
         /// <summary>

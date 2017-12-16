@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using PantherDI.Registry.Registration;
+using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Extensions

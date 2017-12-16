@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using PantherDI.Exceptions;
-using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Resolved.Providers

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using PantherDI.Registry.Catalog;
-using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Tests.Helpers

@@ -22,7 +22,7 @@ namespace PantherDI.Tests
         [TestMethod]
         public void SucceedOnRegistration()
         {
-            var kb = new Mock<IKnowledgeBase>(MockBehavior.Strict);
+            var kb = new Mock<IResolver>(MockBehavior.Strict);
             var provider = new TestProvider(ProviderResult)
             {
                 FulfilledContracts = {typeof(string)},
@@ -35,7 +35,7 @@ namespace PantherDI.Tests
                     It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[]{provider});
 
-            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+            var sut = new Container(kb.Object);
 
             sut.Resolve<string>().Should().Be(ProviderResult);
         }
@@ -51,7 +51,7 @@ namespace PantherDI.Tests
                     It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(Enumerable.Empty<IProvider>());
 
-            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+            var sut = new Container(kb.Object);
 
             sut.Invoking(x => x.Resolve<string>()).ShouldThrow<NoSuitableRegistrationException>();
         }
@@ -73,7 +73,7 @@ namespace PantherDI.Tests
                     It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[] { provider });
 
-            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+            var sut = new Container(kb.Object);
 
             sut.Invoking(x => x.Resolve<string>()).ShouldThrow<NoSuitableRegistrationException>();
 
@@ -103,7 +103,7 @@ namespace PantherDI.Tests
                     It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[] { provider1, provider2 });
 
-            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+            var sut = new Container(kb.Object);
 
             sut.Resolve<string>().Should().Be(ProviderResult + "1");
             provider1.InvocationCounter.Should().Be(1);
@@ -131,7 +131,7 @@ namespace PantherDI.Tests
                     It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[] { provider1, provider2 });
 
-            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+            var sut = new Container(kb.Object);
 
             sut.Invoking(x => x.Resolve<string>()).ShouldThrow<TooManySuitableRegistrationsException>();
             provider1.InvocationCounter.Should().Be(0);
@@ -163,7 +163,7 @@ namespace PantherDI.Tests
 
             kb.Setup(x => x.Add(provider));
 
-            var sut = new Container(kb.Object, new[] {resolver2.Object });
+            var sut = new Container(new MergedResolver(new[] { kb.Object, resolver2.Object }));
 
             sut.Resolve<string>().Should().Be(ProviderResult);
         }
@@ -185,7 +185,7 @@ namespace PantherDI.Tests
                     It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(string))))))
                 .Returns(new IProvider[] { provider });
 
-            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+            var sut = new Container(kb.Object);
 
             sut.Resolve<string>().Should().Be(ProviderResult);
             sut.Resolve<string>().Should().Be(ProviderResult);
@@ -211,7 +211,7 @@ namespace PantherDI.Tests
                     It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(IDisposable))))))
                 .Returns(new IProvider[] { provider });
 
-            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+            var sut = new Container(kb.Object);
 
             sut.Resolve<IDisposable>();
 
@@ -240,7 +240,7 @@ namespace PantherDI.Tests
                     It.Is<IDependency>(d => new Dependency.EqualityComparer().Equals(d, new Dependency(typeof(IDisposable))))))
                 .Returns(new IProvider[] { provider });
 
-            var sut = new Container(kb.Object, Enumerable.Empty<IResolver>());
+            var sut = new Container(kb.Object);
 
             sut.Resolve<IDisposable>();
 

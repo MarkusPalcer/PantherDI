@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using PantherDI.Comparers;
 using PantherDI.Registry.Registration.Dependency;
 
 namespace PantherDI.Resolved.Providers

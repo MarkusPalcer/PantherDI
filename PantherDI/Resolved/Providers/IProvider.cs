@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Registration;
 

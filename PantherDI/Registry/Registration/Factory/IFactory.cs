@@ -2,7 +2,7 @@
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Registration;
 
-namespace PantherDI.Registry.Registration
+namespace PantherDI.Registry.Registration.Factory
 {
     /// <summary>
     /// A factory for an <see cref="IRegistration"/> with no dependencies resolved.

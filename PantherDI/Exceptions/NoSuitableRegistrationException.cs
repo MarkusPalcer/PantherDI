@@ -1,5 +1,3 @@
-using System;
-
 namespace PantherDI.Exceptions
 {
     public class NoSuitableRegistrationException : DependencyException

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using PantherDI.Exceptions;
 using PantherDI.Registry.Registration.Dependency;
-using PantherDI.Resolved;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 
@@ -11,15 +10,13 @@ namespace PantherDI
 {
     public class Container : IContainer
     {
-        internal readonly IKnowledgeBase _knowledgeBase;
-        private readonly MergedResolver _rootResolver;
+        private readonly  ProviderCache _cache = new ProviderCache();
+        internal readonly IResolver _rootResolver;
         private readonly Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
 
-        public Container(IKnowledgeBase knowledgeBase, IEnumerable<IResolver> resolvers)
+        public Container(IResolver resolvers)
         {
-            if (resolvers == null) throw new ArgumentNullException(nameof(resolvers));
-            _knowledgeBase = knowledgeBase ?? throw new ArgumentNullException(nameof(knowledgeBase));
-            _rootResolver = new MergedResolver(resolvers);
+            _rootResolver = resolvers ?? throw new ArgumentNullException(nameof(resolvers));
         }
 
         public T Resolve<T>(params object[] contracts)
@@ -42,20 +39,16 @@ namespace PantherDI
 
         private IEnumerable<IProvider> ResolveInternal(IDependency dependency)
         {
-            var result = _knowledgeBase.Resolve(ResolveInternal, dependency).ToArray();
-            if (result.Any())
+            var result = _cache[dependency];
+            if (result != null)
             {
-                return WrapSingletonProviders(result);
+                return result;
             }
 
-            // The provider is not yet in the knowledge base. Resolve it and then store it there, so it is cached
-            result = _rootResolver.Resolve(ResolveInternal, dependency).ToArray();
-            foreach (var provider in result)
-            {
-                _knowledgeBase.Add(provider);
-            }
-
-            return WrapSingletonProviders(result);
+            // The provider is not yet in the cache. Resolve it and then store it there, so it is cached
+            result = WrapSingletonProviders(_rootResolver.Resolve(ResolveInternal, dependency)).ToArray();
+            _cache[dependency] = result;
+            return result;
         }
 
         private IEnumerable<IProvider> WrapSingletonProviders(IEnumerable<IProvider> source)

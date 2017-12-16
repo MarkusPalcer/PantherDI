@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using PantherDI.Registry.Registration.Factory;
 
 namespace PantherDI.Registry.Registration.Registration
 {
