@@ -36,6 +36,7 @@ namespace PantherDI.Tests.Reflection
             dependencies.Should().HaveCount(1);
             dependencies[0].ExpectedType.Should().Be(typeof(TestClass1));
             dependencies[0].RequiredContracts.Should().BeEquivalentTo(typeof(TestClass1));
+            dependencies[0].Ignored.Should().BeFalse();
             var result = sut.Execute(new object[] { new TestClass1() });
             result.Should().BeOfType<TestClass2>();
         }
@@ -54,6 +55,7 @@ namespace PantherDI.Tests.Reflection
             dependencies.Should().HaveCount(1);
             dependencies[0].ExpectedType.Should().Be(typeof(int));
             dependencies[0].RequiredContracts.Should().BeEquivalentTo((object)"A");
+            dependencies[0].Ignored.Should().BeFalse();
             var result = sut.Execute(new object[] { 2 });
             result.Should().BeOfType<TestClass3>();
         }
@@ -72,8 +74,26 @@ namespace PantherDI.Tests.Reflection
             dependencies.Should().HaveCount(1);
             dependencies[0].ExpectedType.Should().Be(typeof(int));
             dependencies[0].RequiredContracts.Should().BeEquivalentTo("A", typeof(int));
+            dependencies[0].Ignored.Should().BeFalse();
             var result = sut.Execute(new object[] { 2 });
             result.Should().BeOfType<TestClass4>();
+        }
+
+        private class TestClass5
+        {
+            public TestClass5([Attributes.Ignore] int d) { }
+        }
+
+        [TestMethod]
+        public void IgnoreAttributeSetsIgnoredFlagOnDependency()
+        {
+            var sut = new ConstructorFactory(typeof(TestClass5).GetTypeInfo().DeclaredConstructors.Single());
+
+            var dependencies = sut.Dependencies.ToArray();
+            dependencies.Should().HaveCount(1);
+            dependencies[0].ExpectedType.Should().Be(typeof(int));
+            dependencies[0].RequiredContracts.Should().BeEquivalentTo((object)typeof(int));
+            dependencies[0].Ignored.Should().BeTrue();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace PantherDI.Resolvers
         public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
         {
             // Only handle The registered type
-            if (dependency.ExpectedType.GetTypeInfo().IsGenericType &&
+            if (!dependency.ExpectedType.GetTypeInfo().IsGenericType ||
                 dependency.ExpectedType.GetTypeInfo().GetGenericTypeDefinition() != _genericType)
             {
                 return Enumerable.Empty<IProvider>();

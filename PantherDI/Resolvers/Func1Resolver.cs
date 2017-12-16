@@ -17,11 +17,15 @@ namespace PantherDI.Resolvers
         {
             public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
             {
-                var innerDependency = new Dependency(typeof(T), dependency.RequiredContracts);
-                innerDependency.RequiredContracts.Remove(typeof(Func<T>));
-                innerDependency.RequiredContracts.Add(typeof(T));
+                var innerDependency = new Dependency(typeof(T));
+                foreach (var contract in dependency.RequiredContracts.Where(x => !Equals(x, typeof(Func<TIn, T>))))
+                {
+                    innerDependency.RequiredContracts.Add(contract);
+                }
 
-                foreach (var provider in dependencyResolver(innerDependency))
+                var providers = dependencyResolver(innerDependency).ToArray();
+
+                foreach (var provider in providers)
                 {
                     var givenDependencies = provider.UnresolvedDependencies.Where(x => x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn).GetTypeInfo())).ToArray();
 

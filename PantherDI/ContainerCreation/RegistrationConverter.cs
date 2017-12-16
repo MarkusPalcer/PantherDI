@@ -89,7 +89,10 @@ namespace PantherDI.ContainerCreation
             Func<IDependency, IEnumerable<IProvider>> resolveDependency)
         {
             // Cache all providers for a contryt
-            var allProviders = factory.Dependencies.ToDictionary(x => x, x => resolveDependency(x).ToArray()).Where(x => x.Value.Any());
+            var allProviders = factory.Dependencies
+                .Where(x => !x.Ignored)
+                .ToDictionary(x => x, x => resolveDependency(x).ToArray())
+                .Where(x => x.Value.Any());
 
             // Create all combinations possible
             var allCombinations = new List<Dictionary<IDependency, IProvider>> { new Dictionary<IDependency, IProvider>() };

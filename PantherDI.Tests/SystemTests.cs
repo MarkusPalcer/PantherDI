@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PantherDI.ContainerCreation;
@@ -129,6 +130,70 @@ namespace PantherDI.Tests
 
             sut.Resolve<ICatalog>().Should().BeSameAs(instance);
             sut.Resolve<ICatalog>().Should().BeSameAs(instance);
+        }
+
+        public class TestClass1 { }
+
+        public class TestClass2
+        {
+            public TestClass1 ResolvedDependency { get; }
+            public TestClass2(TestClass1 resolvedDependency)
+            {
+                ResolvedDependency = resolvedDependency;
+            }
+        }
+
+        [TestMethod]
+        public void ResolveFunction()
+        {
+            var sut = new ContainerBuilder()
+                .WithType<TestClass1>()
+                .WithGenericResolvers()
+                .Build();
+
+            var resolvedFunction = sut.Resolve<Func<TestClass1>>();
+            resolvedFunction.Invoking(x => x()).ShouldNotThrow();
+        }
+
+        [TestMethod]
+        public void ResolveFunctionWithParameter()
+        {
+            var sut = new ContainerBuilder()
+                .WithType<TestClass2>()
+                .WithGenericResolvers()
+                .Build();
+
+            sut.Invoking(x => x.Resolve<TestClass2>()).ShouldThrow<NoSuitableRegistrationException>();
+            var resolvedFunction = sut.Resolve<Func<TestClass1, TestClass2>>();
+            var dependency = new TestClass1();
+            var resolvedInstance = resolvedFunction(dependency);
+            resolvedInstance.ResolvedDependency.Should().BeSameAs(dependency);
+        }
+
+        public class TestClass3
+        {
+            public TestClass1 ResolvedDependency { get; }
+            public TestClass3([Attributes.Ignore]TestClass1 resolvedDependency)
+            {
+                ResolvedDependency = resolvedDependency;
+            }
+        }
+
+        [TestMethod]
+        public void IgnoreConstructorParameters()
+        {
+            var sut = new ContainerBuilder()
+                .WithType<TestClass1>()
+                .WithType<TestClass3>()
+                .WithGenericResolvers()
+                .Build();
+
+            sut.Invoking(x => x.Resolve<TestClass1>()).ShouldNotThrow();
+            sut.Invoking(x => x.Resolve<TestClass3>()).ShouldThrow<NoSuitableRegistrationException>();
+            var resolvedFunction = sut.Resolve<Func<TestClass1, TestClass3>>();
+            var dependency = new TestClass1();
+            var resolvedInstance = resolvedFunction(dependency);
+            resolvedInstance.ResolvedDependency.Should().BeSameAs(dependency);
         }
     }
 }

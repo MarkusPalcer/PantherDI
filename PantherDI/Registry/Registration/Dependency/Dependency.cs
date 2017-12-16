@@ -8,7 +8,7 @@ using PantherDI.Comparers;
 
 namespace PantherDI.Registry.Registration.Dependency
 {
-    [DebuggerDisplay("Dependency<{ExpectedType}>({RequiredContracts})")]
+    [DebuggerDisplay("{Ignored ? \"Ignored\" : ''}Dependency<{ExpectedType}>({RequiredContracts})")]
     public class Dependency : IDependency
     {
         public Dependency(Type expectedType, params object[] requiredContracts)
@@ -27,6 +27,8 @@ namespace PantherDI.Registry.Registration.Dependency
         public Type ExpectedType { get; }
 
         public ISet<object> RequiredContracts { get; }
+
+        public bool Ignored { get; set; }
 
         public class EqualityComparer : IEqualityComparer, IEqualityComparer<IDependency>
         {
@@ -58,13 +60,17 @@ namespace PantherDI.Registry.Registration.Dependency
                 if (ReferenceEquals(null, x) || ReferenceEquals(null, y)) return false;
                 if (x.ExpectedType != y.ExpectedType) return false;
                 if (!SetComparer<object>.Instance.Equals(x.RequiredContracts, y.RequiredContracts)) return false;
+                if (x.Ignored != y.Ignored) return false;
 
                 return true;
             }
 
             public int GetHashCode(IDependency obj)
             {
-                return ((obj.ExpectedType != null ? obj.ExpectedType.GetHashCode() : 0) * 397) ^ SetComparer<object>.Instance.GetHashCode(obj.RequiredContracts);
+                var hashCode = obj.ExpectedType != null ? obj.ExpectedType.GetHashCode() : 0;
+                hashCode = (hashCode * 397) ^ SetComparer<object>.Instance.GetHashCode(obj.RequiredContracts);
+                hashCode = (hashCode * 397) ^ obj.Ignored.GetHashCode();
+                return hashCode;
             }
         }
     }

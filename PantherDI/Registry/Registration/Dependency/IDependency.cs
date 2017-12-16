@@ -20,5 +20,10 @@ namespace PantherDI.Registry.Registration.Dependency
         /// Gets an <see cref="ISet{T}"/> containing all contracts that need to be fulifilled in order to satisfy this dependency
         /// </summary>
         ISet<object> RequiredContracts { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this dependency should remain unresolved.
+        /// </summary>
+        bool Ignored { get; }
     }
 }

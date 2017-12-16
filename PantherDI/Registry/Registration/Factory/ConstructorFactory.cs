@@ -32,6 +32,8 @@ namespace PantherDI.Registry.Registration.Factory
                         result.RequiredContracts.Add(parameter.ParameterType);
                     }
 
+                    result.Ignored = parameter.GetCustomAttributes<IgnoreAttribute>().Any();
+
                     return result;
                 }).ToArray();
         }
