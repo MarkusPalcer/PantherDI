@@ -14,6 +14,22 @@ namespace PantherDI.Resolved.Providers
             Metadata = metadata;
         }
 
+        public static DelegateProvider WrapProvider<T>(Func<Dictionary<IDependency, object>, object> @delegate, IProvider provider)
+        {
+            var p = new DelegateProvider(@delegate, provider.Metadata)
+            {
+                FulfilledContracts = new HashSet<object>(provider.FulfilledContracts),
+                UnresolvedDependencies = provider.UnresolvedDependencies,
+                ResultType = typeof(T),
+                Singleton = provider.Singleton
+            };
+
+            p.FulfilledContracts.Remove(provider.ResultType);
+            p.FulfilledContracts.Add(typeof(T));
+
+            return p;
+        }
+
         public HashSet<IDependency> UnresolvedDependencies { get; internal set; } = new HashSet<IDependency>(new Dependency.EqualityComparer());
         public Type ResultType { get; internal set; }
         public ISet<object> FulfilledContracts { get; internal set; } = new HashSet<object>();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using PantherDI.Attributes;
+using PantherDI.Extensions;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved.Providers;
 
@@ -19,12 +20,6 @@ namespace PantherDI.Resolvers
 
             public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
             {
-                var innerDependency = new Dependency(typeof(T));
-                foreach (var contract in dependency.RequiredContracts.Where(x => !Equals(x, typeof(Lazy<T, TMetadata>))))
-                {
-                    innerDependency.RequiredContracts.Add(contract);
-                }
-
                 var requestedMetadata = typeof(TMetadata)
                     .GetTypeInfo()
                     .DeclaredProperties
@@ -34,7 +29,7 @@ namespace PantherDI.Resolvers
                     .ToDictionary<PropertyInfo, string, Action<TMetadata, object>>(property => property.Name,
                                                                                    property => ((metadata, value) => property.SetValue(metadata, value)));
 
-                var providers = dependencyResolver(innerDependency).ToArray();
+                var providers = dependencyResolver(dependency.ReplaceExpectedType<T>()).ToArray();
 
                 foreach (var provider in providers)
                 {

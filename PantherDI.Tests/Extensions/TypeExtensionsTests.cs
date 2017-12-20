@@ -79,9 +79,17 @@ namespace PantherDI.Tests.Extensions
         private class TestClass8 : TestInterface3 { }
 
         [TestMethod]
-        public void ImplementingContractsIndirectly()
+        public void ImplementingContractsIndirectlyThroughInterfaces()
         {
             typeof(TestClass8).GetTypeInfo().GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestInterface3), "D");
+        }
+
+        private class TestClass9 : TestClass6 { }
+
+        [TestMethod]
+        public void ImplementingContractsIndirectlyThroughClasses()
+        {
+            typeof(TestClass9).GetTypeInfo().GetFulfilledContracts().Should().BeEquivalentTo(typeof(TestInterface1), "C");
         }
     }
 
