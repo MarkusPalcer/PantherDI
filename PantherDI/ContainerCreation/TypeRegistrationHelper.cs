@@ -50,6 +50,11 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public bool IsSingleton { get; set; } = false;
 
+        /// <summary>
+        /// Gets the dictionary of metadata for the registered type
+        /// </summary>
+        public Dictionary<string, object> Metadata => _registration.Metadata;
+
         internal void RegisterTo(ContainerBuilder cb)
         {
             if (RegisterWithReflection)
@@ -128,6 +133,15 @@ namespace PantherDI.ContainerCreation
         public TypeRegistrationHelper WithFactory(IFactory factory)
         {
             Factories.Add(factory);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a metadata entry 
+        /// </summary>
+        public TypeRegistrationHelper WithMetadata(string key, object value)
+        {
+            Metadata[key] = value;
             return this;
         }
     }

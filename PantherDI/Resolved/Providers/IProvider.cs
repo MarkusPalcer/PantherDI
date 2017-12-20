@@ -35,5 +35,10 @@ namespace PantherDI.Resolved.Providers
         /// Gets a value indicating whether only a single instance of this registered type should be created
         /// </summary>
         bool Singleton { get; }
+
+        /// <summary>
+        /// Gets a dictionary of all metadata associated with the created type
+        /// </summary>
+        IReadOnlyDictionary<string, object> Metadata { get; }
     }
 }

@@ -27,6 +27,8 @@ namespace PantherDI.Resolved.Providers
         // This provider does not need to be wrapped any further.
         public bool Singleton => false;
 
+        public IReadOnlyDictionary<string, object> Metadata => _originalProvider.Metadata;
+
         public SingletonProvider(IProvider originalProvider, Dictionary<Type, object> cache)
         {
             _originalProvider = originalProvider;

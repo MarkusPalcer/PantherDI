@@ -29,6 +29,8 @@ namespace PantherDI.Registry.Registration.Registration
         public ISet<IFactory> Factories { get; }
         public bool Singleton { get; }
 
+        public IReadOnlyDictionary<string, object> Metadata { get; } = new Dictionary<string, object>();
+
         public static TypeRegistration Create<T>() 
         {
             return new TypeRegistration(typeof(T).GetTypeInfo());

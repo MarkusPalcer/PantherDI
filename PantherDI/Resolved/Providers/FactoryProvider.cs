@@ -45,6 +45,7 @@ namespace PantherDI.Resolved.Providers
                 new HashSet<object>(providedRegistration.FulfilledContracts) {providedRegistration.RegisteredType};
 
             Singleton = providedRegistration.Singleton;
+            Metadata = providedRegistration.Metadata;
         }
 
         public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
@@ -78,5 +79,6 @@ namespace PantherDI.Resolved.Providers
         }
 
         public bool Singleton { get; }
+        public IReadOnlyDictionary<string, object> Metadata { get; }
     }
 }

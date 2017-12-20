@@ -40,7 +40,7 @@ namespace PantherDI.Resolvers
                         }
 
                         return (T)provider.CreateInstance(objects);
-                    }))
+                    }), provider.Metadata)
                     {
                         FulfilledContracts = new HashSet<object>(provider.FulfilledContracts),
                         ResultType = typeof(Func<TIn, T>),

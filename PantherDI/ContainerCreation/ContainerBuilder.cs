@@ -137,7 +137,8 @@ namespace PantherDI.ContainerCreation
             return WithResolver(new EnumerableResolver())
                 .WithResolver(new Func0Resolver())
                 .WithResolver(new Func1Resolver())
-                .WithResolver(new LazyResolver());
+                .WithResolver(new LazyResolver())
+                .WithResolver(new MetadataResolver());
         }
 
         /// <summary>

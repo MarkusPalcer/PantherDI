@@ -21,7 +21,7 @@ namespace PantherDI.Resolvers
 
                 foreach (var provider in dependencyResolver(innerDependency))
                 {
-                    var p = new DelegateProvider(x => new Lazy<T>(() => (T)provider.CreateInstance(x)))
+                    var p = new DelegateProvider(x => new Lazy<T>(() => (T)provider.CreateInstance(x)), provider.Metadata)
                     {
                         FulfilledContracts = new HashSet<object>(provider.FulfilledContracts),
                         UnresolvedDependencies = provider.UnresolvedDependencies,

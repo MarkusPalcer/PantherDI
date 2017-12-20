@@ -46,6 +46,7 @@ namespace PantherDI.Resolvers
                 FulfilledContracts = new HashSet<object>(_innerProviders[0].FulfilledContracts);
                 FulfilledContracts.Remove(_innerProviders[0].ResultType);
                 FulfilledContracts.Add(ResultType);
+                Metadata = provider.Metadata.ToDictionary(x => x.Key, x => x.Value);
             }
 
             public void Add(IProvider provider)
@@ -53,6 +54,21 @@ namespace PantherDI.Resolvers
                 FulfilledContracts.IntersectWith(provider.FulfilledContracts);
                 FulfilledContracts.Add(ResultType);
                 _innerProviders.Add(provider);
+
+                // Just keep metadata that are contained and equal in all added providers
+                var entriesToRemove = Metadata.Where(entry =>
+                                              {
+                                                  if (!provider.Metadata.TryGetValue(entry.Key, out var value)) return true;
+                                                  if (!Equals(value, entry.Value)) return true;
+                                                  return false;
+                                              })
+                                              .Select(x => x.Key)
+                                              .ToArray();
+
+                foreach (var entryToRemove in entriesToRemove)
+                {
+                    Metadata.Remove(entryToRemove);
+                }
             }
 
             public ISet<object> FulfilledContracts { get; }
@@ -62,6 +78,9 @@ namespace PantherDI.Resolvers
             public Type ResultType => typeof(IEnumerable<>).MakeGenericType(_innerProviders[0].ResultType);
 
             public bool Singleton => _innerProviders.All(x => x.Singleton);
+            IReadOnlyDictionary<string, object> IProvider.Metadata => Metadata;
+
+            private Dictionary<string, object> Metadata { get; }
 
             public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
             {

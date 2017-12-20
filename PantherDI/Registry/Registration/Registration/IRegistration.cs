@@ -28,5 +28,10 @@ namespace PantherDI.Registry.Registration.Registration
         /// Gets a value indicating whether only a single instance of this registered type should be created
         /// </summary>
         bool Singleton { get; }
+
+        /// <summary>
+        ///  Gets the metadata for this registered type
+        /// </summary>
+        IReadOnlyDictionary<string, object> Metadata { get; }
     }
 }

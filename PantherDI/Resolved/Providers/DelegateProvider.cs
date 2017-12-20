@@ -8,9 +8,10 @@ namespace PantherDI.Resolved.Providers
     {
         private readonly Func<Dictionary<IDependency, object>, object> _delegate;
 
-        public DelegateProvider(Func<Dictionary<IDependency, object>, object> @delegate)
+        public DelegateProvider(Func<Dictionary<IDependency, object>, object> @delegate, IReadOnlyDictionary<string, object> metadata)
         {
             _delegate = @delegate;
+            Metadata = metadata;
         }
 
         public HashSet<IDependency> UnresolvedDependencies { get; internal set; } = new HashSet<IDependency>(new Dependency.EqualityComparer());
@@ -22,5 +23,6 @@ namespace PantherDI.Resolved.Providers
         }
 
         public bool Singleton { get; internal set; }
+        public IReadOnlyDictionary<string, object> Metadata { get; }
     }
 }

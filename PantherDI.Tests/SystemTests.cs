@@ -39,8 +39,8 @@ namespace PantherDI.Tests
                 .WithRegistration(
                                   new ManualRegistration()
                                   {
-                                      FulfilledContracts = {typeof(ICatalog), "SomeContract"},
-                                      Factories = {new Factory(Factory)},
+                                      FulfilledContracts = { typeof(ICatalog), "SomeContract" },
+                                      Factories = { new Factory(Factory) },
                                       RegisteredType = typeof(Catalog)
                                   })
                 .Build();
@@ -275,6 +275,44 @@ namespace PantherDI.Tests
             sut.Invoking(x => x.Resolve<TestClass1>()).ShouldNotThrow();
             sut.Invoking(x => x.Resolve<TestClass5>()).ShouldThrow<CircularDependencyException>();
             sut.Invoking(x => x.Resolve<TestClass6>()).ShouldThrow<CircularDependencyException>();
+        }
+
+        private class Metadata1
+        {
+            public string Entry1 { get; set; }
+            public int Entry2 { get; set; }
+            public Type Entry3 { get; set; }
+        }
+
+        [TestMethod]
+        public void RegisterTypeWithRegistrationHelper()
+        {
+            var cb = new ContainerBuilder();
+            cb.Register<TestClass1>()
+                .WithConstructors();
+
+            var sut = cb.Build();
+
+            sut.Invoking(x => x.Resolve<TestClass1>()).ShouldNotThrow();
+        }
+
+        [TestMethod]
+        public void ManualRegisteredMetadata()
+        {
+            var cb = new ContainerBuilder()
+                .WithGenericResolvers();
+            cb.Register<TestClass1>()
+              .WithConstructors()
+              .WithMetadata("Entry1", "StringEntry")
+              .WithMetadata("Entry2", 42)
+              .WithMetadata("Entry3", typeof(string));
+            var sut = cb.Build();
+
+            var resolved = sut.Resolve<Lazy<TestClass1, Metadata1>>();
+
+            resolved.Metadata.Entry1.Should().Be("StringEntry");
+            resolved.Metadata.Entry2.Should().Be(42);
+            resolved.Metadata.Entry3.Should().Be(typeof(string));
         }
     }
 }

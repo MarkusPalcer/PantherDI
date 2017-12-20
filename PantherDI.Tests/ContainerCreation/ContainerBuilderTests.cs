@@ -7,7 +7,8 @@ using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
-using PantherDI.Tests.Helpers;
+    using PantherDI.Resolvers;
+    using PantherDI.Tests.Helpers;
 
 namespace PantherDI.Tests.ContainerCreation
 {
@@ -120,6 +121,25 @@ namespace PantherDI.Tests.ContainerCreation
             })};
 
             sut.Invoking(x => x.Build()).ShouldThrow<CircularDependencyException>();
+        }
+
+        [TestMethod]
+        public void RegisteringWithMetadata()
+        {
+            var sut = new ContainerBuilder();
+            sut.Register<ContainerBuilderTests>()
+                .WithConstructors()
+               .WithMetadata("Test", 123);
+
+            var cnt = (Container)sut.Build();
+
+            var kb = ((MergedResolver) cnt._rootResolver).OfType<KnowledgeBase>().Single();
+
+            var providers = kb[typeof(ContainerBuilderTests)].ToArray();
+            var provider = providers.Single();
+            var entry = provider.Metadata.Single();
+            entry.Key.Should().Be("Test");
+            entry.Value.Should().Be(123);
         }
     }
 }

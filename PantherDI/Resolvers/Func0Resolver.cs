@@ -26,7 +26,7 @@ namespace PantherDI.Resolvers
 
                 foreach (var provider in providers)
                 {
-                    var p = new DelegateProvider(objects => (Func<T>)(() => (T)provider.CreateInstance(objects)))
+                    var p = new DelegateProvider(objects => (Func<T>)(() => (T)provider.CreateInstance(objects)), provider.Metadata)
                     {
                         FulfilledContracts = new HashSet<object>(provider.FulfilledContracts),
                         UnresolvedDependencies = provider.UnresolvedDependencies,
