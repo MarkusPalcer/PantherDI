@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using PantherDI.Attributes;
 using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
 using PantherDI.Registry.Catalog;
@@ -277,13 +278,6 @@ namespace PantherDI.Tests
             sut.Invoking(x => x.Resolve<TestClass6>()).ShouldThrow<CircularDependencyException>();
         }
 
-        private class Metadata1
-        {
-            public string Entry1 { get; set; }
-            public int Entry2 { get; set; }
-            public Type Entry3 { get; set; }
-        }
-
         [TestMethod]
         public void RegisterTypeWithRegistrationHelper()
         {
@@ -294,6 +288,28 @@ namespace PantherDI.Tests
             var sut = cb.Build();
 
             sut.Invoking(x => x.Resolve<TestClass1>()).ShouldNotThrow();
+        }
+
+        private class MyMetadataAttribute : MetadataAttribute
+        {
+            public MyMetadataAttribute(Type value) : base("Entry3", value)
+            {
+            }
+
+            public MyMetadataAttribute() : base("Entry3")
+            {
+            }
+        }
+
+        private class Metadata1
+        {
+            public string Entry1 { get; set; }
+
+            [Metadata("Entry2")]
+            public int Something { get; set; }
+
+            [MyMetadata]
+            public Type AnotherThing { get; set; }
         }
 
         [TestMethod]
@@ -311,8 +327,34 @@ namespace PantherDI.Tests
             var resolved = sut.Resolve<Lazy<TestClass1, Metadata1>>();
 
             resolved.Metadata.Entry1.Should().Be("StringEntry");
-            resolved.Metadata.Entry2.Should().Be(42);
-            resolved.Metadata.Entry3.Should().Be(typeof(string));
+            resolved.Metadata.Something.Should().Be(42);
+            resolved.Metadata.AnotherThing.Should().Be(typeof(string));
         }
+
+        [Metadata("Entry1", "Value")]
+        [Metadata("Entry2", 42)]
+        [MyMetadata(typeof(string))]
+        public class TestClass7
+        {
+        }
+
+        [TestMethod]
+        public void AutoRegisteredMetadata()
+        {
+            var cb = new ContainerBuilder()
+                .WithGenericResolvers();
+            cb.Register<TestClass7>()
+              .WithConstructors()
+              .UsingReflection();
+
+            var sut = cb.Build();
+
+            var resolved = sut.Resolve<Lazy<TestClass7, Metadata1>>();
+
+            resolved.Metadata.Entry1.Should().Be("Value");
+            resolved.Metadata.Something.Should().Be(42);
+            resolved.Metadata.AnotherThing.Should().Be(typeof(string));
+        }
+
     }
 }

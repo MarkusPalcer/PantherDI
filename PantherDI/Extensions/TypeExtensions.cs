@@ -23,6 +23,11 @@ namespace PantherDI.Extensions
                 yield return type;
         }
 
+        public static IEnumerable<TOut> SelectAttributes<TAttribute, TOut>(this IEnumerable<Type> types, Func<Type, TAttribute, TOut> selector) where TAttribute : Attribute
+        {
+            return types.SelectMany(t => t.GetTypeInfo().GetCustomAttributes<TAttribute>().Select(a => selector(t, a)));
+        }
+
         public static IEnumerable<object> GetFulfilledContracts(this TypeInfo type)
         {
             var result = type.ScanForContracts().ToArray();
@@ -35,8 +40,7 @@ namespace PantherDI.Extensions
             return typeInfo.AsType()
                            .GetTypeHierarchy()
                            .Concat(typeInfo.ImplementedInterfaces)
-                           .SelectMany(t => t.GetTypeInfo().GetCustomAttributes<ContractAttribute>().Select(attr => Tuple.Create(t, attr)))
-                           .Select(x => x.Item2.Contract ?? x.Item1);
+                           .SelectAttributes<ContractAttribute, object>((type, attribute) => attribute.Contract ?? type);
         }
     }
 }

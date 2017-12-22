@@ -11,7 +11,6 @@ namespace PantherDI.Resolvers
 {
     public class MetadataResolver : GenericResolver
     {
-
         public MetadataResolver() : base(typeof(Lazy<,>), typeof(InnerResolver<,>)) { }
 
         public class InnerResolver<T, TMetadata> : IResolver where TMetadata : new()
@@ -26,7 +25,7 @@ namespace PantherDI.Resolvers
                     .Where(x => !x.IsSpecialName)
                     .Where(x => !x.GetCustomAttributes<IgnoreAttribute>().Any())
                     .Where(x => x.CanWrite)
-                    .ToDictionary<PropertyInfo, string, Action<TMetadata, object>>(property => property.Name,
+                    .ToDictionary<PropertyInfo, string, Action<TMetadata, object>>(property => property.GetCustomAttributes<MetadataAttribute>().SingleOrDefault()?.Key ?? property.Name,
                                                                                    property => ((metadata, value) => property.SetValue(metadata, value)));
 
                 var providers = dependencyResolver(dependency.ReplaceExpectedType<T>()).ToArray();

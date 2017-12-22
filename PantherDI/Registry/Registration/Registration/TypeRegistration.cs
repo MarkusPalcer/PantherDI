@@ -11,6 +11,8 @@ namespace PantherDI.Registry.Registration.Registration
     public class TypeRegistration : IRegistration
 
     {
+        private readonly Dictionary<string, object> _metadata = new Dictionary<string, object>();
+
         public TypeRegistration(TypeInfo type) : this(type, type.GetFulfilledContracts()) { }
 
         public TypeRegistration(TypeInfo type, IEnumerable<object> fulfilledContracts)
@@ -22,6 +24,41 @@ namespace PantherDI.Registry.Registration.Registration
                                            .Select(x => new ConstructorFactory(x));
             Factories = new HashSet<IFactory>(constructorFactories);
             Singleton = type.GetCustomAttributes<SingletonAttribute>().Any();
+            CollectMetadata();
+        }
+
+        private void CollectMetadata()
+        {
+            var typeHierarchy = RegisteredType
+                .GetTypeHierarchy()
+                .Select(x => x.GetTypeInfo())
+                .Reverse();
+
+            foreach (var type in typeHierarchy)
+            {
+                foreach (var attribute in type.GetCustomAttributes<MetadataAttribute>().Where(x => x.HasValue))
+                {
+                    _metadata[attribute.Key] = attribute.Value;
+                }
+
+                var fieldMetadata = type.DeclaredFields.Where(x => x.IsStatic && !x.IsSpecialName)
+                    .SelectManyForPairs(x => x.GetCustomAttributes<MetadataAttribute>(),
+                                        (f, a) => new MetadataAttribute(a.Key ?? f.Name, f.GetValue(null)));
+
+                foreach (var attribute in fieldMetadata)
+                {
+                    _metadata[attribute.Key] = attribute.Value;
+                }
+
+                var propertyMetadata = type.DeclaredProperties.Where(x => x.GetMethod.IsStatic)
+                                           .SelectManyForPairs(x => x.GetCustomAttributes<MetadataAttribute>(),
+                                                               (p, a) => new MetadataAttribute(a.Key ?? p.Name, p.GetValue(null)));
+
+                foreach (var attribute in propertyMetadata)
+                {
+                    _metadata[attribute.Key] = attribute.Value;
+                }
+            }
         }
 
         public Type RegisteredType { get; }
@@ -29,7 +66,7 @@ namespace PantherDI.Registry.Registration.Registration
         public ISet<IFactory> Factories { get; }
         public bool Singleton { get; }
 
-        public IReadOnlyDictionary<string, object> Metadata { get; } = new Dictionary<string, object>();
+        public IReadOnlyDictionary<string, object> Metadata => _metadata;
 
         public static TypeRegistration Create<T>() 
         {
