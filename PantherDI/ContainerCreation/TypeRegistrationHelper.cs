@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using PantherDI.Extensions;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 
@@ -33,17 +34,17 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Whether reflection should be used to determine which contracts this type fulfils
         /// </summary>
-        public bool RegisterWithReflection { get; set; } = false;
-
-        /// <summary>
-        /// The factories that create the registered type
-        /// </summary>
-        public ISet<IFactory> Factories => _registration.Factories;
+        public bool UseReflectionForContracts { get; set; } = false;
 
         /// <summary>
         /// Whether to register the types' constructors as factories
         /// </summary>
-        public bool RegisterWithConstructors { get; set; } = false;
+        public bool UseConstructorsAsFactories { get; set; } = false;
+
+        /// <summary>
+        /// Whether to scan the type for metadata using reflection
+        /// </summary>
+        public bool UseReflectionForMetadata { get; set; } = false;
 
         /// <summary>
         /// Whether the given type should be treated as a singleton
@@ -55,19 +56,32 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public Dictionary<string, object> Metadata => _registration.Metadata;
 
+        /// <summary>
+        /// The factories that create the registered type
+        /// </summary>
+        public ISet<IFactory> Factories => _registration.Factories;
+
         internal void RegisterTo(ContainerBuilder cb)
         {
-            if (RegisterWithReflection)
+            if (UseReflectionForContracts)
             {
-                cb.WithType(_type);
+                foreach (var contract in _type.GetTypeInfo().GetFulfilledContracts())
+                {
+                    Contracts.Add(contract);
+                }
             }
 
-            if (RegisterWithConstructors)
+            if (UseConstructorsAsFactories)
             {
                 foreach (var factory in _type.GetTypeInfo().DeclaredConstructors.Select(x => new ConstructorFactory(x)))
                 {
                     Factories.Add(factory);
                 }
+            }
+
+            if (UseReflectionForMetadata)
+            {
+                TypeRegistration.CollectMetadata(_type, Metadata);
             }
 
             _registration.Singleton = IsSingleton;
@@ -103,9 +117,9 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Enables the use of reflection to determine fulfilled contracts
         /// </summary>
-        public TypeRegistrationHelper UsingReflection()
+        public TypeRegistrationHelper WithContractsViaReflection()
         {
-            RegisterWithReflection = true;
+            UseReflectionForContracts = true;
             return this;
         }
 
@@ -114,7 +128,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public TypeRegistrationHelper WithConstructors()
         {
-            RegisterWithConstructors = true;
+            UseConstructorsAsFactories = true;
             return this;
         }
 
@@ -133,6 +147,15 @@ namespace PantherDI.ContainerCreation
         public TypeRegistrationHelper WithFactory(IFactory factory)
         {
             Factories.Add(factory);
+            return this;
+        }
+
+        /// <summary>
+        /// Enables searching for metadata via reflection
+        /// </summary>
+        public TypeRegistrationHelper WithMetadataViaReflection()
+        {
+            UseReflectionForMetadata = true;
             return this;
         }
 

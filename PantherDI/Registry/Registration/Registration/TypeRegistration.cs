@@ -24,12 +24,12 @@ namespace PantherDI.Registry.Registration.Registration
                                            .Select(x => new ConstructorFactory(x));
             Factories = new HashSet<IFactory>(constructorFactories);
             Singleton = type.GetCustomAttributes<SingletonAttribute>().Any();
-            CollectMetadata();
+            CollectMetadata(RegisteredType, _metadata);
         }
 
-        private void CollectMetadata()
+        internal static void CollectMetadata(Type registeredType, Dictionary<string, object> metadata)
         {
-            var typeHierarchy = RegisteredType
+            var typeHierarchy = registeredType
                 .GetTypeHierarchy()
                 .Select(x => x.GetTypeInfo())
                 .Reverse();
@@ -38,7 +38,7 @@ namespace PantherDI.Registry.Registration.Registration
             {
                 foreach (var attribute in type.GetCustomAttributes<MetadataAttribute>().Where(x => x.HasValue))
                 {
-                    _metadata[attribute.Key] = attribute.Value;
+                    metadata[attribute.Key] = attribute.Value;
                 }
 
                 var fieldMetadata = type.DeclaredFields.Where(x => x.IsStatic && !x.IsSpecialName)
@@ -47,7 +47,7 @@ namespace PantherDI.Registry.Registration.Registration
 
                 foreach (var attribute in fieldMetadata)
                 {
-                    _metadata[attribute.Key] = attribute.Value;
+                    metadata[attribute.Key] = attribute.Value;
                 }
 
                 var propertyMetadata = type.DeclaredProperties.Where(x => x.GetMethod.IsStatic)
@@ -56,7 +56,7 @@ namespace PantherDI.Registry.Registration.Registration
 
                 foreach (var attribute in propertyMetadata)
                 {
-                    _metadata[attribute.Key] = attribute.Value;
+                    metadata[attribute.Key] = attribute.Value;
                 }
             }
         }

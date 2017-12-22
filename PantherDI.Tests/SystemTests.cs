@@ -345,7 +345,7 @@ namespace PantherDI.Tests
                 .WithGenericResolvers();
             cb.Register<TestClass7>()
               .WithConstructors()
-              .UsingReflection();
+              .WithMetadataViaReflection();
 
             var sut = cb.Build();
 
