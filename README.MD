@@ -17,6 +17,8 @@ The developer diary can be found on my blog (http://markuspalcer.blogspot.de/ ):
 - [Part 2 - Constructing a container](http://markuspalcer.blogspot.com/2017/11/panther-di-part-2-constructing-container.html)
 - [Part 3 - Singletons, Generics and Reflection](http://markuspalcer.blogspot.com/2017/11/pantherdi-part-3-singletons-generics.html)
 - [Part 4 - The first release](http://markuspalcer.blogspot.com/2017/12/pantherdi-part-4-first-release.html)
+- [Part 5 - Instance registration, Late processing, IgnoreAttribute](http://markuspalcer.blogspot.com/2017/12/pantherdi-part-5-instance-registration.html)
+- [Part 6 - Metadata, Factories](http://markuspalcer.blogspot.com/2017/12/pantherdi-part-6-metadata-factories.html)
 
 PantherDI is still under development and even new features will get blog posts.
 
