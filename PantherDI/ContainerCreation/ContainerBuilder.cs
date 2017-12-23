@@ -256,7 +256,6 @@ namespace PantherDI.ContainerCreation
             return result;
         }
 
-
         /// <summary>
         /// Adds an instance to the container
         /// </summary>

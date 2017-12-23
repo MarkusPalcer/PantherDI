@@ -376,5 +376,22 @@ namespace PantherDI.Tests
             sut.Resolve<string>("Registration1").Should().Be("Test");
             sut.Resolve<string>("Test").Should().Be("Value");
         }
+
+        public class TestClass9 { }
+
+        [Factory]
+        [Contract("Test")]
+        public static TestClass9 TestFactory()
+        {
+            return new TestClass9();
+        }
+
+        [TestMethod]
+        public void FactoryRegisteredViaReflection()
+        {
+            var sut = new ContainerBuilder().WithAssemblyOf<SystemTests>().Build();
+            sut.Invoking(x => x.Resolve<TestClass9>()).ShouldNotThrow();
+            sut.Invoking(x => x.Resolve<TestClass9>("Test")).ShouldNotThrow();
+        }
     }
 }

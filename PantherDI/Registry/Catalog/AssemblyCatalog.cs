@@ -38,11 +38,16 @@ namespace PantherDI.Registry.Catalog
                                                              .Where(x => x.Item2.Any())
                                                              .Select(CreateInstanceRegistration);
 
-
+            var factoriesRegisteredViaMethods = assembly.DefinedTypes
+                                                        .SelectMany(t => t.DeclaredMethods)
+                                                        .Where(x => x.IsStatic && !x.IsSpecialName)
+                                                        .Where(x => x.GetCustomAttributes<FactoryAttribute>().Any())
+                                                        .Select(x => CreateRegistrationForFactory(new MethodFactory(x), x.ReturnType));
 
             Registrations = typeRegistrations
                 .Concat(instanceRegistrationsViaProperties)
                 .Concat(instanceRegistrationsViaFields)
+                .Concat(factoriesRegisteredViaMethods)
                 .ToArray();
         }
 
@@ -58,16 +63,22 @@ namespace PantherDI.Registry.Catalog
             };
         }
 
+        private IRegistration CreateRegistrationForFactory(IFactory factory, Type registeredType)
+        {
+            return new ManualRegistration(new HashSet<object>(), new HashSet<IFactory>(new[] {factory}), new Dictionary<string, object>())
+            {
+                RegisteredType = registeredType,
+                Singleton = false
+            };
+        }
+
         private IRegistration CreateInstanceRegistration(Tuple<FieldInfo, IEnumerable<ContractAttribute>> arg)
         {
             var field = arg.Item1;
             var contracts = new HashSet<object>(arg.Item2.Select(a => a.Contract ?? field.Name));
+            var factory = new InstanceFactory<object>(field.GetValue(null), contracts.ToArray());
 
-            return new ManualRegistration(new HashSet<object>(), new HashSet<IFactory>(new[] { new InstanceFactory<object>(field.GetValue(null), contracts.ToArray()) }), new Dictionary<string, object>())
-            {
-                RegisteredType = field.FieldType,
-                Singleton = false
-            };
+            return CreateRegistrationForFactory(factory, field.FieldType);
         }
 
         #region Implementation of ICatalog

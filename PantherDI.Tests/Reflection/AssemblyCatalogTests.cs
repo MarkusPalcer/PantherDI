@@ -16,7 +16,7 @@ namespace PantherDI.Tests.Reflection
         public void TestAssembly()
         {
             var sut = new AssemblyCatalog(typeof(AssemblyCatalogTests).Assembly);
-            sut.Registrations.Should().HaveCount(14);
+            sut.Registrations.Should().HaveCount(15);
         }
     }
 }
