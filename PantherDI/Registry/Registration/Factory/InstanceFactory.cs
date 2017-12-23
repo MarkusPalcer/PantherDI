@@ -12,9 +12,10 @@ namespace PantherDI.Registry.Registration.Factory
     {
         private readonly T _instance;
 
-        public InstanceFactory(T instance)
+        public InstanceFactory(T instance, object[] contracts)
         {
             _instance = instance;
+            Contracts = new HashSet<object>(contracts);
         }
 
         #region Implementation of IFactory
@@ -25,6 +26,8 @@ namespace PantherDI.Registry.Registration.Factory
         }
 
         public IEnumerable<IDependency> Dependencies => Enumerable.Empty<IDependency>();
+
+        public IEnumerable<object> Contracts { get; }
 
         #endregion
     }

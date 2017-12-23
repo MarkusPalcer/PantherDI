@@ -27,7 +27,7 @@ namespace PantherDI.Registry.Registration.Registration
             CollectMetadata(RegisteredType, _metadata);
         }
 
-        internal static void CollectMetadata(Type registeredType, Dictionary<string, object> metadata)
+        internal static void CollectMetadata(Type registeredType, Dictionary<string, object> metadata) 
         {
             var typeHierarchy = registeredType
                 .GetTypeHierarchy()

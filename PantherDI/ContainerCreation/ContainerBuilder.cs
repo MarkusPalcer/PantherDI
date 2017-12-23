@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using PantherDI.Registry.Catalog;
-using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolvers;
 
@@ -15,13 +14,18 @@ namespace PantherDI.ContainerCreation
     /// </summary>
     public class ContainerBuilder : IEnumerable
     {
+        internal interface IRegistrationHelper
+        {
+            void RegisterTo(ContainerBuilder cb);
+        }
+
         public List<ICatalog> Catalogs { get; } = new List<ICatalog>();
 
         public List<IResolver> Resolvers { get; } = new List<IResolver>();
 
         public List<IRegistration> Registrations { get; } = new List<IRegistration>();
 
-        private List<TypeRegistrationHelper> TypeRegistrationHelpers { get; } = new List<TypeRegistrationHelper>();
+        private List<IRegistrationHelper> RegistrationHelpers { get; } = new List<IRegistrationHelper>();
 
         public bool IsStrict { get; set; } = true;
 
@@ -34,7 +38,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public IContainer Build()
         {
-            foreach (var typeRegistrationHelper in TypeRegistrationHelpers)
+            foreach (var typeRegistrationHelper in RegistrationHelpers)
             {
                 typeRegistrationHelper.RegisterTo(this);
             }
@@ -219,7 +223,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ContainerBuilder WithInstance<T>(T instance)
         {
-            RegisterInstance(instance);
+            Register(instance);
             return this;
         }
 
@@ -248,7 +252,7 @@ namespace PantherDI.ContainerCreation
         public TypeRegistrationHelper Register(Type t)
         {
             var result = new TypeRegistrationHelper(t);
-            TypeRegistrationHelpers.Add(result);
+            RegistrationHelpers.Add(result);
             return result;
         }
 
@@ -256,9 +260,11 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Adds an instance to the container
         /// </summary>
-        public TypeRegistrationHelper RegisterInstance<T>(T instance)
+        public InstanceRegistrationHelper<T> Register<T>(T instance)
         {
-            return Register(instance.GetType()).As<T>().WithFactory(new InstanceFactory<T>(instance));
+            var instanceRegistrationHelper = new InstanceRegistrationHelper<T>(instance);
+            RegistrationHelpers.Add(instanceRegistrationHelper);
+            return instanceRegistrationHelper;
         }
     }
 }

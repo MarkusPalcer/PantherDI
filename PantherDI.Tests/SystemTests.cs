@@ -356,5 +356,25 @@ namespace PantherDI.Tests
             resolved.Metadata.AnotherThing.Should().Be(typeof(string));
         }
 
+        public class TestClass8
+        {
+            [Contract]
+            public static string Registration1 => "Test";
+
+            [Contract("Test")]
+            public static string Registartion2 = "Value";
+        }
+
+        [TestMethod]
+        public void RegisteredInstancesViaPropertyAndField()
+        {
+            var sut = new ContainerBuilder()
+                .WithAssemblyOf<SystemTests>()
+                .WithGenericResolvers()
+                .Build();
+
+            sut.Resolve<string>("Registration1").Should().Be("Test");
+            sut.Resolve<string>("Test").Should().Be("Value");
+        }
     }
 }

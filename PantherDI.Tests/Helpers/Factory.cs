@@ -8,6 +8,7 @@ namespace PantherDI.Tests.Helpers
     public class Factory : IFactory
     {
         private readonly Func<object[], object> _executor;
+        private readonly HashSet<object> _contracts = new HashSet<object>();
 
         public object Execute(object[] resolvedDependencies)
         {
@@ -26,5 +27,8 @@ namespace PantherDI.Tests.Helpers
         }
 
         public IEnumerable<IDependency> Dependencies { get; }
+        IEnumerable<object> IFactory.Contracts => _contracts;
+
+        public HashSet<object> Contracts => _contracts;
     }
 }

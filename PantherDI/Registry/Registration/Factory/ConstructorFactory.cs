@@ -36,6 +36,8 @@ namespace PantherDI.Registry.Registration.Factory
 
                     return result;
                 }).ToArray();
+
+            Contracts = new HashSet<object>(_constructor.GetCustomAttributes<ContractAttribute>().Select(x => x.Contract ?? _constructor.DeclaringType));
         }
 
         public object Execute(object[] resolvedDependencies)
@@ -44,5 +46,6 @@ namespace PantherDI.Registry.Registration.Factory
         }
 
         public IEnumerable<IDependency> Dependencies { get; }
+        public IEnumerable<object> Contracts { get; }
     }
 }

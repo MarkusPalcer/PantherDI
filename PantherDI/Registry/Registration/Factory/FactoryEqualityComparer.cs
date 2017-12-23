@@ -14,15 +14,21 @@ namespace PantherDI.Registry.Registration.Factory
             if (ReferenceEquals(x, y)) return true;
             if (ReferenceEquals(x, null) || ReferenceEquals(y, null)) return false;
             if (x.Dependencies.Count() != y.Dependencies.Count()) return false;
+            if (x.Contracts.Count() != y.Contracts.Count()) return false;
 
-            return x.Dependencies.All(xd => y.Dependencies.Any(yd =>
-                _dependencyComparer.GetHashCode(xd) == _dependencyComparer.GetHashCode(yd) &&
-                _dependencyComparer.Equals(xd, yd)));
+            if (!x.Dependencies.All(xd => y.Dependencies.Any(yd => _dependencyComparer.GetHashCode(xd) == _dependencyComparer.GetHashCode(yd) &&
+                                                                   _dependencyComparer.Equals(xd, yd)))) return false;
+
+            if (!x.Contracts.All(xd => y.Contracts.Any(yd => Equals(xd, yd)))) return false;
+
+            return true;
         }
 
         public int GetHashCode(IFactory obj)
         {
-            return obj.Dependencies.Aggregate(0, (current, item) => (current * 397) ^ _dependencyComparer.GetHashCode(item));
+            var result = obj.Dependencies.Aggregate(0, (current, item) => (current * 397) ^ _dependencyComparer.GetHashCode(item));
+            result = (result * 397) ^ obj.Contracts.GetHashCode();
+            return result;
         }
 
         #endregion

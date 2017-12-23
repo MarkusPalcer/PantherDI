@@ -11,7 +11,7 @@ namespace PantherDI.ContainerCreation
     /// <summary>
     /// Provides a fluent interface for configuring a registered type
     /// </summary>
-    public class TypeRegistrationHelper
+    public class TypeRegistrationHelper : ContainerBuilder.IRegistrationHelper
     {
         private readonly Type _type;
 
@@ -61,7 +61,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ISet<IFactory> Factories => _registration.Factories;
 
-        internal void RegisterTo(ContainerBuilder cb)
+        void ContainerBuilder.IRegistrationHelper.RegisterTo(ContainerBuilder cb)
         {
             if (UseReflectionForContracts)
             {

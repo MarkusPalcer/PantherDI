@@ -42,7 +42,7 @@ namespace PantherDI.Resolved.Providers
             ResultType = providedRegistration.RegisteredType;
 
             FulfilledContracts =
-                new HashSet<object>(providedRegistration.FulfilledContracts) {providedRegistration.RegisteredType};
+                new HashSet<object>(providedRegistration.FulfilledContracts.Concat(factory.Contracts)) {providedRegistration.RegisteredType};
 
             Singleton = providedRegistration.Singleton;
             Metadata = providedRegistration.Metadata;

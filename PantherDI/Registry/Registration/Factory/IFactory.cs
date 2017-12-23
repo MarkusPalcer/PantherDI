@@ -20,5 +20,10 @@ namespace PantherDI.Registry.Registration.Factory
         /// Gets an <see cref="IEnumerable{T}"/> containing all dependencies that need to be resolved and provided to the <see cref="Execute"/>-method
         /// </summary>
         IEnumerable<IDependency> Dependencies { get; }
+
+        /// <summary>
+        /// Gets an <see cref="IEnumerable{T}"/> containing contracts additional to the type itself
+        /// </summary>
+        IEnumerable<object> Contracts { get; }
     }
 }
