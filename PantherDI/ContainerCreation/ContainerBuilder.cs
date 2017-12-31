@@ -139,10 +139,9 @@ namespace PantherDI.ContainerCreation
         public ContainerBuilder WithGenericResolvers()
         {
             return WithResolver(new EnumerableResolver())
-                .WithResolver(new Func0Resolver())
-                .WithResolver(new Func1Resolver())
                 .WithResolver(new LazyResolver())
-                .WithResolver(new MetadataResolver());
+                .WithResolver(new MetadataResolver())
+                .WithFuncResolvers();
         }
 
         /// <summary>
@@ -224,6 +223,19 @@ namespace PantherDI.ContainerCreation
         public ContainerBuilder WithInstance<T>(T instance)
         {
             Register(instance);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds resolvers for factory functions with 0-16 parameters
+        /// </summary>
+        public ContainerBuilder WithFuncResolvers()
+        {
+            foreach (var funcResolver in FuncResolvers.All.Select(x => x()))
+            {
+                Resolvers.Add(funcResolver);
+            }
+
             return this;
         }
 

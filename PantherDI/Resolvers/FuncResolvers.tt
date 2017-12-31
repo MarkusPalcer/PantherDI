@@ -1,0 +1,76 @@
+﻿<#@ template hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #> 
+<#@ assembly name="System.Core.dll" #>  
+<#@ import namespace="System.Linq" #>  
+<# var maxParamCount = 16; #>
+
+// Generated code. See FuncResolvers.tt for code generation
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using PantherDI.Extensions;
+using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Resolved.Providers;
+
+namespace PantherDI.Resolvers
+{
+<# for (int i = 1; i <= maxParamCount; i++) { 
+
+	string CreateString(Func<int, string> selector) 
+	{
+		return String.Join(", ", System.Linq.Enumerable.Range(1, i).Select(selector));
+	}
+
+	var openGenericContent=new String(',', i);
+	var className = $"Func{i}Resolver";
+	var resultType = $"Func<{CreateString(x => $"TIn{x}")},T>";
+#>
+
+	public class <#=className#> : GenericResolver 
+	{
+		public <#=className#>() : base(typeof(Func<<#=openGenericContent#>>), typeof(InnerResolver<<#=openGenericContent#>>)) { }
+		
+		public class InnerResolver<<#=CreateString(x => $"TIn{x}")#>,T> : IResolver 
+		{
+			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			{
+				var types = new[] { <#= CreateString(x => $"typeof(TIn{x})") #> };
+				
+				foreach (var provider in dependencyResolver(dependency.ReplaceExpectedType<T>()))
+				{
+					var func = FuncResolver.ProcessProvider<T>(types, provider);
+					if (func == null) continue;
+
+					<#=resultType#> Delegate(Dictionary<IDependency, object> objects)
+					{
+						return (<#= CreateString(x => $"p{x}") #>) => 
+							func(objects)(new object[] { <#= CreateString(x => $"p{x}") #> });
+					}
+
+					var result = DelegateProvider.WrapProvider<<#=resultType#>>(Delegate, provider);
+
+					var dependenciesLeftUnresolved = provider.UnresolvedDependencies <# for (int j=1; j <= i; j++) { #>
+
+															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn<#=j#>).GetTypeInfo()))<# } #>;
+
+					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+
+                    yield return result;
+				}
+			}
+		}
+	}
+<# } #>
+
+	public static class FuncResolvers 
+	{
+		public static Func<IResolver>[] All => new Func<IResolver>[] 
+		{
+<# for (int i = 0; i <= maxParamCount; i++) { #>
+			() => new Func<#=i#>Resolver(),
+<# } #>
+		};
+	}
+}
