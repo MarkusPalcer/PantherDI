@@ -5,7 +5,8 @@ using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
 using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Dependency;
-using PantherDI.Registry.Registration.Registration;
+    using PantherDI.Registry.Registration.Factory;
+    using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
     using PantherDI.Resolvers;
     using PantherDI.Tests.Helpers;
@@ -33,7 +34,7 @@ namespace PantherDI.Tests.ContainerCreation
             var catalog = new Catalog(new ManualRegistration()
             {
                 FulfilledContracts = {typeof(ICatalog), "SomeContract"},
-                Factories = {new Factory()},
+                Factories = {DelegateFactory.Create<Catalog>(() => null)},
                 RegisteredType = typeof(Catalog)
             });
 
@@ -43,7 +44,7 @@ namespace PantherDI.Tests.ContainerCreation
             }
             .Build();
 
-            var knowledgeBase = (KnowledgeBase)sut.KnowledgeBase();
+            var knowledgeBase = sut.KnowledgeBase();
             knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog));
 
             var results = knowledgeBase[typeof(ICatalog)].ToArray();
@@ -71,14 +72,14 @@ namespace PantherDI.Tests.ContainerCreation
                 RegisteredType = typeof(string),
                 Factories =
                 {
-                    new Factory(new Dependency(typeof(int)))
+                    DelegateFactory.Create<int, string>(i => string.Empty)
                 }
             }, new ManualRegistration
             {
                 RegisteredType = typeof(int),
                 Factories =
                 {
-                    new Factory()
+                    DelegateFactory.Create(() => 42)
                 },
                 Singleton = true
             });
@@ -112,12 +113,12 @@ namespace PantherDI.Tests.ContainerCreation
             {
                 RegisteredType = typeof(object),
                 FulfilledContracts = { "A" },
-                Factories = { new Factory(_ => null, new Dependency(typeof(object), "B")) }
+                Factories = { new DelegateFactory(_ => null, Enumerable.Empty<object>(), new []{ new Dependency(typeof(object), "B")}) }
             }, new ManualRegistration()
             {
                 RegisteredType = typeof(object),
                 FulfilledContracts = { "B" },
-                Factories = { new Factory(_ => null, new Dependency(typeof(object), "A")) }
+                Factories = { new DelegateFactory(_ => null, Enumerable.Empty<object>(), new[] { new Dependency(typeof(object), "A")}) }
             })};
 
             sut.Invoking(x => x.Build()).ShouldThrow<CircularDependencyException>();

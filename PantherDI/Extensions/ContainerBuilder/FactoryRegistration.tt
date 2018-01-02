@@ -1,0 +1,70 @@
+﻿<#@ template hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #> 
+<#@ assembly name="System.Core.dll" #>  
+<#@ import namespace="System.Linq" #>  
+<# var maxParamCount = 16; #>
+
+// Generated code. See FactoryRegistration.tt for code generation
+
+using System;
+using PantherDI.Registry.Registration.Factory;
+
+namespace PantherDI.Extensions.ContainerBuilder
+{
+	/// <summary>
+	/// Extends the ContainerBuilder by functions to register arbitrary functions as factory
+	/// </summary>
+	public static class FactoryRegistration
+	{
+<# for (int i = 1; i <= maxParamCount; i++) { 
+
+	string CreateString(Func<int, string> selector) 
+	{
+		return String.Join(", ", System.Linq.Enumerable.Range(1, i).Select(selector));
+	}
+
+	var resultType = $"Func<{CreateString(x => $"TIn{x}")}, T>";
+#>	
+
+		/// <summary>
+		/// Adds the given factory function to the container builder
+		/// </summary>
+		public static ContainerCreation.ContainerBuilder WithFactory<<#= CreateString(x => $"TIn{x}") #>, T>(this ContainerCreation.ContainerBuilder builder, <#=resultType#> @delegate, params object[] contracts)
+		{
+			return builder.WithFactory<T>(DelegateFactory.Create(@delegate, contracts));
+		}
+
+		/// <summary>
+		/// Registers the given factory function to the container builder
+		/// </summary>
+		/// <returns>
+		/// An means to configure the factory registration with a fluent interface
+		/// </returns>
+		public static FactoryRegistrationHelper RegisterFactory<<#= CreateString(x => $"TIn{x}") #>, T>(this ContainerCreation.ContainerBuilder builder, <#=resultType#> @delegate, params object[] contracts)
+		{
+			return builder.Register<T>(DelegateFactory.Create(@delegate, contracts));
+		}
+
+<# } #>
+
+
+		/// <summary>
+		/// Adds the given factory function to the container builder
+		/// </summary>
+		public static ContainerCreation.ContainerBuilder WithFactory<T>(this ContainerCreation.ContainerBuilder builder, Func<T> @delegate, params object[] contracts)
+		{
+			return builder.WithFactory<T>(DelegateFactory.Create(@delegate, contracts));
+		}
+
+		/// <summary>
+		/// Registers the given factory function to the container builder
+		/// </summary>
+		/// <returns>
+		/// An means to configure the factory registration with a fluent interface
+		/// </returns>
+		public static FactoryRegistrationHelper RegisterFactory<T>(this ContainerCreation.ContainerBuilder builder, Func<T> @delegate, params object[] contracts)
+		{
+			return builder.Register<T>(DelegateFactory.Create(@delegate, contracts));
+		}
+	}
+}

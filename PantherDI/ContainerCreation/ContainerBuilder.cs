@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using PantherDI.Extensions.ContainerBuilder;
 using PantherDI.Registry.Catalog;
+using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolvers;
 
@@ -90,6 +92,11 @@ namespace PantherDI.ContainerCreation
         public void Add(IRegistration registration)
         {
             Registrations.Add(registration);
+        }
+
+        private void Add(IRegistrationHelper registrationHelper)
+        {
+            RegistrationHelpers.Add(registrationHelper);
         }
 
         #region Implementation of IEnumerable
@@ -251,6 +258,15 @@ namespace PantherDI.ContainerCreation
         }
 
         /// <summary>
+        /// Adds a factory to the container
+        /// </summary>
+        public ContainerBuilder WithFactory<T>(IFactory factory, params object[] contracts)
+        {
+            Register<T>(factory).WithContracts(contracts);
+            return this;
+        }
+
+        /// <summary>
         /// Registers a type to the container
         /// </summary>
         public TypeRegistrationHelper Register<T>()
@@ -269,13 +285,23 @@ namespace PantherDI.ContainerCreation
         }
 
         /// <summary>
-        /// Adds an instance to the container
+        /// Registers an instance to the container
         /// </summary>
         public InstanceRegistrationHelper<T> Register<T>(T instance)
         {
             var instanceRegistrationHelper = new InstanceRegistrationHelper<T>(instance);
             RegistrationHelpers.Add(instanceRegistrationHelper);
             return instanceRegistrationHelper;
+        }
+
+        /// <summary>
+        /// Registers a factory to the container
+        /// </summary>
+        public FactoryRegistrationHelper Register<T>(IFactory factory)
+        {
+            var helper = new FactoryRegistrationHelper(typeof(T), factory);
+            Add(helper);
+            return helper;
         }
     }
 }

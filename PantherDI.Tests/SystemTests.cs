@@ -1,14 +1,21 @@
 ﻿using System;
+using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PantherDI.Attributes;
 using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
+using PantherDI.Extensions.ContainerBuilder;
 using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Tests.Helpers;
+// ReSharper disable UnusedMember.Local
+// ReSharper disable ClassNeverInstantiated.Local
+// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 
 namespace PantherDI.Tests
 {
@@ -41,7 +48,7 @@ namespace PantherDI.Tests
                                   new ManualRegistration()
                                   {
                                       FulfilledContracts = { typeof(ICatalog), "SomeContract" },
-                                      Factories = { new Factory(Factory) },
+                                      Factories = { new DelegateFactory(Factory, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>()) },
                                       RegisteredType = typeof(Catalog)
                                   })
                 .Build();
@@ -72,10 +79,9 @@ namespace PantherDI.Tests
             var factoryCounter = 0;
             var dependencyMock = new Mock<ICatalog>().Object;
 
-            string Factory(object[] p)
+            string Factory(ICatalog p)
             {
-                p.Should().HaveCount(1);
-                p[0].Should().Be(dependencyMock);
+                p.Should().Be(dependencyMock);
 
                 factoryCounter++;
                 return string.Empty;
@@ -83,20 +89,15 @@ namespace PantherDI.Tests
 
             var dependencyCounter = 0;
 
-            ICatalog Dependency(object[] p)
+            ICatalog Dependency()
             {
-                p.Should().BeEmpty();
                 dependencyCounter++;
                 return dependencyMock;
             }
 
-            var builder = new ContainerBuilder();
-            builder.Register<string>()
-                   .WithFactory(new Factory(Factory, new Dependency(typeof(ICatalog))));
-            builder.Register<Catalog>()
-                   .As<ICatalog>()
-                   .WithFactory(new Factory(Dependency));
-            var sut = builder.Build();
+            var sut = new ContainerBuilder()
+                .WithFactory<ICatalog, string>(Factory)
+                .WithFactory(Dependency).Build();
 
             sut.Resolve<string>();
             factoryCounter.Should().Be(1);
@@ -111,13 +112,13 @@ namespace PantherDI.Tests
                 new ManualRegistration
                 {
                     RegisteredType = typeof(object),
-                    Factories = {new Factory(_ => null)}
+                    Factories = {DelegateFactory.Create<object>(()=>null)}
                 },
                 new ManualRegistration
                 {
                     RegisteredType = typeof(string),
                     FulfilledContracts = {typeof(object)},
-                    Factories = {new Factory(_ => null)}
+                    Factories = { DelegateFactory.Create<string>(() => null)}
                 }
             }.Build();
 
@@ -137,11 +138,11 @@ namespace PantherDI.Tests
             sut.Resolve<ICatalog>().Should().BeSameAs(instance);
         }
 
-        public class TestClass1
+        private class TestClass1
         {
         }
 
-        public class TestClass2
+        private class TestClass2
         {
             public TestClass1 ResolvedDependency { get; }
 
@@ -178,7 +179,7 @@ namespace PantherDI.Tests
             resolvedInstance.ResolvedDependency.Should().BeSameAs(dependency);
         }
 
-        public class TestClass3
+        private class TestClass3
         {
             public TestClass1 ResolvedDependency { get; }
 
@@ -204,8 +205,8 @@ namespace PantherDI.Tests
             var resolvedInstance = resolvedFunction(dependency);
             resolvedInstance.ResolvedDependency.Should().BeSameAs(dependency);
         }
-
-        public class TestClass4
+        
+        private class TestClass4
         {
             public TestClass1 ResolvedDependency { get; }
 
@@ -334,7 +335,7 @@ namespace PantherDI.Tests
         [Metadata("Entry1", "Value")]
         [Metadata("Entry2", 42)]
         [MyMetadata(typeof(string))]
-        public class TestClass7
+        private class TestClass7
         {
         }
 
@@ -356,13 +357,16 @@ namespace PantherDI.Tests
             resolved.Metadata.AnotherThing.Should().Be(typeof(string));
         }
 
+        // ReSharper disable once UnusedMember.Global
         public class TestClass8
         {
             [Contract]
+            // ReSharper disable once UnusedMember.Global
             public static string Registration1 => "Test";
 
             [Contract("Test")]
-            public static string Registartion2 = "Value";
+            // ReSharper disable once UnusedMember.Global
+            public static string Registration2 = "Value";
         }
 
         [TestMethod]
@@ -381,6 +385,7 @@ namespace PantherDI.Tests
 
         [Factory]
         [Contract("Test")]
+        // ReSharper disable once UnusedMember.Global
         public static TestClass9 TestFactory()
         {
             return new TestClass9();

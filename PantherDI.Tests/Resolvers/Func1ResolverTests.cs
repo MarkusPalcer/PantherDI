@@ -12,6 +12,8 @@ using PantherDI.Tests.Helpers;
 
 namespace PantherDI.Tests.Resolvers
 {
+    // There are only tests for Func1Resolver, since
+    // the same generic code is used for the other Func#Resolver classes.
     [TestClass]
     public class Func1ResolverTests
     {

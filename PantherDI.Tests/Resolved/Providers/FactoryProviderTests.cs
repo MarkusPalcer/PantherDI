@@ -5,6 +5,7 @@ using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved.Providers;
 using PantherDI.Tests.Helpers;
@@ -27,11 +28,11 @@ namespace PantherDI.Tests.Resolved.Providers
 
             var factoryResult = Guid.NewGuid().ToString();
 
-            var factory = new Factory(deps =>
+            var factory = new DelegateFactory(deps =>
             {
                 deps.Should().BeEmpty();
                 return factoryResult;
-            });
+            }, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>());
 
             var sut = new FactoryProvider(registration, factory, new Dictionary<IDependency, IProvider>());
 
@@ -58,14 +59,16 @@ namespace PantherDI.Tests.Resolved.Providers
             var p2 = new TestProvider("Provider result 2");
             var p3 = new TestProvider("Provider result 3");
 
-            var factory = new Factory(deps =>
+            var factory = new DelegateFactory(deps =>
             {
                 deps.Should().BeEquivalentTo(new object[]{"Provider result 1", "Provider result 2", "Provider result 3"});
                 return factoryResult;
             }, 
+            Enumerable.Empty<object>(),
+            new[] {
             new Dependency(typeof(string), "Dependency 1"), 
             new Dependency(typeof(string), "Dependency 2"), 
-            new Dependency(typeof(string), "Dependency 3"));
+            new Dependency(typeof(string), "Dependency 3")});
 
             var sut = new FactoryProvider(registration, factory, new Dictionary<IDependency, IProvider>
             {
@@ -100,14 +103,19 @@ namespace PantherDI.Tests.Resolved.Providers
             var p1 = new TestProvider(_ => "Provider result 1");
             var p2 = new TestProvider(_ => "Provider result 2");
 
-            var factory = new Factory(deps =>
-                {
-                    deps.Should().BeEquivalentTo(new object[]{"Provider result 1", "Provider result 2", "Passed value"});
-                    return factoryResult;
-                },
-                new Dependency(typeof(string), "Dependency 1"),
-                new Dependency(typeof(string), "Dependency 2"),
-                new Dependency(typeof(string), "Dependency 3"));
+            var factory = new DelegateFactory(deps =>
+                                              {
+                                                  deps.Should().BeEquivalentTo(new object[] {"Provider result 1", "Provider result 2", "Passed value"});
+                                                  return factoryResult;
+                                              },
+                                              Enumerable.Empty<object>(),
+                                              new[]
+                                              {
+                                                  new Dependency(typeof(string), "Dependency 1"),
+                                                  new Dependency(typeof(string), "Dependency 2"),
+                                                  new Dependency(typeof(string), "Dependency 3")
+                                              });
+
 
             var sut = new FactoryProvider(registration, factory, new Dictionary<IDependency, IProvider>
             {

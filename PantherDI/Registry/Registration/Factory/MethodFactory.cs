@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using PantherDI.Attributes;
-using PantherDI.Registry.Registration.Dependency;
+﻿using System.Reflection;
 
 namespace PantherDI.Registry.Registration.Factory
 {

@@ -1,0 +1,32 @@
+﻿<#@ template hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #> 
+<#@ assembly name="System.Core.dll" #>  
+<#@ import namespace="System.Linq" #>  
+<# var maxParamCount = 16; #>
+
+// Generated code. See DelegateFactoryCreators.tt for code generation
+
+using System;
+
+namespace PantherDI.Registry.Registration.Factory
+{
+
+	public partial class DelegateFactory 
+	{
+<# for (int i = 1; i <= maxParamCount; i++) { 
+
+	string CreateString(Func<int, string> selector) 
+	{
+		return String.Join(", ", System.Linq.Enumerable.Range(1, i).Select(selector));
+	}
+
+	var resultType = $"Func<{CreateString(x => $"TIn{x}")}, T>";
+#>		
+		public static DelegateFactory Create<<#=CreateString(x => $"TIn{x}")#>, T>(<#=resultType#> @delegate, params object[] contracts)
+		{
+			return new DelegateFactory(p => @delegate(<#= CreateString(x => $"(TIn{x})p[{x-1}]")#>), contracts, new[] { <#=CreateString(x => $"typeof(TIn{x})") #> });
+		}
+
+<# } #>
+	}
+}

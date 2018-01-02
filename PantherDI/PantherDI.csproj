@@ -13,9 +13,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="Registry\Registration\Factory\DelegateFactoryCreators.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DelegateFactoryCreators.cs</LastGenOutput>
+    </None>
     <None Update="Resolvers\FuncResolvers.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>FuncResolvers.cs</LastGenOutput>
+    </None>
+    <None Update="Extensions\ContainerBuilder\FactoryRegistration.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>FactoryRegistration.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
@@ -24,10 +32,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Registry\Registration\Factory\DelegateFactoryCreators.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DelegateFactoryCreators.tt</DependentUpon>
+    </Compile>
     <Compile Update="Resolvers\FuncResolvers.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>FuncResolvers.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Extensions\ContainerBuilder\FactoryRegistration.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FactoryRegistration.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 
