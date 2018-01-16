@@ -4,7 +4,7 @@ using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 
-namespace PantherDI.Extensions.ContainerBuilder
+namespace PantherDI.ContainerCreation
 {
     public class FactoryRegistrationHelper : ContainerCreation.ContainerBuilder.IRegistrationHelper
     {

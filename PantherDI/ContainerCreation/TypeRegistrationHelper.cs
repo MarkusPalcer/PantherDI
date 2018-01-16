@@ -167,5 +167,15 @@ namespace PantherDI.ContainerCreation
             Metadata[key] = value;
             return this;
         }
+
+        public TypeRegistrationHelper WithFactory<T>(Func<T> factory, params object[] contracts)
+        {
+            if (!_type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()))
+            {
+                throw new ArgumentException($"A factory creating ${typeof(T).Name} can not be used for registering ${_type.Name}.");
+            }
+
+            return WithFactory(DelegateFactory.Create(factory, contracts));
+        }
     }
 }

@@ -1,0 +1,39 @@
+﻿<#@ template hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #> 
+<#@ assembly name="System.Core.dll" #>  
+<#@ import namespace="System.Linq" #>  
+<# var maxParamCount = 16; #>
+
+// Generated code. See FactoryRegistration.tt for code generation
+
+using System;
+using PantherDI.Registry.Registration.Factory;
+
+namespace PantherDI.Extensions.TypeRegistrationHelper
+{
+	/// <summary>
+	/// Extends the ContainerBuilder by functions to register arbitrary functions as factory
+	/// </summary>
+	public static class FactoryRegistration
+	{
+<# for (int i = 1; i <= maxParamCount; i++) { 
+
+	string CreateString(Func<int, string> selector) 
+	{
+		return String.Join(", ", System.Linq.Enumerable.Range(1, i).Select(selector));
+	}
+
+	var resultType = $"Func<{CreateString(x => $"TIn{x}")}, T>";
+#>
+
+		public static ContainerCreation.TypeRegistrationHelper WithFactory<<#= CreateString(x => $"TIn{x}") #>, T>(this ContainerCreation.TypeRegistrationHelper src, <#=resultType#> @delegate, params object[] contracts)
+		{
+			return src.WithFactory(DelegateFactory.Create(@delegate, contracts));
+		}
+
+<# } #>
+
+		
+
+	}
+}

@@ -6,7 +6,7 @@ using Moq;
 using PantherDI.Attributes;
 using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
-using PantherDI.Extensions.ContainerBuilder;
+using PantherDI.Extensions.TypeRegistrationHelper;
 using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Factory;
@@ -95,9 +95,11 @@ namespace PantherDI.Tests
                 return dependencyMock;
             }
 
-            var sut = new ContainerBuilder()
-                .WithFactory<ICatalog, string>(Factory)
-                .WithFactory(Dependency).Build();
+            var cb = new ContainerBuilder();
+            cb.Register<ICatalog>().WithFactory(Dependency);
+            cb.Register<string>().WithFactory<ICatalog, string>(Factory);
+              
+            var sut = cb.Build();
 
             sut.Resolve<string>();
             factoryCounter.Should().Be(1);
@@ -397,6 +399,17 @@ namespace PantherDI.Tests
             var sut = new ContainerBuilder().WithAssemblyOf<SystemTests>().Build();
             sut.Invoking(x => x.Resolve<TestClass9>()).ShouldNotThrow();
             sut.Invoking(x => x.Resolve<TestClass9>("Test")).ShouldNotThrow();
+        }
+
+        [TestMethod]
+        public void FactoryRegisteredManually()
+        {
+            var cb = new ContainerBuilder();
+            cb.Register<TestClass9>().WithFactory(TestFactory);
+            var sut = cb.Build();
+
+            sut.Invoking(x => x.Resolve<TestClass9>()).ShouldNotThrow();
+            sut.Invoking(x => x.Resolve<TestClass9>("Test")).ShouldThrow<NoSuitableRegistrationException>();
         }
     }
 }

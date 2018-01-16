@@ -297,6 +297,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Registers a factory to the container
         /// </summary>
+        [Obsolete("Use Register<ReturnType>().WithFactory instead.")]
         public FactoryRegistrationHelper Register<T>(IFactory factory)
         {
             var helper = new FactoryRegistrationHelper(typeof(T), factory);

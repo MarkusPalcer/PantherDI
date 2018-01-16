@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="Extensions\TypeRegistrationHelper\FactoryRegistration.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>FactoryRegistration.cs</LastGenOutput>
+    </None>
     <None Update="Registry\Registration\Factory\DelegateFactoryCreators.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>DelegateFactoryCreators.cs</LastGenOutput>
@@ -32,6 +36,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Extensions\TypeRegistrationHelper\FactoryRegistration.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FactoryRegistration.tt</DependentUpon>
+    </Compile>
     <Compile Update="Registry\Registration\Factory\DelegateFactoryCreators.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
