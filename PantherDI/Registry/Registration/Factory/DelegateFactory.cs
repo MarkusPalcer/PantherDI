@@ -11,7 +11,7 @@ namespace PantherDI.Registry.Registration.Factory
 
         public DelegateFactory(Func<object[], object> @delegate, IEnumerable<object> contracts, IEnumerable<IDependency> dependencies)
         {
-            Contracts = contracts;
+            FulfilledContracts = contracts;
             _delegate = @delegate;
             Dependencies = dependencies;
         }
@@ -33,7 +33,7 @@ namespace PantherDI.Registry.Registration.Factory
 
         public IEnumerable<IDependency> Dependencies { get; }
 
-        public IEnumerable<object> Contracts { get; }
+        public IEnumerable<object> FulfilledContracts { get; }
 
         #endregion
     }

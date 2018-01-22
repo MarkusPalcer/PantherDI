@@ -13,12 +13,20 @@ using PantherDI.Resolvers;
 
 namespace PantherDI.ContainerCreation
 {
+    public class RegisteredFactory
+    {
+        public IFactory Factory;
+        public IRegistration Registration;
+
+        public IEnumerable<object> FulfilledContracts => Factory.FulfilledContracts.Concat(Registration.FulfilledContracts);
+    }
+
     /// <summary>
     /// Converts registrations to providers
     /// </summary>
     public class RegistrationConverter
     {
-        private readonly Dictionary<object, List<IRegistration>> _unprocessed;
+        private readonly Dictionary<object, List<RegisteredFactory>> _unprocessed;
         private readonly MergedResolver _resolvers = new MergedResolver();
         private readonly List<object> _resolutionStack = new List<object>();
 
@@ -61,14 +69,15 @@ namespace PantherDI.ContainerCreation
             _resolutionStack.Remove(contract);
         }
 
-        private void ProcessRegistration(IRegistration registration, Func<IDependency, IEnumerable<IProvider>> dependencyResolver)
+        private void ProcessRegistration(RegisteredFactory registeredFactory, Func<IDependency, IEnumerable<IProvider>> dependencyResolver)
         {
+
             // Remove this registration completely (and remove empty entries)
-            foreach (var contract in registration.FulfilledContracts)
+            foreach (var contract in registeredFactory.FulfilledContracts)
             {
                 if (_unprocessed.TryGetValue(contract, out var entries))
                 {
-                    entries.Remove(registration);
+                    entries.Remove(registeredFactory);
                     if (!entries.Any())
                     {
                         _unprocessed.Remove(contract);
@@ -76,19 +85,19 @@ namespace PantherDI.ContainerCreation
                 }
             }
 
-            foreach (var factory in registration.Factories)
+            foreach (var provider in ProcessFactory(registeredFactory, dependencyResolver))
             {
-                foreach (var provider in ProcessFactory(registration, factory, dependencyResolver))
-                {
-                    KnowledgeBase.Add(provider);
-                }
+                KnowledgeBase.Add(provider);
             }
         }
 
-        public static IEnumerable<IProvider> ProcessFactory(IRegistration registration, IFactory factory,
+        public static IEnumerable<IProvider> ProcessFactory(RegisteredFactory registeredFactory, 
             Func<IDependency, IEnumerable<IProvider>> resolveDependency)
         {
-            // Cache all providers for a contryt
+            var registration = registeredFactory.Registration;
+            var factory = registeredFactory.Factory;
+
+            // Cache all providers for a contract
             var allProviders = factory.Dependencies
                 .Where(x => !x.Ignored)
                 .ToDictionary(x => x, x => resolveDependency(x).ToArray())
@@ -124,9 +133,9 @@ namespace PantherDI.ContainerCreation
             return _resolvers.Resolve(ResolveDependency, dependency);
         }
 
-        private static Dictionary<object, List<IRegistration>> CreateProcessQueue(ICatalog catalog)
+        private static Dictionary<object, List<RegisteredFactory>> CreateProcessQueue(ICatalog catalog)
         {
-            var unprocessed = new Dictionary<object, List<IRegistration>>();
+            var unprocessed = new Dictionary<object, List<RegisteredFactory>>();
 
             // Create copies of all registrations and add the registered type to the fulfilled contracts in the process
             var registrations = catalog.Registrations
@@ -134,15 +143,25 @@ namespace PantherDI.ContainerCreation
 
             foreach (var registration in registrations)
             {
-                foreach (var contract in registration.FulfilledContracts)
+                foreach (var factory in registration.Factories)
                 {
-                    if (!unprocessed.ContainsKey(contract))
+                    var entry = new RegisteredFactory
                     {
-                        unprocessed.Add(contract, new List<IRegistration>());
-                    }
+                        Factory = factory,
+                        Registration = registration
+                    };
 
-                    unprocessed[contract].Add(registration);
+                    foreach (var contract in entry.FulfilledContracts)
+                    {
+                        if (!unprocessed.ContainsKey(contract))
+                        {
+                            unprocessed.Add(contract, new List<RegisteredFactory>());
+                        }
+
+                        unprocessed[contract].Add(entry);
+                    }
                 }
+
             }
 
             return unprocessed;

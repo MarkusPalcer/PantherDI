@@ -12,6 +12,7 @@ using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Tests.Helpers;
+
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Local
 // ReSharper disable UnusedParameter.Local
@@ -47,8 +48,8 @@ namespace PantherDI.Tests
                 .WithRegistration(
                                   new ManualRegistration()
                                   {
-                                      FulfilledContracts = { typeof(ICatalog), "SomeContract" },
-                                      Factories = { new DelegateFactory(Factory, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>()) },
+                                      FulfilledContracts = {typeof(ICatalog), "SomeContract"},
+                                      Factories = {new DelegateFactory(Factory, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>())},
                                       RegisteredType = typeof(Catalog)
                                   })
                 .Build();
@@ -98,7 +99,7 @@ namespace PantherDI.Tests
             var cb = new ContainerBuilder();
             cb.Register<ICatalog>().WithFactory(Dependency);
             cb.Register<string>().WithFactory<ICatalog, string>(Factory);
-              
+
             var sut = cb.Build();
 
             sut.Resolve<string>();
@@ -114,13 +115,13 @@ namespace PantherDI.Tests
                 new ManualRegistration
                 {
                     RegisteredType = typeof(object),
-                    Factories = {DelegateFactory.Create<object>(()=>null)}
+                    Factories = {DelegateFactory.Create<object>(() => null)}
                 },
                 new ManualRegistration
                 {
                     RegisteredType = typeof(string),
                     FulfilledContracts = {typeof(object)},
-                    Factories = { DelegateFactory.Create<string>(() => null)}
+                    Factories = {DelegateFactory.Create<string>(() => null)}
                 }
             }.Build();
 
@@ -207,7 +208,7 @@ namespace PantherDI.Tests
             var resolvedInstance = resolvedFunction(dependency);
             resolvedInstance.ResolvedDependency.Should().BeSameAs(dependency);
         }
-        
+
         private class TestClass4
         {
             public TestClass1 ResolvedDependency { get; }
@@ -242,12 +243,16 @@ namespace PantherDI.Tests
 
         private class TestClass5
         {
-            public TestClass5(TestClass6 d) { }
+            public TestClass5(TestClass6 d)
+            {
+            }
         }
 
         private class TestClass6
         {
-            public TestClass6(TestClass5 d) { }
+            public TestClass6(TestClass5 d)
+            {
+            }
         }
 
         [TestMethod]
@@ -286,7 +291,7 @@ namespace PantherDI.Tests
         {
             var cb = new ContainerBuilder();
             cb.Register<TestClass1>()
-                .WithConstructors();
+              .WithConstructors();
 
             var sut = cb.Build();
 
@@ -383,7 +388,9 @@ namespace PantherDI.Tests
             sut.Resolve<string>("Test").Should().Be("Value");
         }
 
-        public class TestClass9 { }
+        public class TestClass9
+        {
+        }
 
         [Factory]
         [Contract("Test")]
@@ -410,6 +417,93 @@ namespace PantherDI.Tests
 
             sut.Invoking(x => x.Resolve<TestClass9>()).ShouldNotThrow();
             sut.Invoking(x => x.Resolve<TestClass9>("Test")).ShouldThrow<NoSuitableRegistrationException>();
+        }
+
+        private class TestClass12
+        {
+            public TestClass12(TestClass9 dependency)
+            {
+            }
+        }
+
+        [TestMethod]
+        // Tests that issue #31 doesn't appear again
+        public void FactoryWithContractCanBeUsedForDependenciesDuringContainerCreation()
+        {
+            var cb = new ContainerBuilder();
+
+            cb.WithType<TestClass12>();
+            cb.Register<TestClass9>()
+              .WithFactory(() => new TestClass9(), "Test");
+
+            var sut = cb.Build();
+            sut.Resolve<TestClass12>();
+        }
+
+        [TestMethod]
+        public void FactoryWithContractIsAddedWithAdditionalContract()
+        {
+            var counter = 0;
+            TestClass9 Factory()
+            {
+                counter++;
+                return new TestClass9();
+            }
+
+            var cb = new ContainerBuilder();
+            cb.Register<TestClass9>()
+              .WithConstructors()
+              .WithFactory(Factory, "Test");
+
+            var sut = cb.Build();
+            sut.Invoking(x => x.Resolve<TestClass9>()).ShouldThrow<TooManySuitableRegistrationsException>();
+            counter.Should().Be(0);
+            sut.Resolve<TestClass9>("Test");
+            counter.Should().Be(1);
+        }
+
+        public class TestClass13
+        {
+        }
+
+        public class TestClass14
+        {
+            public TestClass13 Dependency { get; }
+
+            public TestClass14(TestClass13 dependency)
+            {
+                Dependency = dependency;
+            }
+        }
+
+        public class TestClass15
+        {
+            public TestClass14 Dependency { get; }
+
+            public TestClass15(TestClass14 dependency)
+            {
+                Dependency = dependency;
+            }
+        }
+
+        [TestMethod]
+        // Regression test against issue #35
+        public void DependenciesAreTransitive()
+        {
+            var sut = new ContainerBuilder()
+                .WithType<TestClass14>()
+                .WithType<TestClass15>()
+                .WithFuncResolvers()
+                .Build();
+
+            sut.Invoking(x => x.Resolve<TestClass15>()).ShouldThrow<NoSuitableRegistrationException>();
+
+            var factory = sut.Resolve<Func<TestClass13, TestClass15>>();
+            var given = new TestClass13();
+
+            var result = factory(given);
+
+            result.Dependency.Dependency.Should().BeSameAs(given);
         }
     }
 }

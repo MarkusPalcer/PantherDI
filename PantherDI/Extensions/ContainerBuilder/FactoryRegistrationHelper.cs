@@ -18,7 +18,7 @@ namespace PantherDI.ContainerCreation
 
         public FactoryRegistrationHelper(Type registeredType, IFactory registeredFactory)
         {
-            _contracts = new List<object>(registeredFactory.Contracts);
+            _contracts = new List<object>(registeredFactory.FulfilledContracts);
             _dependencies = new List<IDependency>(registeredFactory.Dependencies);
             _delegate = registeredFactory.Execute;
             _registeredType = registeredType;

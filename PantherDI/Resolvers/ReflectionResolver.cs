@@ -30,7 +30,11 @@ namespace PantherDI.Resolvers
             {
                 foreach (var factory in registration.Factories)
                 {
-                    foreach (var provider in RegistrationConverter.ProcessFactory(registration, factory, dependencyResolver))
+                    foreach (var provider in RegistrationConverter.ProcessFactory(new RegisteredFactory
+                    {
+                        Factory = factory,
+                        Registration = registration
+                    }, dependencyResolver))
                     {
                         yield return provider;
                     }

@@ -30,11 +30,11 @@ namespace PantherDI.Registry.Registration.Factory
                                       return result;
                                   }).ToArray();
 
-            Contracts = new HashSet<object>(method.GetCustomAttributes<ContractAttribute>().Select(x => x.Contract ?? method.DeclaringType));
+            FulfilledContracts = new HashSet<object>(method.GetCustomAttributes<ContractAttribute>().Select(x => x.Contract ?? method.DeclaringType));
         }
 
         public IEnumerable<IDependency> Dependencies { get; }
-        public IEnumerable<object> Contracts { get; }
+        public IEnumerable<object> FulfilledContracts { get; }
 
         public abstract object Execute(object[] resolvedDependencies);
     }

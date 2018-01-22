@@ -24,6 +24,6 @@ namespace PantherDI.Registry.Registration.Factory
         /// <summary>
         /// Gets an <see cref="IEnumerable{T}"/> containing contracts additional to the type itself
         /// </summary>
-        IEnumerable<object> Contracts { get; }
+        IEnumerable<object> FulfilledContracts { get; }
     }
 }

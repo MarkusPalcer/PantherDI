@@ -33,16 +33,27 @@ namespace PantherDI.Resolved.Providers
             
             foreach (var dependency in _factory.Dependencies)
             {
-                if (!_dependencyProviders.Any(x => new Dependency.EqualityComparer().Equals(dependency, x.Key)))
+                // Sadly using the dictionary is not possible
+                var dependencyProvider = _dependencyProviders.FirstOrDefault(x => new Dependency.EqualityComparer().Equals(dependency, x.Key));
+
+                if (dependencyProvider.Key == null)
                 {
                     UnresolvedDependencies.Add(dependency);
+                }
+                else
+                {
+                    // Add the dependencies of the provider to my dependencies
+                    foreach (var unresolvedDependency in dependencyProvider.Value.UnresolvedDependencies)
+                    {
+                        UnresolvedDependencies.Add(unresolvedDependency);
+                    }
                 }
             }
 
             ResultType = providedRegistration.RegisteredType;
 
             FulfilledContracts =
-                new HashSet<object>(providedRegistration.FulfilledContracts.Concat(factory.Contracts)) {providedRegistration.RegisteredType};
+                new HashSet<object>(providedRegistration.FulfilledContracts.Concat(factory.FulfilledContracts)) {providedRegistration.RegisteredType};
 
             Singleton = providedRegistration.Singleton;
             Metadata = providedRegistration.Metadata;

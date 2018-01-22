@@ -15,7 +15,7 @@ namespace PantherDI.Registry.Registration.Factory
         public InstanceFactory(T instance, object[] contracts)
         {
             _instance = instance;
-            Contracts = new HashSet<object>(contracts);
+            FulfilledContracts = new HashSet<object>(contracts);
         }
 
         #region Implementation of IFactory
@@ -27,7 +27,7 @@ namespace PantherDI.Registry.Registration.Factory
 
         public IEnumerable<IDependency> Dependencies => Enumerable.Empty<IDependency>();
 
-        public IEnumerable<object> Contracts { get; }
+        public IEnumerable<object> FulfilledContracts { get; }
 
         #endregion
     }

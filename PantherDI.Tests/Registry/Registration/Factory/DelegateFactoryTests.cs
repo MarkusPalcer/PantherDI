@@ -66,14 +66,14 @@ namespace PantherDI.Tests.Registry.Registration.Factory
         public void NoContractPreFilling()
         {
             var sut = DelegateFactory.Create(() => string.Empty);
-            sut.Contracts.Should().BeEmpty();
+            sut.FulfilledContracts.Should().BeEmpty();
         }
 
         [TestMethod]
         public void ContractsAreCopied()
         {
             var sut = DelegateFactory.Create(() => string.Empty, 1, 2, 3);
-            sut.Contracts.Should().BeEquivalentTo(1, 2, 3);
+            sut.FulfilledContracts.Should().BeEquivalentTo(1, 2, 3);
         }
     }
 }
