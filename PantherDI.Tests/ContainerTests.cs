@@ -10,6 +10,7 @@ using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
+using PantherDI.Resolvers.Aggregation;
 using PantherDI.Tests.Helpers;
 
 namespace PantherDI.Tests
@@ -163,7 +164,7 @@ namespace PantherDI.Tests
 
             kb.Setup(x => x.Add(provider));
 
-            var sut = new Container(new MergedResolver(new[] { kb.Object, resolver2.Object }));
+            var sut = new Container(new FirstMatchResolver(new[] { kb.Object, resolver2.Object }));
 
             sut.Resolve<string>().Should().Be(ProviderResult);
         }

@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using PantherDI.Extensions.ContainerBuilder;
 using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolvers;
+using PantherDI.Resolvers.Aggregation;
 
 namespace PantherDI.ContainerCreation
 {
@@ -31,7 +31,7 @@ namespace PantherDI.ContainerCreation
 
         public bool IsStrict { get; set; } = true;
 
-        public bool UseLateProcessing { get; set; } = false;
+        public bool UseLateProcessing { get; set; }
 
         public List<Type> Types { get; } = new List<Type>();
 
@@ -61,11 +61,11 @@ namespace PantherDI.ContainerCreation
             if (!UseLateProcessing)
             {
                 converter.ProcessAll();
-                return new Container(new MergedResolver(new IResolver[] {converter.KnowledgeBase}.Concat(resolvers)));
+                return new Container(new FirstMatchResolver(new IResolver[] {converter.KnowledgeBase}.Concat(resolvers)));
             }
             else
             {
-                return new Container(new MergedResolver(new IResolver[] {new RegistrationProcessingResolver(converter)}
+                return new Container(new FirstMatchResolver(new IResolver[] {new RegistrationProcessingResolver(converter)}
                                                             .Concat(resolvers)));
             }
         }
@@ -260,9 +260,10 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Adds a factory to the container
         /// </summary>
-        public ContainerBuilder WithFactory<T>(IFactory factory, params object[] contracts)
+        public ContainerBuilder WithFactory<T>(IFactory factory)
         {
-            Register<T>(factory).WithContracts(contracts);
+            Register<T>()
+                .WithFactory(factory);
             return this;
         }
 

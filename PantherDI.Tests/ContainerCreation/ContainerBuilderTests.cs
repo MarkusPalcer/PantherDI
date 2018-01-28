@@ -9,6 +9,7 @@ using PantherDI.Registry.Registration.Dependency;
     using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
     using PantherDI.Resolvers;
+    using PantherDI.Resolvers.Aggregation;
     using PantherDI.Tests.Helpers;
 
 namespace PantherDI.Tests.ContainerCreation
@@ -134,7 +135,7 @@ namespace PantherDI.Tests.ContainerCreation
 
             var cnt = (Container)sut.Build();
 
-            var kb = ((MergedResolver) cnt._rootResolver).OfType<KnowledgeBase>().Single();
+            var kb = ((FirstMatchResolver) cnt._rootResolver).OfType<KnowledgeBase>().Single();
 
             var providers = kb[typeof(ContainerBuilderTests)].ToArray();
             var provider = providers.Single();

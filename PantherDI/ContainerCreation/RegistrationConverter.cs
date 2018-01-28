@@ -10,6 +10,7 @@ using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
+using PantherDI.Resolvers.Aggregation;
 
 namespace PantherDI.ContainerCreation
 {
@@ -27,7 +28,7 @@ namespace PantherDI.ContainerCreation
     public class RegistrationConverter
     {
         private readonly Dictionary<object, List<RegisteredFactory>> _unprocessed;
-        private readonly MergedResolver _resolvers = new MergedResolver();
+        private readonly FirstMatchResolver _resolvers = new FirstMatchResolver();
         private readonly List<object> _resolutionStack = new List<object>();
 
         internal KnowledgeBase KnowledgeBase { get; } = new KnowledgeBase();

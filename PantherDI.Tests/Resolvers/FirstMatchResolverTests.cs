@@ -7,23 +7,24 @@ using Moq;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
+using PantherDI.Resolvers.Aggregation;
 
 namespace PantherDI.Tests.Resolvers
 {
     [TestClass]
-    public class MergedResolverTests
+    public class FirstMatchResolverTests
     {
         [TestMethod]
         public void NoRegisteredResolverResolvesToNothing()
         {
-            var sut = new MergedResolver();
+            var sut = new FirstMatchResolver();
             sut.Resolve(null, new Dependency(typeof(string), "A")).Should().BeEmpty();
         }
 
         [TestMethod]
         public void AllRegisteredResolversReturnEmptyListsReturnsNothing()
         {
-            var sut = new MergedResolver();
+            var sut = new FirstMatchResolver();
             sut.Resolve(null, new Dependency(typeof(string), "A")).Should().BeEmpty();
 
             var resolverMock1 = new Mock<IResolver>(MockBehavior.Strict);
@@ -47,7 +48,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void FirstResultIsTaken()
         {
-            var sut = new MergedResolver();
+            var sut = new FirstMatchResolver();
             sut.Resolve(null, new Dependency(typeof(string), "A")).Should().BeEmpty();
 
 
@@ -71,7 +72,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void NextResolverIsCalledWhenPreviousDoesNotGiveResult()
         {
-            var sut = new MergedResolver();
+            var sut = new FirstMatchResolver();
             sut.Resolve(null, new Dependency(typeof(string), "A")).Should().BeEmpty();
 
             var providers = new[] { new Mock<IProvider>() }.Select(x => x.Object);

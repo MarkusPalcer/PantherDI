@@ -81,7 +81,7 @@
     <Compile Include="Resolvers\Func0ResolverTests.cs" />
     <Compile Include="Resolvers\Func1ResolverTests.cs" />
     <Compile Include="Resolvers\LazyResolverTests.cs" />
-    <Compile Include="Resolvers\MergedResolverTests.cs" />
+    <Compile Include="Resolvers\FirstMatchResolverTests.cs" />
     <Compile Include="Resolvers\ReflectionResolverTests.cs" />
     <Compile Include="SystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -12,6 +12,8 @@ using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Tests.Helpers;
+// ReSharper disable InconsistentNaming
+// ReSharper disable ClassNeverInstantiated.Global
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Local
@@ -388,14 +390,13 @@ namespace PantherDI.Tests
             sut.Resolve<string>("Test").Should().Be("Value");
         }
 
-        public class TestClass9
+        private class TestClass9
         {
         }
 
         [Factory]
         [Contract("Test")]
-        // ReSharper disable once UnusedMember.Global
-        public static TestClass9 TestFactory()
+        private static TestClass9 TestFactory()
         {
             return new TestClass9();
         }
@@ -462,11 +463,11 @@ namespace PantherDI.Tests
             counter.Should().Be(1);
         }
 
-        public class TestClass13
+        private class TestClass13
         {
         }
 
-        public class TestClass14
+        private class TestClass14
         {
             public TestClass13 Dependency { get; }
 
@@ -476,7 +477,7 @@ namespace PantherDI.Tests
             }
         }
 
-        public class TestClass15
+        private class TestClass15
         {
             public TestClass14 Dependency { get; }
 
