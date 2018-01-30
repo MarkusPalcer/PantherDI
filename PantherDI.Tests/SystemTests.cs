@@ -11,6 +11,7 @@ using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
+using PantherDI.Resolvers;
 using PantherDI.Tests.Helpers;
 // ReSharper disable InconsistentNaming
 // ReSharper disable ClassNeverInstantiated.Global
@@ -445,6 +446,7 @@ namespace PantherDI.Tests
         public void FactoryWithContractIsAddedWithAdditionalContract()
         {
             var counter = 0;
+
             TestClass9 Factory()
             {
                 counter++;
@@ -506,5 +508,45 @@ namespace PantherDI.Tests
 
             result.Dependency.Dependency.Should().BeSameAs(given);
         }
+
+        [TestMethod]
+        public void LooseModeResolvesUnregisteredTypes()
+        {
+            var sut = new ContainerBuilder()
+                .WithSupportForUnregisteredTypes()
+                .Build();
+
+            var result = sut.Resolve<TestClass15>();
+            result.Dependency.Should().NotBeNull();
+            result.Dependency.Dependency.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void RemovalOfResolversByType()
+        {
+            var sut = new ContainerBuilder()
+                .WithFuncResolvers()
+                .WithoutResolver<Func0Resolver>()
+                .WithType<TestClass13>()
+                .WithType<TestClass15>()
+                .Build();
+
+            sut.Invoking(x => x.Resolve<TestClass13>()).ShouldNotThrow("TestClass13 has no dependency.");
+            sut.Invoking(x => x.Resolve<Func<TestClass13>>()).ShouldThrow<NoSuitableRegistrationException>("the Func0Resolver has been removed.");
+            sut.Invoking(x => x.Resolve<TestClass15>()).ShouldThrow<NoSuitableRegistrationException>("TestClass15 has a dependency which is not registered.");
+            sut.Invoking(x => x.Resolve<Func<TestClass14, TestClass15>>()).ShouldNotThrow("Func1Resolver is still present.");
+        }
+
+        [TestMethod]
+        public void StrictModeCanBeReenabled()
+        {
+            var sut = new ContainerBuilder()
+                .WithSupportForUnregisteredTypes()
+                .WithStrictRegistrationHandling()
+                .Build();
+
+            sut.Invoking(x => x.Resolve<TestClass13>()).ShouldThrow<NoSuitableRegistrationException>();
+        }
     }
+
 }
