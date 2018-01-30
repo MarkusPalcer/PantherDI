@@ -45,29 +45,39 @@ namespace PantherDI.ContainerCreation
                 typeRegistrationHelper.RegisterTo(this);
             }
 
-            var resolvers = Resolvers.ToArray();
+            var manuallyRegisteredResolvers = new AllMatchesResolver(Resolvers);
+
+            var containerResolvers = new FirstMatchResolver
+            {
+                manuallyRegisteredResolvers
+            };
 
             if (!IsStrict)
             {
-                resolvers = resolvers.Concat(new IResolver[] {new ReflectionResolver()}).ToArray();
+                manuallyRegisteredResolvers.Add(new ReflectionResolver());
             }
 
             var catalogs = Catalogs
                 .Concat(new ICatalog[] { new TypeCatalog(Types), new ManualCatalog(Registrations.ToArray()) })
                 .ToArray();
 
-            var converter = new RegistrationConverter(new MergedCatalog(catalogs), resolvers);
+            var converter = new RegistrationConverter(new MergedCatalog(catalogs), manuallyRegisteredResolvers);
+
+            IResolver registrationResolver;
 
             if (!UseLateProcessing)
             {
                 converter.ProcessAll();
-                return new Container(new FirstMatchResolver(new IResolver[] {converter.KnowledgeBase}.Concat(resolvers)));
+                registrationResolver = converter.KnowledgeBase;
             }
             else
             {
-                return new Container(new FirstMatchResolver(new IResolver[] {new RegistrationProcessingResolver(converter)}
-                                                            .Concat(resolvers)));
+                registrationResolver = new RegistrationProcessingResolver(converter);
             }
+
+            containerResolvers.Insert(0, registrationResolver);
+
+            return new Container(containerResolvers);
         }
 
         /// <summary>

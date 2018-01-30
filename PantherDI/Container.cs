@@ -11,12 +11,12 @@ namespace PantherDI
     public class Container : IContainer
     {
         private readonly  ProviderCache _cache = new ProviderCache();
-        internal readonly IResolver _rootResolver;
+        internal readonly IResolver RootResolver;
         private readonly Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
 
         public Container(IResolver resolvers)
         {
-            _rootResolver = resolvers ?? throw new ArgumentNullException(nameof(resolvers));
+            RootResolver = resolvers ?? throw new ArgumentNullException(nameof(resolvers));
         }
 
         public T Resolve<T>(params object[] contracts)
@@ -46,7 +46,7 @@ namespace PantherDI
             }
 
             // The provider is not yet in the cache. Resolve it and then store it there, so it is cached
-            result = WrapSingletonProviders(_rootResolver.Resolve(ResolveInternal, dependency)).ToArray();
+            result = WrapSingletonProviders(RootResolver.Resolve(ResolveInternal, dependency)).ToArray();
             _cache[dependency] = result;
             return result;
         }

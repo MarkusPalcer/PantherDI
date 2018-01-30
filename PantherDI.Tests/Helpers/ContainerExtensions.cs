@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using PantherDI.Resolved;
-using PantherDI.Resolvers;
 using PantherDI.Resolvers.Aggregation;
 
 namespace PantherDI.Tests.Helpers
@@ -9,7 +8,7 @@ namespace PantherDI.Tests.Helpers
     {
         public static KnowledgeBase KnowledgeBase(this Container container)
         {
-            return ((FirstMatchResolver)container._rootResolver).OfType<KnowledgeBase>().Single();
+            return ((FirstMatchResolver)container.RootResolver).OfType<KnowledgeBase>().Single();
         }
     }
 }

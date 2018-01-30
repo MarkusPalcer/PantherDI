@@ -135,7 +135,7 @@ namespace PantherDI.Tests.ContainerCreation
 
             var cnt = (Container)sut.Build();
 
-            var kb = ((FirstMatchResolver) cnt._rootResolver).OfType<KnowledgeBase>().Single();
+            var kb = ((FirstMatchResolver) cnt.RootResolver).OfType<KnowledgeBase>().Single();
 
             var providers = kb[typeof(ContainerBuilderTests)].ToArray();
             var provider = providers.Single();
