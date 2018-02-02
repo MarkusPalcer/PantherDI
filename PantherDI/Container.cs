@@ -14,9 +14,9 @@ namespace PantherDI
         internal readonly IResolver RootResolver;
         private readonly Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
 
-        public Container(IResolver resolvers)
+        public Container(IResolver rootResolver)
         {
-            RootResolver = resolvers ?? throw new ArgumentNullException(nameof(resolvers));
+            RootResolver = rootResolver ?? throw new ArgumentNullException(nameof(rootResolver));
         }
 
         public T Resolve<T>(params object[] contracts)

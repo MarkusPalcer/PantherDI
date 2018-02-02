@@ -28,18 +28,14 @@ namespace PantherDI.ContainerCreation
     public class RegistrationConverter
     {
         private readonly Dictionary<object, List<RegisteredFactory>> _unprocessed;
-        private readonly FirstMatchResolver _resolvers = new FirstMatchResolver();
+        private readonly IResolver _resolvers;
         private readonly List<object> _resolutionStack = new List<object>();
 
         internal KnowledgeBase KnowledgeBase { get; } = new KnowledgeBase();
 
-        public RegistrationConverter(ICatalog catalog, params IResolver[] resolvers)
+        public RegistrationConverter(ICatalog catalog, IResolver resolvers)
         {
-            _resolvers.Add(KnowledgeBase);
-            foreach (var resolver in resolvers)
-            {
-                _resolvers.Add(resolver);
-            }
+            _resolvers = resolvers;
 
             _unprocessed = CreateProcessQueue(catalog);
         }

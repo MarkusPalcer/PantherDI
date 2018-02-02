@@ -61,13 +61,13 @@ namespace PantherDI.ContainerCreation
                 .Concat(new ICatalog[] { new TypeCatalog(Types), new ManualCatalog(Registrations.ToArray()) })
                 .ToArray();
 
-            var converter = new RegistrationConverter(new MergedCatalog(catalogs), manuallyRegisteredResolvers);
+            var converter = new RegistrationConverter(new MergedCatalog(catalogs), containerResolvers);
+            
 
             IResolver registrationResolver;
 
             if (!UseLateProcessing)
             {
-                converter.ProcessAll();
                 registrationResolver = converter.KnowledgeBase;
             }
             else
@@ -76,6 +76,11 @@ namespace PantherDI.ContainerCreation
             }
 
             containerResolvers.Insert(0, registrationResolver);
+
+            if (!UseLateProcessing)
+            {
+                converter.ProcessAll();
+            }
 
             return new Container(containerResolvers);
         }
