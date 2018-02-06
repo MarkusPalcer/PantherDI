@@ -13,6 +13,7 @@ using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolvers;
 using PantherDI.Tests.Helpers;
+
 // ReSharper disable InconsistentNaming
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -48,14 +49,14 @@ namespace PantherDI.Tests
             }
 
             var sut = new ContainerBuilder()
-                .WithRegistration(
-                                  new ManualRegistration()
-                                  {
-                                      FulfilledContracts = {typeof(ICatalog), "SomeContract"},
-                                      Factories = {new DelegateFactory(Factory, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>())},
-                                      RegisteredType = typeof(Catalog)
-                                  })
-                .Build();
+                      .WithRegistration(
+                                        new ManualRegistration()
+                                        {
+                                            FulfilledContracts = {typeof(ICatalog), "SomeContract"},
+                                            Factories = {new DelegateFactory(Factory, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>())},
+                                            RegisteredType = typeof(Catalog)
+                                        })
+                      .Build();
 
             object resolved = sut.Resolve<ICatalog>();
             invokeCounter.Should().Be(1);
@@ -137,8 +138,8 @@ namespace PantherDI.Tests
             var instance = new Catalog();
 
             var sut = new ContainerBuilder()
-                .WithInstance<ICatalog>(instance)
-                .Build();
+                      .WithInstance<ICatalog>(instance)
+                      .Build();
 
             sut.Resolve<ICatalog>().Should().BeSameAs(instance);
             sut.Resolve<ICatalog>().Should().BeSameAs(instance);
@@ -162,9 +163,9 @@ namespace PantherDI.Tests
         public void ResolveFunction()
         {
             var sut = new ContainerBuilder()
-                .WithType<TestClass1>()
-                .WithGenericResolvers()
-                .Build();
+                      .WithType<TestClass1>()
+                      .WithGenericResolvers()
+                      .Build();
 
             var resolvedFunction = sut.Resolve<Func<TestClass1>>();
             resolvedFunction.Invoking(x => x()).ShouldNotThrow();
@@ -174,9 +175,9 @@ namespace PantherDI.Tests
         public void ResolveFunctionWithParameter()
         {
             var sut = new ContainerBuilder()
-                .WithType<TestClass2>()
-                .WithGenericResolvers()
-                .Build();
+                      .WithType<TestClass2>()
+                      .WithGenericResolvers()
+                      .Build();
 
             sut.Invoking(x => x.Resolve<TestClass2>()).ShouldThrow<NoSuitableRegistrationException>();
             var resolvedFunction = sut.Resolve<Func<TestClass1, TestClass2>>();
@@ -199,10 +200,10 @@ namespace PantherDI.Tests
         public void IgnoreConstructorParameters()
         {
             var sut = new ContainerBuilder()
-                .WithType<TestClass1>()
-                .WithType<TestClass3>()
-                .WithGenericResolvers()
-                .Build();
+                      .WithType<TestClass1>()
+                      .WithType<TestClass3>()
+                      .WithGenericResolvers()
+                      .Build();
 
             sut.Invoking(x => x.Resolve<TestClass1>()).ShouldNotThrow();
             sut.Invoking(x => x.Resolve<TestClass3>()).ShouldThrow<NoSuitableRegistrationException>();
@@ -231,9 +232,9 @@ namespace PantherDI.Tests
         public void IgnoreConstructors()
         {
             var sut = new ContainerBuilder()
-                .WithType<TestClass4>()
-                .WithGenericResolvers()
-                .Build();
+                      .WithType<TestClass4>()
+                      .WithGenericResolvers()
+                      .Build();
 
             // Empty constructor should be ignored
             sut.Invoking(x => x.Resolve<TestClass4>()).ShouldThrow<NoSuitableRegistrationException>();
@@ -262,9 +263,9 @@ namespace PantherDI.Tests
         public void CircularDependency()
         {
             var sut = new ContainerBuilder()
-                .WithType<TestClass1>()
-                .WithType<TestClass5>()
-                .WithType<TestClass6>();
+                      .WithType<TestClass1>()
+                      .WithType<TestClass5>()
+                      .WithType<TestClass6>();
 
             sut.Invoking(x => x.Build()).ShouldThrow<CircularDependencyException>();
         }
@@ -278,11 +279,11 @@ namespace PantherDI.Tests
              */
 
             var sut = new ContainerBuilder()
-                .WithType<TestClass1>()
-                .WithType<TestClass5>()
-                .WithType<TestClass6>()
-                .WithLateProcessing()
-                .Build();
+                      .WithType<TestClass1>()
+                      .WithType<TestClass5>()
+                      .WithType<TestClass6>()
+                      .WithLateProcessing()
+                      .Build();
 
             sut.Invoking(x => x.Resolve<TestClass1>()).ShouldNotThrow();
             sut.Invoking(x => x.Resolve<TestClass5>()).ShouldThrow<CircularDependencyException>();
@@ -383,9 +384,9 @@ namespace PantherDI.Tests
         public void RegisteredInstancesViaPropertyAndField()
         {
             var sut = new ContainerBuilder()
-                .WithAssemblyOf<SystemTests>()
-                .WithGenericResolvers()
-                .Build();
+                      .WithAssemblyOf<SystemTests>()
+                      .WithGenericResolvers()
+                      .Build();
 
             sut.Resolve<string>("Registration1").Should().Be("Test");
             sut.Resolve<string>("Test").Should().Be("Value");
@@ -494,10 +495,10 @@ namespace PantherDI.Tests
         public void DependenciesAreTransitive()
         {
             var sut = new ContainerBuilder()
-                .WithType<TestClass14>()
-                .WithType<TestClass15>()
-                .WithFuncResolvers()
-                .Build();
+                      .WithType<TestClass14>()
+                      .WithType<TestClass15>()
+                      .WithFuncResolvers()
+                      .Build();
 
             sut.Invoking(x => x.Resolve<TestClass15>()).ShouldThrow<NoSuitableRegistrationException>();
 
@@ -513,8 +514,8 @@ namespace PantherDI.Tests
         public void LooseModeResolvesUnregisteredTypes()
         {
             var sut = new ContainerBuilder()
-                .WithSupportForUnregisteredTypes()
-                .Build();
+                      .WithSupportForUnregisteredTypes()
+                      .Build();
 
             var result = sut.Resolve<TestClass15>();
             result.Dependency.Should().NotBeNull();
@@ -525,11 +526,11 @@ namespace PantherDI.Tests
         public void RemovalOfResolversByType()
         {
             var sut = new ContainerBuilder()
-                .WithFuncResolvers()
-                .WithoutResolver<Func0Resolver>()
-                .WithType<TestClass13>()
-                .WithType<TestClass15>()
-                .Build();
+                      .WithFuncResolvers()
+                      .WithoutResolver<Func0Resolver>()
+                      .WithType<TestClass13>()
+                      .WithType<TestClass15>()
+                      .Build();
 
             sut.Invoking(x => x.Resolve<TestClass13>()).ShouldNotThrow("TestClass13 has no dependency.");
             sut.Invoking(x => x.Resolve<Func<TestClass13>>()).ShouldThrow<NoSuitableRegistrationException>("the Func0Resolver has been removed.");
@@ -541,12 +542,20 @@ namespace PantherDI.Tests
         public void StrictModeCanBeReenabled()
         {
             var sut = new ContainerBuilder()
-                .WithSupportForUnregisteredTypes()
-                .WithStrictRegistrationHandling()
-                .Build();
+                      .WithSupportForUnregisteredTypes()
+                      .WithStrictRegistrationHandling()
+                      .Build();
 
             sut.Invoking(x => x.Resolve<TestClass13>()).ShouldThrow<NoSuitableRegistrationException>();
         }
-    }
 
+        [TestMethod]
+        public void ContainerCanBeResolved()
+        {
+            var sut = new ContainerBuilder().Build();
+
+            sut.Resolve<IContainer>().Should().BeSameAs(sut);
+            sut.Resolve<Container>().Should().BeSameAs(sut);
+        }
+    }
 }

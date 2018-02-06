@@ -1,16 +1,15 @@
-﻿    using System.Linq;
+﻿using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
 using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Dependency;
-    using PantherDI.Registry.Registration.Factory;
-    using PantherDI.Registry.Registration.Registration;
+using PantherDI.Registry.Registration.Factory;
+using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
-    using PantherDI.Resolvers;
-    using PantherDI.Resolvers.Aggregation;
-    using PantherDI.Tests.Helpers;
+using PantherDI.Resolvers.Aggregation;
+using PantherDI.Tests.Helpers;
 
 namespace PantherDI.Tests.ContainerCreation
 {
@@ -26,7 +25,7 @@ namespace PantherDI.Tests.ContainerCreation
             }
             .Build();
 
-            ((KnowledgeBase)sut.KnowledgeBase()).KnownProviders.Should().BeEmpty();
+            sut.KnowledgeBase().KnownProviders.Keys.Should().BeEquivalentTo(typeof(Container), typeof(IContainer));
         }
 
         [TestMethod]
@@ -34,8 +33,8 @@ namespace PantherDI.Tests.ContainerCreation
         {
             var catalog = new Catalog(new ManualRegistration()
             {
-                FulfilledContracts = {typeof(ICatalog), "SomeContract"},
-                Factories = {DelegateFactory.Create<Catalog>(() => null)},
+                FulfilledContracts = { typeof(ICatalog), "SomeContract" },
+                Factories = { DelegateFactory.Create<Catalog>(() => null) },
                 RegisteredType = typeof(Catalog)
             });
 
@@ -46,7 +45,7 @@ namespace PantherDI.Tests.ContainerCreation
             .Build();
 
             var knowledgeBase = sut.KnowledgeBase();
-            knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog));
+            knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog), typeof(Container), typeof(IContainer));
 
             var results = knowledgeBase[typeof(ICatalog)].ToArray();
             results.Should().HaveCount(1);
@@ -85,10 +84,10 @@ namespace PantherDI.Tests.ContainerCreation
                 Singleton = true
             });
 
-            var sut = (Container)new ContainerBuilder {catalog}.Build();
-            var knowledgeBase = (KnowledgeBase)sut.KnowledgeBase();
+            var sut = (Container)new ContainerBuilder { catalog }.Build();
+            var knowledgeBase = sut.KnowledgeBase();
 
-            knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(string), typeof(int));
+            knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(string), typeof(int), typeof(Container), typeof(IContainer));
 
             var results = knowledgeBase[typeof(string)].ToArray();
             results.Should().HaveCount(1);
@@ -135,7 +134,7 @@ namespace PantherDI.Tests.ContainerCreation
 
             var cnt = (Container)sut.Build();
 
-            var kb = ((FirstMatchResolver) cnt.RootResolver).OfType<KnowledgeBase>().Single();
+            var kb = ((FirstMatchResolver)cnt.RootResolver).OfType<KnowledgeBase>().Single();
 
             var providers = kb[typeof(ContainerBuilderTests)].ToArray();
             var provider = providers.Single();

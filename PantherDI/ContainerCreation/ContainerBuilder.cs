@@ -40,6 +40,15 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public IContainer Build()
         {
+            Container result = null;
+
+            /* ReSharper disable once AccessToModifiedClosure
+             * Justification: Access to modified closure is desired. Container should resolve itself.
+             */
+            Register<Container>()
+                .As<IContainer>()
+                .WithFactory(() => result);
+
             foreach (var typeRegistrationHelper in RegistrationHelpers)
             {
                 typeRegistrationHelper.RegisterTo(this);
@@ -82,7 +91,9 @@ namespace PantherDI.ContainerCreation
                 converter.ProcessAll();
             }
 
-            return new Container(containerResolvers);
+            
+            result = new Container(containerResolvers);
+            return result;
         }
 
         /// <summary>
