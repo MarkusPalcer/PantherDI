@@ -8,9 +8,10 @@ using PantherDI.Comparers;
 
 namespace PantherDI.Registry.Registration.Dependency
 {
-    [DebuggerDisplay("{Ignored ? \"Ignored\" : ''}Dependency<{ExpectedType}>({RequiredContracts})")]
+    [DebuggerDisplay("{Ignored ? Ignored : }Dependency<{ExpectedType}>({RequiredContracts})")]
     public class Dependency : IDependency
     {
+        [DebuggerStepThrough]
         public Dependency(Type expectedType, params object[] requiredContracts)
         {
             if (expectedType == null) throw new ArgumentNullException(nameof(expectedType));

@@ -96,6 +96,25 @@ namespace PantherDI.ContainerCreation
             return result;
         }
 
+        private void Add(IRegistrationHelper registrationHelper)
+        {
+            RegistrationHelpers.Add(registrationHelper);
+        }
+
+        #region Obsoleted
+
+        [Obsolete("Use WithResolver(IContainer.AsResolver) instead")]
+        public ContainerBuilder WithResolver(IContainer container)
+        {
+            return WithResolver(container.AsResolver());
+        }
+
+        [Obsolete("Enumerating all contents of the builder will be removed in the future")]
+        public IEnumerator GetEnumerator()
+        {
+            return Catalogs.Cast<object>().Concat(Resolvers).Concat(Registrations).GetEnumerator();
+        }
+
         /// <summary>
         /// Adds a catalog to the container configuration
         /// </summary>
@@ -122,19 +141,6 @@ namespace PantherDI.ContainerCreation
         {
             Registrations.Add(registration);
         }
-
-        private void Add(IRegistrationHelper registrationHelper)
-        {
-            RegistrationHelpers.Add(registrationHelper);
-        }
-
-        #region Implementation of IEnumerable
-        [Obsolete("Enumerating all contents of the builder will be removed in the future")]
-        public IEnumerator GetEnumerator()
-        {
-            return Catalogs.Cast<object>().Concat(Resolvers).Concat(Registrations).GetEnumerator();
-        }
-
         #endregion
 
         /// <summary>

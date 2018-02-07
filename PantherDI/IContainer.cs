@@ -1,4 +1,5 @@
 ﻿using System;
+using PantherDI.Resolvers;
 
 namespace PantherDI
 {
@@ -16,5 +17,10 @@ namespace PantherDI
         /// If none is given, the return type will be used as contract.
         /// </param>
         T Resolve<T>(params object[] contracts);
+
+        /// <summary>
+        /// Converts the container into an resolver which can be used during container creation
+        /// </summary>
+        IResolver AsResolver();
     }
 }

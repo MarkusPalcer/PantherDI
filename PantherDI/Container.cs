@@ -37,6 +37,30 @@ namespace PantherDI
             return (T)providers.Single().CreateInstance(new Dictionary<IDependency, object>());
         }
 
+        private class ContainerResolver : IResolver
+        {
+            private readonly Container _cnt;
+
+            public ContainerResolver(Container cnt)
+            {
+                _cnt = cnt;
+            }
+
+            #region Implementation of IResolver
+
+            public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+            {
+                return _cnt.RootResolver.Resolve(dependencyResolver, dependency);
+            }
+
+            #endregion
+        }
+
+        public IResolver AsResolver()
+        {
+            return new ContainerResolver(this);
+        }
+
         private IEnumerable<IProvider> ResolveInternal(IDependency dependency)
         {
             var result = _cache[dependency];

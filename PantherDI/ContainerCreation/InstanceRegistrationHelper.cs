@@ -16,7 +16,7 @@ namespace PantherDI.ContainerCreation
 
         void ContainerBuilder.IRegistrationHelper.RegisterTo(ContainerBuilder builder)
         {
-            builder.Add(new ManualRegistration(new HashSet<object>(),
+            builder.WithRegistration(new ManualRegistration(new HashSet<object>(),
                                                new HashSet<IFactory>(new[] {new InstanceFactory<T>(_instance, _contracts.ToArray())}),
                                                new Dictionary<string, object>())
             {
