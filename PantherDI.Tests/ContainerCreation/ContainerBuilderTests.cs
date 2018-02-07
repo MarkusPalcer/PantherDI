@@ -19,11 +19,7 @@ namespace PantherDI.Tests.ContainerCreation
         [TestMethod]
         public void NoRegistrationYieldsEmptyKnowledgeBase()
         {
-            var sut = (Container)new ContainerBuilder
-            {
-                new Catalog()
-            }
-            .Build();
+            var sut = (Container) new ContainerBuilder().WithCatalog(new Catalog()).Build();
 
             sut.KnowledgeBase().KnownProviders.Keys.Should().BeEquivalentTo(typeof(Container), typeof(IContainer));
         }
@@ -39,10 +35,8 @@ namespace PantherDI.Tests.ContainerCreation
             });
 
             var sut = (Container)new ContainerBuilder()
-            {
-                catalog
-            }
-            .Build();
+                .WithCatalog(catalog)
+                .Build();
 
             var knowledgeBase = sut.KnowledgeBase();
             knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog), typeof(Container), typeof(IContainer));
@@ -84,7 +78,7 @@ namespace PantherDI.Tests.ContainerCreation
                 Singleton = true
             });
 
-            var sut = (Container)new ContainerBuilder { catalog }.Build();
+            var sut = (Container) new ContainerBuilder().WithCatalog(catalog).Build();
             var knowledgeBase = sut.KnowledgeBase();
 
             knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(string), typeof(int), typeof(Container), typeof(IContainer));
@@ -109,7 +103,8 @@ namespace PantherDI.Tests.ContainerCreation
         [TestMethod]
         public void DetectCircularDependencies()
         {
-            var sut = new ContainerBuilder{new Catalog(new ManualRegistration
+            var sut = new ContainerBuilder()
+                .WithCatalog(new Catalog(new ManualRegistration
             {
                 RegisteredType = typeof(object),
                 FulfilledContracts = { "A" },
@@ -119,7 +114,7 @@ namespace PantherDI.Tests.ContainerCreation
                 RegisteredType = typeof(object),
                 FulfilledContracts = { "B" },
                 Factories = { new DelegateFactory(_ => null, Enumerable.Empty<object>(), new[] { new Dependency(typeof(object), "A")}) }
-            })};
+            }));
 
             sut.Invoking(x => x.Build()).ShouldThrow<CircularDependencyException>();
         }

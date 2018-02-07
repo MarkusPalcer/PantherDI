@@ -114,20 +114,19 @@ namespace PantherDI.Tests
         [TestMethod]
         public void TooManySuitableFactoriesThrows()
         {
-            var sut = new ContainerBuilder
-            {
-                new ManualRegistration
+            var sut = new ContainerBuilder()
+                .WithRegistration(new ManualRegistration
                 {
                     RegisteredType = typeof(object),
                     Factories = {DelegateFactory.Create<object>(() => null)}
-                },
-                new ManualRegistration
+                })
+                .WithRegistration(new ManualRegistration
                 {
                     RegisteredType = typeof(string),
                     FulfilledContracts = {typeof(object)},
                     Factories = {DelegateFactory.Create<string>(() => null)}
-                }
-            }.Build();
+                })
+                .Build();
 
             sut.Invoking(x => x.Resolve<object>()).ShouldThrow<TooManySuitableRegistrationsException>();
         }

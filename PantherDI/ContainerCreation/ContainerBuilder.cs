@@ -14,7 +14,7 @@ namespace PantherDI.ContainerCreation
     /// <summary>
     /// Helper class to create a container from a configuration
     /// </summary>
-    public class ContainerBuilder : IEnumerable
+    public class ContainerBuilder : IEnumerable, IContainerBuilder
     {
         internal interface IRegistrationHelper
         {
@@ -99,6 +99,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Adds a catalog to the container configuration
         /// </summary>
+        [Obsolete("Please use WithCatalog instead.")]
         public void Add(ICatalog catalog)
         {
             Catalogs.Add(catalog);
@@ -107,6 +108,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Adds a resolver to the container configuration
         /// </summary>
+        [Obsolete("Please use WithResolver instead.")]
         public void Add(IResolver resolver)
         {
             Resolvers.Add(resolver);
@@ -115,6 +117,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Adds a registraion to the container configuration
         /// </summary>
+        [Obsolete("Please use WithRegistration instead.")]
         public void Add(IRegistration registration)
         {
             Registrations.Add(registration);
@@ -126,7 +129,7 @@ namespace PantherDI.ContainerCreation
         }
 
         #region Implementation of IEnumerable
-
+        [Obsolete("Enumerating all contents of the builder will be removed in the future")]
         public IEnumerator GetEnumerator()
         {
             return Catalogs.Cast<object>().Concat(Resolvers).Concat(Registrations).GetEnumerator();
@@ -140,7 +143,7 @@ namespace PantherDI.ContainerCreation
         /// <returns>The ContainerBuilder for fluent access</returns>
         public ContainerBuilder WithCatalog(ICatalog catalog)
         {
-            Add(catalog);
+            Catalogs.Add(catalog);
             return this;
         }
 
@@ -150,7 +153,7 @@ namespace PantherDI.ContainerCreation
         /// <returns>The ContainerBuilder for fluent access</returns>
         public ContainerBuilder WithResolver(IResolver resolver)
         {
-            Add(resolver);
+            Resolvers.Add(resolver);
             return this;
         }
 
@@ -246,7 +249,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ContainerBuilder WithRegistration(IRegistration registration)
         {
-            Add(registration);
+            Registrations.Add(registration);
             return this;
         }
 
