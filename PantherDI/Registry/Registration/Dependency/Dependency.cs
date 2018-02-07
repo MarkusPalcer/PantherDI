@@ -8,7 +8,7 @@ using PantherDI.Comparers;
 
 namespace PantherDI.Registry.Registration.Dependency
 {
-    [DebuggerDisplay("{Ignored ? Ignored : }Dependency<{ExpectedType}>({RequiredContracts})")]
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class Dependency : IDependency
     {
         [DebuggerStepThrough]
@@ -24,6 +24,8 @@ namespace PantherDI.Registry.Registration.Dependency
             ExpectedType = expectedType;
             RequiredContracts = new HashSet<object>(requiredContracts);
         }
+
+        private string DebuggerDisplay => (Ignored ? "Ignored" : "") + $"Dependency<{ExpectedType}>";
 
         public Type ExpectedType { get; }
 
