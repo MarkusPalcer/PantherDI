@@ -4,7 +4,7 @@ using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.ContainerCreation
 {
-    public class InstanceRegistrationHelper<T> : ContainerBuilder.IRegistrationHelper {
+    public class InstanceRegistrationHelper<T> : IRegistrationHelper {
         private readonly T _instance;
 
         private readonly List<object> _contracts = new List<object>();
@@ -14,7 +14,7 @@ namespace PantherDI.ContainerCreation
             _instance = instance;
         }
 
-        void ContainerBuilder.IRegistrationHelper.RegisterTo(ContainerBuilder builder)
+        void IRegistrationHelper.RegisterTo(ICatalogBuilder builder)
         {
             builder.WithRegistration(new ManualRegistration(new HashSet<object>(),
                                                new HashSet<IFactory>(new[] {new InstanceFactory<T>(_instance, _contracts.ToArray())}),

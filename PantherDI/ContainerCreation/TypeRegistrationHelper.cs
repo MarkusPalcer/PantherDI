@@ -11,7 +11,7 @@ namespace PantherDI.ContainerCreation
     /// <summary>
     /// Provides a fluent interface for configuring a registered type
     /// </summary>
-    public class TypeRegistrationHelper : ContainerBuilder.IRegistrationHelper
+    public class TypeRegistrationHelper : IRegistrationHelper
     {
         private readonly Type _type;
 
@@ -61,7 +61,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ISet<IFactory> Factories => _registration.Factories;
 
-        void ContainerBuilder.IRegistrationHelper.RegisterTo(ContainerBuilder cb)
+        void IRegistrationHelper.RegisterTo(ICatalogBuilder cb)
         {
             if (UseReflectionForContracts)
             {
@@ -86,7 +86,7 @@ namespace PantherDI.ContainerCreation
 
             _registration.Singleton = IsSingleton;
 
-            cb.Registrations.Add(_registration);
+            cb.WithRegistration(_registration);
         }
 
         /// <summary>

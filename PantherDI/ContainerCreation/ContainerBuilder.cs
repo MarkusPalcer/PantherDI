@@ -16,24 +16,19 @@ namespace PantherDI.ContainerCreation
     /// </summary>
     public class ContainerBuilder : IEnumerable, IContainerBuilder
     {
-        internal interface IRegistrationHelper
-        {
-            void RegisterTo(ContainerBuilder cb);
-        }
+        private readonly CatalogBuilder _catalogBuilder = new CatalogBuilder();
 
-        public List<ICatalog> Catalogs { get; } = new List<ICatalog>();
+        public List<ICatalog> Catalogs => _catalogBuilder.Catalogs;
 
         public List<IResolver> Resolvers { get; } = new List<IResolver>();
 
-        public List<IRegistration> Registrations { get; } = new List<IRegistration>();
+        public List<IRegistration> Registrations => _catalogBuilder.Registrations;
 
-        private List<IRegistrationHelper> RegistrationHelpers { get; } = new List<IRegistrationHelper>();
+        public List<Type> Types => _catalogBuilder.Types;
 
         public bool IsStrict { get; set; } = true;
 
         public bool UseLateProcessing { get; set; }
-
-        public List<Type> Types { get; } = new List<Type>();
 
         /// <summary>
         /// Creates the container configured so far
@@ -49,11 +44,6 @@ namespace PantherDI.ContainerCreation
                 .As<IContainer>()
                 .WithFactory(() => result);
 
-            foreach (var typeRegistrationHelper in RegistrationHelpers)
-            {
-                typeRegistrationHelper.RegisterTo(this);
-            }
-
             var manuallyRegisteredResolvers = new AllMatchesResolver(Resolvers);
 
             var containerResolvers = new FirstMatchResolver
@@ -66,12 +56,7 @@ namespace PantherDI.ContainerCreation
                 manuallyRegisteredResolvers.Add(new ReflectionResolver());
             }
 
-            var catalogs = Catalogs
-                .Concat(new ICatalog[] { new TypeCatalog(Types), new ManualCatalog(Registrations.ToArray()) })
-                .ToArray();
-
-            var converter = new RegistrationConverter(new MergedCatalog(catalogs), containerResolvers);
-            
+            var converter = new RegistrationConverter(_catalogBuilder.Build(), containerResolvers);
 
             IResolver registrationResolver;
 
@@ -94,11 +79,6 @@ namespace PantherDI.ContainerCreation
             
             result = new Container(containerResolvers);
             return result;
-        }
-
-        private void Add(IRegistrationHelper registrationHelper)
-        {
-            RegistrationHelpers.Add(registrationHelper);
         }
 
         #region Obsoleted
@@ -149,7 +129,7 @@ namespace PantherDI.ContainerCreation
         /// <returns>The ContainerBuilder for fluent access</returns>
         public ContainerBuilder WithCatalog(ICatalog catalog)
         {
-            Catalogs.Add(catalog);
+            _catalogBuilder.WithCatalog(catalog);
             return this;
         }
 
@@ -214,7 +194,8 @@ namespace PantherDI.ContainerCreation
         /// <param name="assembly">The assembly to add</param>
         public ContainerBuilder WithAssembly(Assembly assembly)
         {
-            return WithCatalog(new AssemblyCatalog(assembly));
+            _catalogBuilder.WithAssembly(assembly);
+            return this;
         }
 
         /// <summary>
@@ -222,7 +203,8 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ContainerBuilder WithAssemblyOf(Type type)
         {
-            return WithAssembly(type.GetTypeInfo().Assembly);
+            _catalogBuilder.WithAssemblyOf(type);
+            return this;
         }
 
         /// <summary>
@@ -230,7 +212,8 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ContainerBuilder WithAssemblyOf<T>()
         {
-            return WithAssemblyOf(typeof(T));
+            _catalogBuilder.WithAssemblyOf<T>();
+            return this;
         }
 
         /// <summary>
@@ -238,7 +221,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ContainerBuilder WithType(Type type)
         {
-            Types.Add(type);
+            _catalogBuilder.WithType(type);
             return this;
         }
 
@@ -247,7 +230,8 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ContainerBuilder WithType<T>()
         {
-            return WithType(typeof(T));
+            _catalogBuilder.WithType<T>();
+            return this;
         }
 
         /// <summary>
@@ -255,7 +239,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ContainerBuilder WithRegistration(IRegistration registration)
         {
-            Registrations.Add(registration);
+            _catalogBuilder.WithRegistration(registration);
             return this;
         }
 
@@ -264,7 +248,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ContainerBuilder WithInstance<T>(T instance)
         {
-            Register(instance);
+            _catalogBuilder.Register(instance);
             return this;
         }
 
@@ -297,17 +281,8 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ContainerBuilder WithFactory<T>(IFactory factory)
         {
-            Register<T>()
-                .WithFactory(factory);
+            _catalogBuilder.WithFactory<T>(factory);
             return this;
-        }
-
-        /// <summary>
-        /// Registers a type to the container
-        /// </summary>
-        public TypeRegistrationHelper Register<T>()
-        {
-            return Register(typeof(T));
         }
 
         /// <summary>
@@ -315,9 +290,15 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public TypeRegistrationHelper Register(Type t)
         {
-            var result = new TypeRegistrationHelper(t);
-            RegistrationHelpers.Add(result);
-            return result;
+            return _catalogBuilder.Register(t);
+        }
+
+        /// <summary>
+        /// Registers a type to the container
+        /// </summary>
+        public TypeRegistrationHelper Register<T>()
+        {
+            return _catalogBuilder.Register<T>();
         }
 
         /// <summary>
@@ -325,9 +306,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public InstanceRegistrationHelper<T> Register<T>(T instance)
         {
-            var instanceRegistrationHelper = new InstanceRegistrationHelper<T>(instance);
-            RegistrationHelpers.Add(instanceRegistrationHelper);
-            return instanceRegistrationHelper;
+            return _catalogBuilder.Register(instance);
         }
 
         /// <summary>
@@ -337,7 +316,7 @@ namespace PantherDI.ContainerCreation
         public FactoryRegistrationHelper Register<T>(IFactory factory)
         {
             var helper = new FactoryRegistrationHelper(typeof(T), factory);
-            Add(helper);
+            _catalogBuilder.AddRegistrationHelper(helper);
             return helper;
         }
     }

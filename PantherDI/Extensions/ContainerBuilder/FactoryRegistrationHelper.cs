@@ -6,7 +6,7 @@ using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.ContainerCreation
 {
-    public class FactoryRegistrationHelper : ContainerCreation.ContainerBuilder.IRegistrationHelper
+    public class FactoryRegistrationHelper : IRegistrationHelper
     {
         private readonly Type _registeredType;
         private readonly List<object> _contracts;
@@ -50,7 +50,7 @@ namespace PantherDI.ContainerCreation
 
         #region Implementation of IRegistrationHelper
 
-        public void RegisterTo(ContainerCreation.ContainerBuilder cb)
+        public void RegisterTo(ICatalogBuilder cb)
         {
             var wrapperFactory = new DelegateFactory(_delegate, _contracts, _dependencies);
             var wrapperRegistration = new ManualRegistration(new HashSet<object>(), new HashSet<IFactory>(new[] { wrapperFactory }), Metadata)
@@ -59,7 +59,7 @@ namespace PantherDI.ContainerCreation
                 Singleton = _singleton
             };
 
-            cb.Registrations.Add(wrapperRegistration);
+            cb.WithRegistration(wrapperRegistration);
         }
 
         #endregion
