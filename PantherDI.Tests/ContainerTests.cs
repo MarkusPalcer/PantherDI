@@ -5,8 +5,10 @@ using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
 using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
@@ -248,5 +250,49 @@ namespace PantherDI.Tests
             sut.Dispose();
         }
 
+        private class TestType1 { }
+
+        private class TestType2
+        {
+            private TestType1 dependency;
+
+            public TestType2(TestType1 dependency)
+            {
+                this.dependency = dependency;
+            }
+        }
+
+        private class TestType3
+        {
+            private TestType2 dependency;
+
+            public TestType3(TestType2 dependency)
+            {
+                this.dependency = dependency;
+            }
+        }
+
+        [TestMethod]
+        public void ContainerAsCatalog()
+        {
+            var sut = new ContainerBuilder()
+                      .WithType<TestType2>()
+                      .WithType<TestType3>()
+                      .Build()
+                      .AsCatalog();
+
+            // Expecting 3 registrations: The registered type and the container itself
+            sut.Registrations.ToArray().Should().HaveCount(3);
+            
+            var registration = sut.Registrations.Single(x => x.RegisteredType == typeof(TestType3));
+            registration.FulfilledContracts.Concat(registration.Factories.Single().FulfilledContracts).Should().BeEquivalentTo(typeof(TestType3));
+            registration.Singleton.Should().BeFalse();
+            registration.Factories.Single().Dependencies.Should().BeEquivalentTo(new Dependency(typeof(TestType1)));
+
+            registration = sut.Registrations.Single(x => x.RegisteredType == typeof(TestType2));
+            registration.FulfilledContracts.Concat(registration.Factories.Single().FulfilledContracts).Should().BeEquivalentTo(typeof(TestType2));
+            registration.Singleton.Should().BeFalse();
+            registration.Factories.Single().Dependencies.Should().BeEquivalentTo(new Dependency(typeof(TestType1)));
+        }
     }
 }

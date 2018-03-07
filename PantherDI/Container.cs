@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
+using PantherDI.Extensions;
+using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration.Factory;
+using PantherDI.Registry.Registration.Registration;
+using PantherDI.Resolved;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 
@@ -36,29 +42,16 @@ namespace PantherDI
 
             return (T)providers.Single().CreateInstance(new Dictionary<IDependency, object>());
         }
-
-        private class ContainerResolver : IResolver
-        {
-            private readonly Container _cnt;
-
-            public ContainerResolver(Container cnt)
-            {
-                _cnt = cnt;
-            }
-
-            #region Implementation of IResolver
-
-            public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
-            {
-                return _cnt.RootResolver.Resolve(dependencyResolver, dependency);
-            }
-
-            #endregion
-        }
+        
 
         public IResolver AsResolver()
         {
             return new ContainerResolver(this);
+        }
+
+        public ICatalog AsCatalog()
+        {
+            return new ContainerCatalog(this);
         }
 
         private IEnumerable<IProvider> ResolveInternal(IDependency dependency)
@@ -115,6 +108,134 @@ namespace PantherDI
                 }
                 _singletons.Clear();
             }
+        }
+
+        private class ContainerResolver : IResolver
+        {
+            private readonly Container _cnt;
+
+            public ContainerResolver(Container cnt)
+            {
+                _cnt = cnt;
+            }
+
+            #region Implementation of IResolver
+
+            public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+            {
+                return _cnt.RootResolver.Resolve(dependencyResolver, dependency);
+            }
+
+            #endregion
+        }
+
+        private class ContainerCatalog : ICatalog
+        {
+            private readonly Dictionary<Type, ManualRegistration> _registrations = new Dictionary<Type, ManualRegistration>();
+
+            public ContainerCatalog(Container container)
+            {
+                ProcessResolver(container.RootResolver);
+            }
+
+            private void ProcessResolver(IResolver resolver)
+            {
+                switch (resolver)
+                {
+                    case KnowledgeBase knowledgeBase:
+                    {
+                        ProcessKnowledgeBase(knowledgeBase);
+                        break;
+                    }
+                    case IEnumerable<IResolver> resolvers:
+                    {
+                        resolvers.ForEach(ProcessResolver);
+                        break;
+                    }
+                    case RegistrationProcessingResolver registrationProcessingResolver:
+                    {
+                        ProcessConverter(registrationProcessingResolver.Converter);
+                        break;
+                    }
+                }
+            }
+
+            private void ProcessKnowledgeBase(KnowledgeBase knowledgeBase)
+            {
+                var providers = knowledgeBase.KnownProviders.ToDictionary(x => x.Key, x=> x.Value);
+
+                while (providers.Any())
+                {
+                    var item = providers[providers.Keys.First()].First();
+
+                    item.FulfilledContracts.ForEach(x =>
+                    {
+                        var itemsForContract = providers[x];
+                        itemsForContract.Remove(item);
+                        if (!itemsForContract.Any()) providers.Remove(x);
+                    });
+
+
+                    if (!_registrations.TryGetValue(item.ResultType, out var registration))
+                    {
+                        registration = new ManualRegistration(null, null, item.Metadata)
+                        {
+                            RegisteredType = item.ResultType,
+                            Singleton = item.Singleton
+                        };
+
+                        _registrations[item.ResultType] = registration;
+                    }
+
+                    registration.Factories.Add(new ProviderFactory(item));
+                }
+            }
+
+            private void ProcessConverter(RegistrationConverter converter)
+            {
+                ProcessUnregistered(converter._unprocessed);
+                ProcessKnowledgeBase(converter.KnowledgeBase);
+            }
+
+            private void ProcessUnregistered(Dictionary<object, List<RegisteredFactory>> unregistered)
+            {
+                unregistered.SelectMany(x => x.Value).Select(x => x.Registration).ForEach(x =>
+                {
+                    if (_registrations.ContainsKey(x.RegisteredType)) return;
+                    _registrations[x.RegisteredType] = x.Clone();
+                });
+            }
+
+            private class ProviderFactory : IFactory
+            {
+                private readonly IProvider _provider;
+
+                public ProviderFactory(IProvider provider)
+                {
+                    _provider = provider;
+                    FulfilledContracts = provider.FulfilledContracts;
+                    Dependencies = provider.UnresolvedDependencies.ToArray();
+
+                }
+
+                #region Implementation of IFactory
+
+                public object Execute(object[] resolvedDependencies)
+                {
+                    return _provider.CreateInstance(Dependencies.Zip(resolvedDependencies, Tuple.Create).ToDictionary(x => x.Item1, x => x.Item2));
+                }
+
+                public IEnumerable<IDependency> Dependencies { get; }
+                public IEnumerable<object> FulfilledContracts { get; }
+
+                #endregion
+            }
+
+            #region Implementation of ICatalog
+
+            public IEnumerable<IRegistration> Registrations => _registrations.Values;
+
+            #endregion
         }
     }
 }

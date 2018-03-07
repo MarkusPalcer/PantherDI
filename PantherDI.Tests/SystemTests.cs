@@ -52,8 +52,8 @@ namespace PantherDI.Tests
                       .WithRegistration(
                                         new ManualRegistration()
                                         {
-                                            FulfilledContracts = {typeof(ICatalog), "SomeContract"},
-                                            Factories = {new DelegateFactory(Factory, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>())},
+                                            FulfilledContracts = { typeof(ICatalog), "SomeContract" },
+                                            Factories = { new DelegateFactory(Factory, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>()) },
                                             RegisteredType = typeof(Catalog)
                                         })
                       .Build();
@@ -118,13 +118,13 @@ namespace PantherDI.Tests
                 .WithRegistration(new ManualRegistration
                 {
                     RegisteredType = typeof(object),
-                    Factories = {DelegateFactory.Create<object>(() => null)}
+                    Factories = { DelegateFactory.Create<object>(() => null) }
                 })
                 .WithRegistration(new ManualRegistration
                 {
                     RegisteredType = typeof(string),
-                    FulfilledContracts = {typeof(object)},
-                    Factories = {DelegateFactory.Create<string>(() => null)}
+                    FulfilledContracts = { typeof(object) },
+                    Factories = { DelegateFactory.Create<string>(() => null) }
                 })
                 .Build();
 
@@ -555,6 +555,26 @@ namespace PantherDI.Tests
 
             sut.Resolve<IContainer>().Should().BeSameAs(sut);
             sut.Resolve<Container>().Should().BeSameAs(sut);
+        }
+
+        [TestMethod]
+        public void ContainerCanBeUsedAsCatalog()
+        {
+            // src is missing TestClass 13
+            var src = new ContainerBuilder()
+                      .WithType<TestClass15>()
+                      .WithType<TestClass14>()
+                      .Build();
+
+            // Sut only has TestClass 13
+            var sut = new ContainerBuilder()
+                      .WithType<TestClass13>()
+                      .WithCatalog(src.AsCatalog())
+                      .Build();
+
+            sut.Invoking(x => x.Resolve<TestClass13>()).ShouldNotThrow();
+            sut.Invoking(x => x.Resolve<TestClass14>()).ShouldNotThrow();
+            sut.Invoking(x => x.Resolve<TestClass15>()).ShouldNotThrow();
         }
     }
 }

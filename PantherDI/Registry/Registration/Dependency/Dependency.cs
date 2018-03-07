@@ -33,6 +33,25 @@ namespace PantherDI.Registry.Registration.Dependency
 
         public bool Ignored { get; set; }
 
+        #region Equality members
+
+        protected bool Equals(Dependency other)
+        {
+            return new EqualityComparer().Equals(this, other);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ((IEqualityComparer)new EqualityComparer()).Equals((object)this, obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return new EqualityComparer().GetHashCode(this);
+        }
+
+        #endregion
+
         public class EqualityComparer : IEqualityComparer, IEqualityComparer<IDependency>
         {
             bool IEqualityComparer.Equals(object x, object y)

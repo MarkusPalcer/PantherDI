@@ -27,7 +27,7 @@ namespace PantherDI.ContainerCreation
     /// </summary>
     public class RegistrationConverter
     {
-        private readonly Dictionary<object, List<RegisteredFactory>> _unprocessed;
+        internal readonly Dictionary<object, List<RegisteredFactory>> _unprocessed;
         private readonly IResolver _resolvers;
         private readonly List<object> _resolutionStack = new List<object>();
 

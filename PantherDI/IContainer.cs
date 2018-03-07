@@ -1,4 +1,5 @@
 ﻿using System;
+using PantherDI.Registry.Catalog;
 using PantherDI.Resolvers;
 
 namespace PantherDI
@@ -19,8 +20,13 @@ namespace PantherDI
         T Resolve<T>(params object[] contracts);
 
         /// <summary>
-        /// Converts the container into an resolver which can be used during container creation
+        /// Converts the container into a resolver which can be used during container creation
         /// </summary>
         IResolver AsResolver();
+
+        /// <summary>
+        /// Converts the container into a catalog that contains registrations for each provider
+        /// </summary>
+        ICatalog AsCatalog();
     }
 }

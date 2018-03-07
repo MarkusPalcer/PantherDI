@@ -25,8 +25,8 @@ namespace PantherDI.Registry.Registration.Registration
 
         public ManualRegistration(ISet<object> fulfilledContracts, ISet<IFactory> factories, IEnumerable<KeyValuePair<string, object>> metadata)
         {
-            FulfilledContracts = fulfilledContracts;
-            Factories = factories;
+            FulfilledContracts = fulfilledContracts ?? new HashSet<object>();
+            Factories = factories ?? new HashSet<IFactory>();
             Metadata = metadata?.ToDictionary(x => x.Key, x=> x.Value) ?? new Dictionary<string, object>();
         }
     }

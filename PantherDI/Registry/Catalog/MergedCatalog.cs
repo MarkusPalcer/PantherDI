@@ -9,11 +9,15 @@ namespace PantherDI.Registry.Catalog
 {
     public class MergedCatalog : ICatalog
     {
-        public MergedCatalog(params ICatalog[] catalogs)
+        public MergedCatalog(params ICatalog[] catalogs) : this(MergeRegistrations(catalogs.SelectMany(x => x.Registrations)))
+        {
+        }
+
+        private static IEnumerable<IRegistration> MergeRegistrations(IEnumerable<IRegistration> input)
         {
             var registrations = new Dictionary<Type, ManualRegistration>();
 
-            foreach (var registration in catalogs.SelectMany(x => x.Registrations))
+            foreach (var registration in input)
             {
                 if (!registrations.TryGetValue(registration.RegisteredType, out var mergedRegistration))
                 {
@@ -39,7 +43,13 @@ namespace PantherDI.Registry.Catalog
                 }
             }
 
-            Registrations = registrations.Values;
+            var result = registrations.Values;
+            return result;
+        }
+
+        public MergedCatalog(IEnumerable<IRegistration> registrations)
+        {
+            Registrations = MergeRegistrations(registrations);
         }
 
         #region Implementation of ICatalog

@@ -13,6 +13,18 @@ namespace PantherDI.Extensions
         {
             return source.SelectMany(x => pairSelector(x).Select(y => Tuple.Create(x, y))).Select(x => selectFromPair(x.Item1, x.Item2));
         }
+
+        /// <summary>
+        /// Executes the action for each entry in the enumerable
+        /// </summary>
+        /// <remarks>No, I'm not gonna pull in a NuGet-Package just for this!</remarks>
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+        {
+            foreach (var x in source)
+            {
+                action(x);
+            }
+        }
     }
 }
 

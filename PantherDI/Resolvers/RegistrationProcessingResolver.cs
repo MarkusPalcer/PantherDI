@@ -9,19 +9,19 @@ namespace PantherDI.Resolvers
 {
     public class RegistrationProcessingResolver : IResolver
     {
-        private readonly RegistrationConverter _converter;
+        internal readonly RegistrationConverter Converter;
 
         public RegistrationProcessingResolver(RegistrationConverter converter)
         {
-            _converter = converter;
+            Converter = converter;
         }
 
         #region Implementation of IResolver
 
         public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
         {
-            _converter.ProcessContract(dependency.RequiredContracts.First(), dependencyResolver);
-            return _converter.KnowledgeBase.Resolve(dependencyResolver, dependency);
+            Converter.ProcessContract(dependency.RequiredContracts.First(), dependencyResolver);
+            return Converter.KnowledgeBase.Resolve(dependencyResolver, dependency);
         }
 
         #endregion
