@@ -25,6 +25,8 @@ namespace PantherDI
             RootResolver = rootResolver ?? throw new ArgumentNullException(nameof(rootResolver));
         }
 
+        public MultiGenerationConfiguration MultiGenerationConfiguration { get; set; }
+
         public T Resolve<T>(params object[] contracts)
         {
             var providers = ResolveInternal(new Dependency(typeof(T),contracts))
@@ -56,6 +58,11 @@ namespace PantherDI
 
         private IEnumerable<IProvider> ResolveInternal(IDependency dependency)
         {
+            return ResolveInternal(dependency, ResolveInternal);
+        }
+
+        internal IEnumerable<IProvider> ResolveInternal(IDependency dependency, Func<IDependency, IEnumerable<IProvider>> dependencyResolver)
+        {
             var result = _cache[dependency];
             if (result != null)
             {
@@ -63,7 +70,7 @@ namespace PantherDI
             }
 
             // The provider is not yet in the cache. Resolve it and then store it there, so it is cached
-            result = WrapSingletonProviders(RootResolver.Resolve(ResolveInternal, dependency)).ToArray();
+            result = WrapSingletonProviders(RootResolver.Resolve(dependencyResolver, dependency)).ToArray();
             _cache[dependency] = result;
             return result;
         }
@@ -123,7 +130,7 @@ namespace PantherDI
 
             public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
             {
-                return _cnt.RootResolver.Resolve(dependencyResolver, dependency);
+                return _cnt.ResolveInternal(dependency, dependencyResolver).SelectMany(resolver => RegistrationConverter.ProcessProvider(resolver, dependencyResolver));
             }
 
             #endregion

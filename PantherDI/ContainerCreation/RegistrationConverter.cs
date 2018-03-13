@@ -88,6 +88,43 @@ namespace PantherDI.ContainerCreation
             }
         }
 
+        public static IEnumerable<IProvider> ProcessProvider(IProvider provider, Func<IDependency, IEnumerable<IProvider>> resolveDependency)
+        {
+            if (!provider.UnresolvedDependencies.Any())
+            {
+                return new[] {provider};
+            }
+
+            // Cache all providers for a contract
+            var allProviders = provider.UnresolvedDependencies
+                                      .Where(x => !x.Ignored)
+                                      .ToDictionary(x => x, x => resolveDependency(x).ToArray())
+                                      .Where(x => x.Value.Any());
+
+            // Create all combinations possible
+            var allCombinations = new List<Dictionary<IDependency, IProvider>> { new Dictionary<IDependency, IProvider>() };
+            foreach (var pair in allProviders)
+            {
+                var newCombinations = new List<Dictionary<IDependency, IProvider>>();
+
+                foreach (var oldCombination in allCombinations)
+                {
+                    foreach (var dependencyProvider in pair.Value)
+                    {
+                        var newCombination = oldCombination.ToDictionary(x => x.Key, x => x.Value);
+                        newCombination.Add(pair.Key, dependencyProvider);
+
+                        newCombinations.Add(newCombination);
+                    }
+                }
+
+                allCombinations = newCombinations;
+            }
+
+            // Create a provider for each combination
+            return allCombinations.Select(provider.AddDependencies).ToArray();
+        }
+
         public static IEnumerable<IProvider> ProcessFactory(RegisteredFactory registeredFactory, 
             Func<IDependency, IEnumerable<IProvider>> resolveDependency)
         {

@@ -25,7 +25,7 @@ namespace PantherDI.Registry.Registration.Dependency
             RequiredContracts = new HashSet<object>(requiredContracts);
         }
 
-        private string DebuggerDisplay => (Ignored ? "Ignored" : "") + $"Dependency<{ExpectedType}>";
+        private string DebuggerDisplay => (Ignored ? "Ignored" : "") + $"Dependency<{ExpectedType}>({String.Join(",", RequiredContracts.Select(x =>x.ToString()))})";
 
         public Type ExpectedType { get; }
 
@@ -49,6 +49,15 @@ namespace PantherDI.Registry.Registration.Dependency
         {
             return new EqualityComparer().GetHashCode(this);
         }
+
+        #region Overrides of Object
+
+        public override string ToString()
+        {
+            return DebuggerDisplay;
+        }
+
+        #endregion
 
         #endregion
 

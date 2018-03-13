@@ -58,4 +58,8 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ContainerCreation\RegistrationHelpers\" />
+  </ItemGroup>
+
 </Project>

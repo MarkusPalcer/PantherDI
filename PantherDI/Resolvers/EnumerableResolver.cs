@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PantherDI.Comparers;
+using PantherDI.Extensions;
 using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Resolved.Providers;
 
@@ -19,7 +20,7 @@ namespace PantherDI.Resolvers
             {
                 var result = new List<EnumerableProvider<T>>();
 
-                foreach (var provider in dependencyResolver(new Dependency(typeof(T), dependency.RequiredContracts)))
+                foreach (var provider in dependencyResolver(dependency.ReplaceExpectedType<T>()))
                 {
                     var enumerableProvider = result.FirstOrDefault(x => SetComparer<IDependency>.Instance.Equals(x.UnresolvedDependencies, provider.UnresolvedDependencies));
                     if (enumerableProvider == null)

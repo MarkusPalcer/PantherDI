@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -34,8 +35,13 @@ namespace PantherDI.Tests.Resolvers
                 }
             };
 
+            var dependencyResolver = new DependencyResolverDictionary()
+            {
+                {new Dependency(typeof(String)), registrations}
+            };
+             
             var sut = new EnumerableResolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(IEnumerable<string>))).ToArray();
+            var result = sut.Resolve(dependencyResolver.Execute, new Dependency(typeof(IEnumerable<string>))).ToArray();
 
             result.Should().HaveCount(1);
             result[0].FulfilledContracts.Should().BeEquivalentTo(typeof(IEnumerable<string>));
@@ -65,8 +71,13 @@ namespace PantherDI.Tests.Resolvers
                 }
             };
 
+            var dependencyResolver = new DependencyResolverDictionary()
+            {
+                {new Dependency(typeof(String)), registrations}
+            };
+
             var sut = new EnumerableResolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(SetComparer<string>))).ToArray();
+            var result = sut.Resolve(dependencyResolver.Execute, new Dependency(typeof(SetComparer<string>))).ToArray();
 
             result.Should().BeEmpty();
         }
@@ -94,8 +105,13 @@ namespace PantherDI.Tests.Resolvers
                 },
             };
 
+            var dependencyResolver = new DependencyResolverDictionary()
+            {
+                {new Dependency(typeof(String)), registrations}
+            };
+
             var sut = new EnumerableResolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(IEnumerable<string>))).ToArray();
+            var result = sut.Resolve(dependencyResolver.Execute, new Dependency(typeof(IEnumerable<string>))).ToArray();
 
             result.Should().HaveCount(1);
             result[0].FulfilledContracts.Should().BeEquivalentTo(typeof(IEnumerable<string>));
@@ -158,8 +174,13 @@ namespace PantherDI.Tests.Resolvers
                 },
             };
 
+            var dependencyResolver = new DependencyResolverDictionary()
+            {
+                {new Dependency(typeof(String)), registrations}
+            };
+
             var sut = new EnumerableResolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(IEnumerable<string>))).ToArray();
+            var result = sut.Resolve(dependencyResolver.Execute, new Dependency(typeof(IEnumerable<string>))).ToArray();
 
             registrations.Should().NotContain(x => x.InvocationCounter != 0);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -575,6 +576,78 @@ namespace PantherDI.Tests
             sut.Invoking(x => x.Resolve<TestClass13>()).ShouldNotThrow();
             sut.Invoking(x => x.Resolve<TestClass14>()).ShouldNotThrow();
             sut.Invoking(x => x.Resolve<TestClass15>()).ShouldNotThrow();
+        }
+
+        [TestMethod]
+        public void ChildContainersCanAccessParentRegistrations()
+        {
+            var parentBuilder = new ContainerBuilder()
+                                    .WithType<TestClass14>()
+                                    .WithFuncResolvers();
+            parentBuilder.WithMultipleGenerations();
+
+            var parent = parentBuilder.Build();
+
+            var child = parent.Resolve<IContainerBuilder>()
+                              .WithType<TestClass13>()
+                              .WithType<TestClass15>()
+                              .Build();
+
+            // Child can access the parent
+            child.Invoking(x => x.Resolve<TestClass13>()).ShouldNotThrow();
+            child.Invoking(x => x.Resolve<TestClass14>()).ShouldNotThrow();
+            child.Invoking(x => x.Resolve<TestClass15>()).ShouldNotThrow();
+
+            // Parent can't access the child. 
+            parent.Invoking(x => x.Resolve<TestClass13>()).ShouldThrow<NoSuitableRegistrationException>();
+            parent.Invoking(x => x.Resolve<TestClass14>()).ShouldThrow<NoSuitableRegistrationException>();
+            parent.Invoking(x => x.Resolve<TestClass15>()).ShouldThrow<NoSuitableRegistrationException>();
+            parent.Invoking(x => x.Resolve<Func<TestClass13, TestClass14>>()).ShouldNotThrow();
+        }
+
+
+        [TestMethod]
+        public void ChildContainersCanAccessParentResolvers()
+        {
+            var parentBuilder = new ContainerBuilder()
+                .WithSupportForUnregisteredTypes();
+            parentBuilder.WithMultipleGenerations();
+
+            var parent = parentBuilder
+                         .Build();
+
+            var child = parent.Resolve<IContainerBuilder>()
+                              .WithType<TestClass14>()
+                              .WithType<TestClass15>()
+                              .WithResolver(new EnumerableResolver())
+                              .Build();
+
+            // Child can access the parent resolvers
+            child.Invoking(x => x.Resolve<TestClass13>()).ShouldNotThrow("the child should have access to the parents support for unregistered types");
+            child.Invoking(x => x.Resolve<IEnumerable<TestClass13>>()).ShouldNotThrow();
+
+            // Parent can't access the child resolvers. 
+            parent.Invoking(x => x.Resolve<TestClass13>()).ShouldNotThrow("the parent should have support for unregistered types");
+            parent.Invoking(x => x.Resolve<IEnumerable<TestClass13>>()).ShouldThrow<NoSuitableRegistrationException>("the parent should not have access to the childs EnumerableResolver");
+        }
+
+        [TestMethod]
+        public void GenerationsAreCapped()
+        {
+            var parentBuilder = new ContainerBuilder()
+                .WithSupportForUnregisteredTypes();
+            parentBuilder.WithMultipleGenerations()
+                         .WithMaxiumNumberOfChildGenerations(3);
+
+            var cnt = parentBuilder
+                .Build();
+
+            // Three child generations are allowed
+            cnt = cnt.Resolve<IContainerBuilder>().Build();
+            cnt = cnt.Resolve<IContainerBuilder>().Build();
+            cnt = cnt.Resolve<IContainerBuilder>().Build();
+
+            cnt.Invoking(x => x.Resolve<IContainerBuilder>().Build()).ShouldThrow<MaximumNumberOfGenerationsExceededException>();
         }
     }
 }

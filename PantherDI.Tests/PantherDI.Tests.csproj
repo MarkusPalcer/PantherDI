@@ -64,10 +64,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContainerCreation\ContainerBuilderTests.cs" />
+    <Compile Include="ContainerResolverTests.cs" />
     <Compile Include="ContainerTests.cs" />
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
     <Compile Include="Helpers\Catalog.cs" />
     <Compile Include="Helpers\ContainerExtensions.cs" />
+    <Compile Include="Helpers\DependencyResolverDictionary.cs" />
     <Compile Include="Helpers\TestProvider.cs" />
     <Compile Include="MergedCatalogTests.cs" />
     <Compile Include="Reflection\AssemblyCatalogTests.cs" />

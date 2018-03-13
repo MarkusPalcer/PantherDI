@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using PantherDI.Attributes;
+using PantherDI.ContainerCreation.ContainerBuilderHelpers;
+using PantherDI.Extensions;
 using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
@@ -16,6 +19,8 @@ namespace PantherDI.ContainerCreation
     /// </summary>
     public class ContainerBuilder : IEnumerable, IContainerBuilder
     {
+        public Container Parent { get; internal set; }
+
         private readonly CatalogBuilder _catalogBuilder = new CatalogBuilder();
 
         public List<ICatalog> Catalogs => _catalogBuilder.Catalogs;
@@ -30,6 +35,13 @@ namespace PantherDI.ContainerCreation
 
         public bool UseLateProcessing { get; set; }
 
+        public MultiGenerationConfiguration MultiGenerationConfiguration { get; set; } = new MultiGenerationConfiguration();
+
+        private List<IContainerBuilderHelper> ContainerBuilderHelpers { get; } = new List<IContainerBuilderHelper>();
+         
+        [Ignore]
+        public ContainerBuilder() { }
+
         /// <summary>
         /// Creates the container configured so far
         /// </summary>
@@ -37,12 +49,30 @@ namespace PantherDI.ContainerCreation
         {
             Container result = null;
 
+            ContainerBuilderHelpers.ForEach(x => x.ApplyTo(this));
+
             /* ReSharper disable once AccessToModifiedClosure
              * Justification: Access to modified closure is desired. Container should resolve itself.
              */
             Register<Container>()
                 .As<IContainer>()
                 .WithFactory(() => result);
+
+            if (Parent != null)
+            {
+                MultiGenerationConfiguration = Parent.MultiGenerationConfiguration.CreateChildConfiguration();
+            }
+
+            if (MultiGenerationConfiguration.AllowMultipleGenerations)
+            {
+                /* ReSharper disable once AccessToModifiedClosure
+                 * Justification: Access to modified closure is desired. Container should be used as parent
+                 */
+                Register<ContainerBuilder>()
+                    .As<IContainerBuilder>()
+                    .WithFactory(() => new ContainerBuilder { Parent = result });
+            }
+
 
             var manuallyRegisteredResolvers = new AllMatchesResolver(Resolvers);
 
@@ -69,6 +99,11 @@ namespace PantherDI.ContainerCreation
                 registrationResolver = new RegistrationProcessingResolver(converter);
             }
 
+            if (Parent != null)
+            {
+                manuallyRegisteredResolvers.Add(Parent.AsResolver());
+            }
+
             containerResolvers.Insert(0, registrationResolver);
 
             if (!UseLateProcessing)
@@ -76,8 +111,12 @@ namespace PantherDI.ContainerCreation
                 converter.ProcessAll();
             }
 
-            
-            result = new Container(containerResolvers);
+
+            result = new Container(containerResolvers)
+            {
+                MultiGenerationConfiguration = MultiGenerationConfiguration
+            };
+
             return result;
         }
 
@@ -285,6 +324,13 @@ namespace PantherDI.ContainerCreation
             return this;
         }
 
+        public MultipleGenerationContainerBuilderHelper WithMultipleGenerations()
+        {
+            var result = new MultipleGenerationContainerBuilderHelper();
+            ContainerBuilderHelpers.Add(result);
+            return result;
+        }
+
         /// <summary>
         /// Registers a type to the container
         /// </summary>
@@ -319,5 +365,7 @@ namespace PantherDI.ContainerCreation
             _catalogBuilder.AddRegistrationHelper(helper);
             return helper;
         }
+
+        
     }
 }
