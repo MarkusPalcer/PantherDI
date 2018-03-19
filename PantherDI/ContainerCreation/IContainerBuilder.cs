@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using PantherDI.Registry.Catalog;
@@ -22,23 +21,6 @@ namespace PantherDI.ContainerCreation
         /// Creates the container configured so far
         /// </summary>
         IContainer Build();
-
-        /// <summary>
-        /// Adds a catalog to the container configuration
-        /// </summary>
-        void Add(ICatalog catalog);
-
-        /// <summary>
-        /// Adds a resolver to the container configuration
-        /// </summary>
-        void Add(IResolver resolver);
-
-        /// <summary>
-        /// Adds a registraion to the container configuration
-        /// </summary>
-        void Add(IRegistration registration);
-
-        IEnumerator GetEnumerator();
 
         /// <summary>
         /// Adds a catalog to the container configuration
@@ -146,10 +128,5 @@ namespace PantherDI.ContainerCreation
         /// Registers an instance to the container
         /// </summary>
         InstanceRegistrationHelper<T> Register<T>(T instance);
-
-        /// <summary>
-        /// Registers a factory to the container
-        /// </summary>
-        FactoryRegistrationHelper Register<T>(IFactory factory);
-    }
+        }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -17,7 +16,7 @@ namespace PantherDI.ContainerCreation
     /// <summary>
     /// Helper class to create a container from a configuration
     /// </summary>
-    public class ContainerBuilder : IEnumerable, IContainerBuilder
+    public class ContainerBuilder : IContainerBuilder
     {
         public Container Parent { get; internal set; }
 
@@ -119,48 +118,6 @@ namespace PantherDI.ContainerCreation
 
             return result;
         }
-
-        #region Obsoleted
-
-        [Obsolete("Use WithResolver(IContainer.AsResolver) instead")]
-        public ContainerBuilder WithResolver(IContainer container)
-        {
-            return WithResolver(container.AsResolver());
-        }
-
-        [Obsolete("Enumerating all contents of the builder will be removed in the future")]
-        public IEnumerator GetEnumerator()
-        {
-            return Catalogs.Cast<object>().Concat(Resolvers).Concat(Registrations).GetEnumerator();
-        }
-
-        /// <summary>
-        /// Adds a catalog to the container configuration
-        /// </summary>
-        [Obsolete("Please use WithCatalog instead.")]
-        public void Add(ICatalog catalog)
-        {
-            Catalogs.Add(catalog);
-        }
-
-        /// <summary>
-        /// Adds a resolver to the container configuration
-        /// </summary>
-        [Obsolete("Please use WithResolver instead.")]
-        public void Add(IResolver resolver)
-        {
-            Resolvers.Add(resolver);
-        }
-
-        /// <summary>
-        /// Adds a registraion to the container configuration
-        /// </summary>
-        [Obsolete("Please use WithRegistration instead.")]
-        public void Add(IRegistration registration)
-        {
-            Registrations.Add(registration);
-        }
-        #endregion
 
         /// <summary>
         /// Adds a catalog to the container configuration
@@ -354,18 +311,6 @@ namespace PantherDI.ContainerCreation
         {
             return _catalogBuilder.Register(instance);
         }
-
-        /// <summary>
-        /// Registers a factory to the container
-        /// </summary>
-        [Obsolete("Use Register<ReturnType>().WithFactory instead.")]
-        public FactoryRegistrationHelper Register<T>(IFactory factory)
-        {
-            var helper = new FactoryRegistrationHelper(typeof(T), factory);
-            _catalogBuilder.AddRegistrationHelper(helper);
-            return helper;
-        }
-
         
     }
 }

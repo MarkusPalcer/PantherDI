@@ -101,10 +101,5 @@ namespace PantherDI.ContainerCreation
                            .WithFactory(factory);
             return this;
         }
-
-        internal void AddRegistrationHelper(FactoryRegistrationHelper helper)
-        {
-            RegistrationHelpers.Add(helper);
-        }
     }
 }

@@ -25,10 +25,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>FuncResolvers.cs</LastGenOutput>
     </None>
-    <None Update="Extensions\ContainerBuilder\FactoryRegistration.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>FactoryRegistration.cs</LastGenOutput>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -50,11 +46,6 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>FuncResolvers.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Extensions\ContainerBuilder\FactoryRegistration.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>FactoryRegistration.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 
