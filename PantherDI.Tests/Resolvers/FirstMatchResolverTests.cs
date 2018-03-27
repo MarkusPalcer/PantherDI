@@ -4,7 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 using PantherDI.Resolvers.Aggregation;
@@ -29,13 +29,13 @@ namespace PantherDI.Tests.Resolvers
 
             var resolverMock1 = new Mock<IResolver>(MockBehavior.Strict);
             resolverMock1
-                .Setup(x => x.Resolve(It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(),It.IsAny<IDependency>()))
+                .Setup(x => x.Resolve(It.IsAny<Func<Dependency, IEnumerable<IProvider>>>(),It.IsAny<Dependency>()))
                 .Returns(Enumerable.Empty<IProvider>());
             sut.Add(resolverMock1.Object);
 
             var resolverMock2 = new Mock<IResolver>(MockBehavior.Strict);
             resolverMock2
-                .Setup(x => x.Resolve(It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(), It.IsAny<IDependency>()))
+                .Setup(x => x.Resolve(It.IsAny<Func<Dependency, IEnumerable<IProvider>>>(), It.IsAny<Dependency>()))
                 .Returns(Enumerable.Empty<IProvider>());
             sut.Add(resolverMock2.Object);
 
@@ -56,7 +56,7 @@ namespace PantherDI.Tests.Resolvers
 
             var resolverMock1 = new Mock<IResolver>(MockBehavior.Strict);
             resolverMock1
-                .Setup(x => x.Resolve(It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(), It.IsAny<IDependency>()))
+                .Setup(x => x.Resolve(It.IsAny<Func<Dependency, IEnumerable<IProvider>>>(), It.IsAny<Dependency>()))
                 .Returns(providers);
             sut.Add(resolverMock1.Object);
 
@@ -79,13 +79,13 @@ namespace PantherDI.Tests.Resolvers
 
             var resolverMock1 = new Mock<IResolver>(MockBehavior.Strict);
             resolverMock1
-                .Setup(x => x.Resolve(It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(), It.IsAny<IDependency>()))
+                .Setup(x => x.Resolve(It.IsAny<Func<Dependency, IEnumerable<IProvider>>>(), It.IsAny<Dependency>()))
                 .Returns(Enumerable.Empty<IProvider>());
             sut.Add(resolverMock1.Object);
 
             var resolverMock2 = new Mock<IResolver>(MockBehavior.Strict);
             resolverMock2
-                .Setup(x => x.Resolve(It.IsAny<Func<IDependency, IEnumerable<IProvider>>>(), It.IsAny<IDependency>()))
+                .Setup(x => x.Resolve(It.IsAny<Func<Dependency, IEnumerable<IProvider>>>(), It.IsAny<Dependency>()))
                 .Returns(providers);
             sut.Add(resolverMock2.Object);
 

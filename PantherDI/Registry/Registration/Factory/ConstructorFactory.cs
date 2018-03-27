@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using PantherDI.Attributes;
-using PantherDI.Registry.Registration.Dependency;
 
 namespace PantherDI.Registry.Registration.Factory
 {

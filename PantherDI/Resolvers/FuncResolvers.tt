@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using PantherDI.Extensions;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
@@ -34,7 +34,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<<#=CreateString(x => $"TIn{x}")#>,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { <#= CreateString(x => $"typeof(TIn{x})") #> };
 				
@@ -43,7 +43,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					<#=resultType#> Delegate(Dictionary<IDependency, object> objects)
+					<#=resultType#> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (<#= CreateString(x => $"p{x}") #>) => 
 							func(objects)(new object[] { <#= CreateString(x => $"p{x}") #> });
@@ -55,7 +55,7 @@ namespace PantherDI.Resolvers
 
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn<#=j#>).GetTypeInfo()))<# } #>;
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}

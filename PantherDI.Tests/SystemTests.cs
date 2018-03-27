@@ -9,7 +9,7 @@ using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
 using PantherDI.Extensions.TypeRegistrationHelper;
 using PantherDI.Registry.Catalog;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolvers;
@@ -54,7 +54,7 @@ namespace PantherDI.Tests
                                         new ManualRegistration()
                                         {
                                             FulfilledContracts = { typeof(ICatalog), "SomeContract" },
-                                            Factories = { new DelegateFactory(Factory, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>()) },
+                                            Factories = { new DelegateFactory(Factory, Enumerable.Empty<object>(), Enumerable.Empty<Dependency>()) },
                                             RegisteredType = typeof(Catalog)
                                         })
                       .Build();

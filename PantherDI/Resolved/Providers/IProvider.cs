@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Resolved.Providers
@@ -13,7 +13,7 @@ namespace PantherDI.Resolved.Providers
         /// <summary>
         /// All dependencies which cannot be resolved by the container
         /// </summary>
-        HashSet<IDependency> UnresolvedDependencies { get; }
+        HashSet<Dependency> UnresolvedDependencies { get; }
 
         /// <summary>
         /// The type of the actual implementation as provided by the <see cref="IRegistration"/>
@@ -29,7 +29,7 @@ namespace PantherDI.Resolved.Providers
         /// Creates an instance of the provided type
         /// </summary>
         /// <param name="resolvedDependencies">The resolved objects for the dependencies which could not be resolved by the container.</param>
-        object CreateInstance(Dictionary<IDependency, object> resolvedDependencies);
+        object CreateInstance(Dictionary<Dependency, object> resolvedDependencies);
 
         /// <summary>
         /// Gets a value indicating whether only a single instance of this registered type should be created

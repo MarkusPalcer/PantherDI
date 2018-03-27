@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.Registry.Catalog;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Tests.Helpers;
@@ -28,7 +28,7 @@ namespace PantherDI.Tests
                 {
                     RegisteredType = typeof(string),
                     FulfilledContracts = {typeof(string), "A"},
-                    Factories = {new DelegateFactory(_ => string.Empty, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>())}
+                    Factories = {new DelegateFactory(_ => string.Empty, Enumerable.Empty<object>(), Enumerable.Empty<Dependency>())}
                 });
 
             var sut = new MergedCatalog(catalog1);
@@ -48,7 +48,7 @@ namespace PantherDI.Tests
                 {
                     RegisteredType = typeof(string),
                     FulfilledContracts = { typeof(string), "A" },
-                    Factories = { new DelegateFactory(_ => string.Empty, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>()) }
+                    Factories = { new DelegateFactory(_ => string.Empty, Enumerable.Empty<object>(), Enumerable.Empty<Dependency>()) }
                 });
 
             var catalog2 = new Catalog(
@@ -56,7 +56,7 @@ namespace PantherDI.Tests
                 {
                     RegisteredType = typeof(int),
                     FulfilledContracts = { typeof(int), "B" },
-                    Factories = { new DelegateFactory(_ => 2, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>()) }
+                    Factories = { new DelegateFactory(_ => 2, Enumerable.Empty<object>(), Enumerable.Empty<Dependency>()) }
                 });
 
             var sut = new MergedCatalog(catalog1, catalog2);
@@ -80,7 +80,7 @@ namespace PantherDI.Tests
                 {
                     RegisteredType = typeof(string),
                     FulfilledContracts = { typeof(string), "A" },
-                    Factories = { new DelegateFactory(_ => string.Empty, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>()) }
+                    Factories = { new DelegateFactory(_ => string.Empty, Enumerable.Empty<object>(), Enumerable.Empty<Dependency>()) }
                 });
 
             var catalog2 = new Catalog(
@@ -108,7 +108,7 @@ namespace PantherDI.Tests
                 {
                     RegisteredType = typeof(string),
                     FulfilledContracts = { typeof(string), "A" },
-                    Factories = { new DelegateFactory(_ => string.Empty, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>()) }
+                    Factories = { new DelegateFactory(_ => string.Empty, Enumerable.Empty<object>(), Enumerable.Empty<Dependency>()) }
                 });
 
             var catalog2 = new Catalog(
@@ -116,7 +116,7 @@ namespace PantherDI.Tests
                 {
                     RegisteredType = typeof(string),
                     FulfilledContracts = { typeof(string), "C" },
-                    Factories = { new DelegateFactory(_ => "123", Enumerable.Empty<object>(), Enumerable.Empty<IDependency>()) }
+                    Factories = { new DelegateFactory(_ => "123", Enumerable.Empty<object>(), Enumerable.Empty<Dependency>()) }
                 });
 
             var sut = new MergedCatalog(catalog1, catalog2);

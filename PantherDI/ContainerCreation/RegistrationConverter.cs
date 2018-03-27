@@ -4,7 +4,7 @@ using System.Linq;
 using PantherDI.Exceptions;
 using PantherDI.Extensions;
 using PantherDI.Registry.Catalog;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
@@ -48,7 +48,7 @@ namespace PantherDI.ContainerCreation
             }
         }
 
-        public void ProcessContract(object contract, Func<IDependency, IEnumerable<IProvider>> dependencyResolver)
+        public void ProcessContract(object contract, Func<Dependency, IEnumerable<IProvider>> dependencyResolver)
         {
             if (_resolutionStack.Contains(contract))
             {
@@ -66,7 +66,7 @@ namespace PantherDI.ContainerCreation
             _resolutionStack.Remove(contract);
         }
 
-        private void ProcessRegistration(RegisteredFactory registeredFactory, Func<IDependency, IEnumerable<IProvider>> dependencyResolver)
+        private void ProcessRegistration(RegisteredFactory registeredFactory, Func<Dependency, IEnumerable<IProvider>> dependencyResolver)
         {
 
             // Remove this registration completely (and remove empty entries)
@@ -88,7 +88,7 @@ namespace PantherDI.ContainerCreation
             }
         }
 
-        public static IEnumerable<IProvider> ProcessProvider(IProvider provider, Func<IDependency, IEnumerable<IProvider>> resolveDependency)
+        public static IEnumerable<IProvider> ProcessProvider(IProvider provider, Func<Dependency, IEnumerable<IProvider>> resolveDependency)
         {
             if (!provider.UnresolvedDependencies.Any())
             {
@@ -102,10 +102,10 @@ namespace PantherDI.ContainerCreation
                                       .Where(x => x.Value.Any());
 
             // Create all combinations possible
-            var allCombinations = new List<Dictionary<IDependency, IProvider>> { new Dictionary<IDependency, IProvider>() };
+            var allCombinations = new List<Dictionary<Dependency, IProvider>> { new Dictionary<Dependency, IProvider>() };
             foreach (var pair in allProviders)
             {
-                var newCombinations = new List<Dictionary<IDependency, IProvider>>();
+                var newCombinations = new List<Dictionary<Dependency, IProvider>>();
 
                 foreach (var oldCombination in allCombinations)
                 {
@@ -126,7 +126,7 @@ namespace PantherDI.ContainerCreation
         }
 
         public static IEnumerable<IProvider> ProcessFactory(RegisteredFactory registeredFactory, 
-            Func<IDependency, IEnumerable<IProvider>> resolveDependency)
+            Func<Dependency, IEnumerable<IProvider>> resolveDependency)
         {
             var registration = registeredFactory.Registration;
             var factory = registeredFactory.Factory;
@@ -138,10 +138,10 @@ namespace PantherDI.ContainerCreation
                 .Where(x => x.Value.Any());
 
             // Create all combinations possible
-            var allCombinations = new List<Dictionary<IDependency, IProvider>> { new Dictionary<IDependency, IProvider>() };
+            var allCombinations = new List<Dictionary<Dependency, IProvider>> { new Dictionary<Dependency, IProvider>() };
             foreach (var pair in allProviders)
             {
-                var newCombinations = new List<Dictionary<IDependency, IProvider>>();
+                var newCombinations = new List<Dictionary<Dependency, IProvider>>();
 
                 foreach (var oldCombination in allCombinations)
                 {
@@ -161,7 +161,7 @@ namespace PantherDI.ContainerCreation
             return allCombinations.Select(combination => new FactoryProvider(registration, factory, combination)).ToArray();
         }
 
-        private IEnumerable<IProvider> ResolveDependency(IDependency dependency)
+        private IEnumerable<IProvider> ResolveDependency(Dependency dependency)
         {
             ProcessContract(dependency.RequiredContracts.First(), ResolveDependency);
             return _resolvers.Resolve(ResolveDependency, dependency);

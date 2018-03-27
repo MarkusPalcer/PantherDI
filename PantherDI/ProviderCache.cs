@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using PantherDI.Comparers;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI
@@ -10,7 +10,7 @@ namespace PantherDI
     {
         private readonly Dictionary<Type, Dictionary<ISet<object>, IProvider[]>> _data = new Dictionary<Type, Dictionary<ISet<object>, IProvider[]>>();
 
-        public IProvider[] this[IDependency key]
+        public IProvider[] this[Dependency key]
         {
             get
             {

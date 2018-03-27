@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using PantherDI.Attributes;
 using PantherDI.Extensions;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
@@ -17,7 +17,7 @@ namespace PantherDI.Resolvers
         {
             #region Implementation of IResolver
 
-            public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+            public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
             {
                 var requestedMetadata = typeof(TMetadata)
                     .GetTypeInfo()
@@ -42,7 +42,7 @@ namespace PantherDI.Resolvers
                         }
                     }
 
-                    object ProviderFunction(Dictionary<IDependency, object> x)
+                    object ProviderFunction(Dictionary<Dependency, object> x)
                     {
                         var result = new Lazy<T, TMetadata>(() => (T) provider.CreateInstance(x));
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved;
 using PantherDI.Resolved.Providers;
 
@@ -22,6 +22,6 @@ namespace PantherDI.Resolvers
         /// Will return <code>null</code> if this resolver is unable to handle the dependency at all
         /// </returns>
         /// 
-        IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency);
+        IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency);
     }
 }

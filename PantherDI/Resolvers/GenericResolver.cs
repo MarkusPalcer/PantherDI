@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
@@ -19,7 +19,7 @@ namespace PantherDI.Resolvers
             
         }
 
-        public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+        public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
         {
             // Only handle The registered type
             if (!dependency.ExpectedType.GetTypeInfo().IsGenericType ||

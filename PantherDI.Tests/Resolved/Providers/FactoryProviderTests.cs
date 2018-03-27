@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved.Providers;
@@ -32,15 +32,15 @@ namespace PantherDI.Tests.Resolved.Providers
             {
                 deps.Should().BeEmpty();
                 return factoryResult;
-            }, Enumerable.Empty<object>(), Enumerable.Empty<IDependency>());
+            }, Enumerable.Empty<object>(), Enumerable.Empty<Dependency>());
 
-            var sut = new FactoryProvider(registration, factory, new Dictionary<IDependency, IProvider>());
+            var sut = new FactoryProvider(registration, factory, new Dictionary<Dependency, IProvider>());
 
             sut.FulfilledContracts.Should().BeEquivalentTo(FulfilledContract, typeof(string));
             sut.ResultType.Should().Be(typeof(string).GetTypeInfo());
             sut.UnresolvedDependencies.Should().BeEmpty();
 
-            var result = sut.CreateInstance(new Dictionary<IDependency, object>());
+            var result = sut.CreateInstance(new Dictionary<Dependency, object>());
             result.Should().Be(factoryResult);
         }
 
@@ -70,7 +70,7 @@ namespace PantherDI.Tests.Resolved.Providers
             new Dependency(typeof(string), "Dependency 2"), 
             new Dependency(typeof(string), "Dependency 3")});
 
-            var sut = new FactoryProvider(registration, factory, new Dictionary<IDependency, IProvider>
+            var sut = new FactoryProvider(registration, factory, new Dictionary<Dependency, IProvider>
             {
                 { new Dependency(typeof(string), "Dependency 1"), p1},
                 { new Dependency(typeof(string), "Dependency 2"), p2},
@@ -81,7 +81,7 @@ namespace PantherDI.Tests.Resolved.Providers
             sut.ResultType.Should().Be(typeof(string).GetTypeInfo());
             sut.UnresolvedDependencies.Should().BeEmpty();
 
-            var result = sut.CreateInstance(new Dictionary<IDependency, object>());
+            var result = sut.CreateInstance(new Dictionary<Dependency, object>());
             result.Should().Be(factoryResult);
 
             p1.InvocationCounter.Should().Be(1);
@@ -117,7 +117,7 @@ namespace PantherDI.Tests.Resolved.Providers
                                               });
 
 
-            var sut = new FactoryProvider(registration, factory, new Dictionary<IDependency, IProvider>
+            var sut = new FactoryProvider(registration, factory, new Dictionary<Dependency, IProvider>
             {
                 { new Dependency(typeof(string), "Dependency 1"), p1},
                 { new Dependency(typeof(string), "Dependency 2"), p2},
@@ -126,10 +126,9 @@ namespace PantherDI.Tests.Resolved.Providers
             sut.FulfilledContracts.Should().BeEquivalentTo(FulfilledContract, typeof(string));
             sut.ResultType.Should().Be(typeof(string).GetTypeInfo());
             sut.UnresolvedDependencies.Count.Should().Be(1);
-            new Dependency.EqualityComparer().Equals(sut.UnresolvedDependencies.Select(x => x).First(),
-                new Dependency(typeof(string), "Dependency 3")).Should().BeTrue();
+            sut.UnresolvedDependencies.Select(x => x).First().Should().Be(new Dependency(typeof(string), "Dependency 3"));
 
-            var result = sut.CreateInstance(new Dictionary<IDependency, object>
+            var result = sut.CreateInstance(new Dictionary<Dependency, object>
             {
                 {new Dependency(typeof(string), "Dependency 3"),  "Passed value"}
             });

@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 
 namespace PantherDI.Resolved.Providers
 {
     public class DelegateProvider : IProvider
     {
-        private readonly Func<Dictionary<IDependency, object>, object> _delegate;
+        private readonly Func<Dictionary<Dependency, object>, object> _delegate;
 
-        public DelegateProvider(Func<Dictionary<IDependency, object>, object> @delegate, IReadOnlyDictionary<string, object> metadata)
+        public DelegateProvider(Func<Dictionary<Dependency, object>, object> @delegate, IReadOnlyDictionary<string, object> metadata)
         {
             _delegate = @delegate;
             Metadata = metadata;
         }
 
-        public static DelegateProvider WrapProvider<T>(Func<Dictionary<IDependency, object>, object> @delegate, IProvider provider)
+        public static DelegateProvider WrapProvider<T>(Func<Dictionary<Dependency, object>, object> @delegate, IProvider provider)
         {
             var p = new DelegateProvider(@delegate, provider.Metadata)
             {
@@ -30,10 +30,10 @@ namespace PantherDI.Resolved.Providers
             return p;
         }
 
-        public HashSet<IDependency> UnresolvedDependencies { get; internal set; } = new HashSet<IDependency>(new Dependency.EqualityComparer());
+        public HashSet<Dependency> UnresolvedDependencies { get; internal set; } = new HashSet<Dependency>();
         public Type ResultType { get; internal set; }
         public ISet<object> FulfilledContracts { get; internal set; } = new HashSet<object>();
-        public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
+        public object CreateInstance(Dictionary<Dependency, object> resolvedDependencies)
         {
             return _delegate(resolvedDependencies);
         }

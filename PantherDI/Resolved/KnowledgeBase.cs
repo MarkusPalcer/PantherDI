@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PantherDI.Registry.Registration.Dependency;
 using System.Reflection;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolved
@@ -29,13 +29,8 @@ namespace PantherDI.Resolved
             }
         }
 
-        public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+        public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
         {
-            if (dependency == null)
-            {
-                throw new ArgumentNullException(nameof(dependency));
-            }
-
             return this[dependency.RequiredContracts.First()]
                 .Where(x => x.FulfilledContracts.IsSupersetOf(dependency.RequiredContracts))
                 .Where(x => dependency.ExpectedType.GetTypeInfo().IsAssignableFrom(x.ResultType.GetTypeInfo()))

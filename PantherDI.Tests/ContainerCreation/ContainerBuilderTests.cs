@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
 using PantherDI.Registry.Catalog;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
@@ -29,14 +29,14 @@ namespace PantherDI.Tests.ContainerCreation
         {
             var catalog = new Catalog(new ManualRegistration()
             {
-                FulfilledContracts = { typeof(ICatalog), "SomeContract" },
-                Factories = { DelegateFactory.Create<Catalog>(() => null) },
+                FulfilledContracts = {typeof(ICatalog), "SomeContract"},
+                Factories = {DelegateFactory.Create<Catalog>(() => null)},
                 RegisteredType = typeof(Catalog)
             });
 
-            var sut = (Container)new ContainerBuilder()
-                .WithCatalog(catalog)
-                .Build();
+            var sut = (Container) new ContainerBuilder()
+                                  .WithCatalog(catalog)
+                                  .Build();
 
             var knowledgeBase = sut.KnowledgeBase();
             knowledgeBase.KnownProviders.Keys.Should().BeEquivalentTo(typeof(ICatalog), "SomeContract", typeof(Catalog), typeof(Container), typeof(IContainer));
@@ -62,21 +62,22 @@ namespace PantherDI.Tests.ContainerCreation
         public void DependencyInjection()
         {
             var catalog = new Catalog(new ManualRegistration
-            {
-                RegisteredType = typeof(string),
-                Factories =
-                {
-                    DelegateFactory.Create<int, string>(i => string.Empty)
-                }
-            }, new ManualRegistration
-            {
-                RegisteredType = typeof(int),
-                Factories =
-                {
-                    DelegateFactory.Create(() => 42)
-                },
-                Singleton = true
-            });
+                                      {
+                                          RegisteredType = typeof(string),
+                                          Factories =
+                                          {
+                                              DelegateFactory.Create<int, string>(i => string.Empty)
+                                          }
+                                      },
+                                      new ManualRegistration
+                                      {
+                                          RegisteredType = typeof(int),
+                                          Factories =
+                                          {
+                                              DelegateFactory.Create(() => 42)
+                                          },
+                                          Singleton = true
+                                      });
 
             var sut = (Container) new ContainerBuilder().WithCatalog(catalog).Build();
             var knowledgeBase = sut.KnowledgeBase();
@@ -105,16 +106,23 @@ namespace PantherDI.Tests.ContainerCreation
         {
             var sut = new ContainerBuilder()
                 .WithCatalog(new Catalog(new ManualRegistration
-            {
-                RegisteredType = typeof(object),
-                FulfilledContracts = { "A" },
-                Factories = { new DelegateFactory(_ => null, Enumerable.Empty<object>(), new []{ new Dependency(typeof(object), "B")}) }
-            }, new ManualRegistration()
-            {
-                RegisteredType = typeof(object),
-                FulfilledContracts = { "B" },
-                Factories = { new DelegateFactory(_ => null, Enumerable.Empty<object>(), new[] { new Dependency(typeof(object), "A")}) }
-            }));
+                                         {
+                                             RegisteredType = typeof(object),
+                                             FulfilledContracts = {"A"},
+                                             Factories =
+ {
+                                                 new DelegateFactory(_ => null, Enumerable.Empty<object>(), new[] {new Dependency(typeof(object), "B")})
+                                             }
+                                         },
+                                         new ManualRegistration()
+                                         {
+                                             RegisteredType = typeof(object),
+                                             FulfilledContracts = {"B"},
+                                             Factories =
+ {
+                                                 new DelegateFactory(_ => null, Enumerable.Empty<object>(), new[] {new Dependency(typeof(object), "A")})
+                                             }
+                                         }));
 
             sut.Invoking(x => x.Build()).ShouldThrow<CircularDependencyException>();
         }
@@ -124,12 +132,12 @@ namespace PantherDI.Tests.ContainerCreation
         {
             var sut = new ContainerBuilder();
             sut.Register<ContainerBuilderTests>()
-                .WithConstructors()
+               .WithConstructors()
                .WithMetadata("Test", 123);
 
-            var cnt = (Container)sut.Build();
+            var cnt = (Container) sut.Build();
 
-            var kb = ((FirstMatchResolver)cnt.RootResolver).OfType<KnowledgeBase>().Single();
+            var kb = ((FirstMatchResolver) cnt.RootResolver).OfType<KnowledgeBase>().Single();
 
             var providers = kb[typeof(ContainerBuilderTests)].ToArray();
             var provider = providers.Single();

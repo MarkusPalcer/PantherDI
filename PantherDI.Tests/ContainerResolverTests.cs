@@ -6,7 +6,7 @@ using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 using PantherDI.Tests.Helpers;
 using PantherDI.Tests.Reflection;
@@ -16,7 +16,7 @@ namespace PantherDI.Tests
     [TestClass]
     public class ContainerResolverTests
     {
-        private static IEnumerable<IProvider> FailingDependencyResolver(IDependency dependency)
+        private static IEnumerable<IProvider> FailingDependencyResolver(Dependency dependency)
         {
             throw new AssertionFailedException("Unexpected call to dependencyResolver");
         }
@@ -80,7 +80,7 @@ namespace PantherDI.Tests
             result[0].ResultType.Should().Be<TestType2>();
             result[0].UnresolvedDependencies.Should().BeEmpty();
 
-            var instance = result[0].CreateInstance(new Dictionary<IDependency, object>());
+            var instance = result[0].CreateInstance(new Dictionary<Dependency, object>());
             instance.Should().BeOfType<TestType2>();
             instance.As<TestType2>().Dependency.Should().NotBeNull();
         }
@@ -105,7 +105,7 @@ namespace PantherDI.Tests
             result[0].ResultType.Should().Be<TestType2>();
             result[0].UnresolvedDependencies.Should().BeEmpty();
 
-            var instance = result[0].CreateInstance(new Dictionary<IDependency, object>());
+            var instance = result[0].CreateInstance(new Dictionary<Dependency, object>());
             instance.Should().BeOfType<TestType2>();
             instance.As<TestType2>().Dependency.Should().NotBeNull();
         }

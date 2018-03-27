@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using PantherDI.Registry.Registration.Dependency;
 using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Registry.Registration.Factory
@@ -19,7 +18,7 @@ namespace PantherDI.Registry.Registration.Factory
         /// <summary>
         /// Gets an <see cref="IEnumerable{T}"/> containing all dependencies that need to be resolved and provided to the <see cref="Execute"/>-method
         /// </summary>
-        IEnumerable<IDependency> Dependencies { get; }
+        IEnumerable<Dependency> Dependencies { get; }
 
         /// <summary>
         /// Gets an <see cref="IEnumerable{T}"/> containing contracts additional to the type itself

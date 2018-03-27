@@ -5,7 +5,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.Comparers;
 using PantherDI.Registry.Catalog;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 using PantherDI.Tests.Helpers;
@@ -21,7 +21,7 @@ namespace PantherDI.Tests.Resolvers
         public void NoRegistration()
         {
             var sut = new Func1Resolver();
-            sut.Resolve(_ => Enumerable.Empty<IProvider>(), new Dependency(typeof(Func<IDependency, string>))).Should().BeEmpty();
+            sut.Resolve(_ => Enumerable.Empty<IProvider>(), new Dependency(typeof(Func<Dependency, string>))).Should().BeEmpty();
         }
 
         [TestMethod]
@@ -59,7 +59,7 @@ namespace PantherDI.Tests.Resolvers
             };
 
             var sut = new Func1Resolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<IDependency, string>))).ToArray();
+            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<Dependency, string>))).ToArray();
 
             result.Should().BeEmpty();
         }
@@ -77,25 +77,25 @@ namespace PantherDI.Tests.Resolvers
                     },
                     UnresolvedDependencies =
                     {
-                        new Dependency(typeof(IDependency))
+                        new Dependency(typeof(Dependency))
                     }
                 }
             };
 
             var sut = new Func1Resolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<IDependency, string>))).ToArray();
+            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<Dependency, string>))).ToArray();
 
             result.Should().HaveCount(1);
-            result[0].FulfilledContracts.Should().BeEquivalentTo(typeof(Func<IDependency, string>));
+            result[0].FulfilledContracts.Should().BeEquivalentTo(typeof(Func<Dependency, string>));
             result[0].UnresolvedDependencies.Should().BeEmpty();
             result[0].Singleton.Should().BeFalse();
-            result[0].ResultType.Should().Be(typeof(Func<IDependency, string>));
+            result[0].ResultType.Should().Be(typeof(Func<Dependency, string>));
 
             registrations[0].InvocationCounter.Should().Be(0);
-            var instance = result[0].CreateInstance(new Dictionary<IDependency, object>());
-            instance.Should().BeAssignableTo<Func<IDependency, string>>();
+            var instance = result[0].CreateInstance(new Dictionary<Dependency, object>());
+            instance.Should().BeAssignableTo<Func<Dependency, string>>();
             registrations[0].InvocationCounter.Should().Be(0);
-            instance.As<Func<IDependency, string>>()(null).Should().Be("1");
+            instance.As<Func<Dependency, string>>()(new Dependency(typeof(string))).Should().Be("1");
             registrations[0].InvocationCounter.Should().Be(1);
         }
 
@@ -123,7 +123,7 @@ namespace PantherDI.Tests.Resolvers
             };
 
             var sut = new Func1Resolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<IDependency, string>))).ToArray();
+            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<Dependency, string>))).ToArray();
 
             result.Should().BeEmpty();
         }
@@ -157,7 +157,7 @@ namespace PantherDI.Tests.Resolvers
                     },
                     UnresolvedDependencies =
                     {
-                        new Dependency(typeof(IDependency))
+                        new Dependency(typeof(Dependency))
                     }
                 },
                 new TestProvider("4")
@@ -169,7 +169,7 @@ namespace PantherDI.Tests.Resolvers
                     },
                     UnresolvedDependencies =
                     {
-                        new Dependency(typeof(IDependency)),
+                        new Dependency(typeof(Dependency)),
                         new Dependency(typeof(ICatalog))
                     }
                 },
@@ -188,7 +188,7 @@ namespace PantherDI.Tests.Resolvers
             };
 
             var sut = new Func1Resolver();
-            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<IDependency, string>))).ToArray();
+            var result = sut.Resolve(_ => registrations, new Dependency(typeof(Func<Dependency, string>))).ToArray();
 
             registrations.Should().NotContain(x => x.InvocationCounter != 0);
 
@@ -196,9 +196,9 @@ namespace PantherDI.Tests.Resolvers
             var i = 0;
             foreach (var provider in result)
             {
-                provider.FulfilledContracts.Should().BeEquivalentTo(new[] { typeof(Func<IDependency, string>) }, $"result[{i}] should have fulfilled contracts just as its source provider");
+                provider.FulfilledContracts.Should().BeEquivalentTo(new[] { typeof(Func<Dependency, string>) }, $"result[{i}] should have fulfilled contracts just as its source provider");
                 provider.Singleton.Should().BeFalse($"result[{i}]");
-                provider.ResultType.Should().Be(typeof(Func<IDependency, string>), $"result[{i}]");
+                provider.ResultType.Should().Be(typeof(Func<Dependency, string>), $"result[{i}]");
                 i++;
             }
 
@@ -207,11 +207,11 @@ namespace PantherDI.Tests.Resolvers
             result[1].UnresolvedDependencies.First().ExpectedType.Should().Be(typeof(ICatalog));
             result[1].UnresolvedDependencies.First().RequiredContracts.Should().BeEquivalentTo(typeof(ICatalog));
 
-            var instances = result.Select(x => x.CreateInstance(new Dictionary<IDependency, object>())).ToArray();
+            var instances = result.Select(x => x.CreateInstance(new Dictionary<Dependency, object>())).ToArray();
 
-            instances.Should().AllBeAssignableTo<Func<IDependency, string>>();
+            instances.Should().AllBeAssignableTo<Func<Dependency, string>>();
             registrations.Should().OnlyContain(x => x.InvocationCounter == 0);
-            instances.Cast<Func<IDependency, string>>().Select(x => x(null)).Should().BeEquivalentTo("3", "4");
+            instances.Cast<Func<Dependency, string>>().Select(x => x(new Dependency(typeof(string)))).Should().BeEquivalentTo("3", "4");
             registrations.Select(x => x.InvocationCounter).Should().Equal(0,0,1,1,0);
         }
     }

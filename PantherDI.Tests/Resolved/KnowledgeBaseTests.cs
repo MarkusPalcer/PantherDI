@@ -4,7 +4,7 @@ using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved;
 using PantherDI.Resolved.Providers;
 
@@ -70,14 +70,6 @@ namespace PantherDI.Tests.Resolved
 
             sut.Resolve(null, new Dependency(typeof(string), "A")).Should()
                 .BeEmpty();
-        }
-
-        [TestMethod]
-        public void OmittingTheDependencyThrows()
-        {
-            var sut = new KnowledgeBase();
-
-            sut.Invoking(x => x.Resolve(null, null)).ShouldThrow<ArgumentNullException>();
         }
 
         private static IProvider CreateMockedProvider(params string[] contracts)

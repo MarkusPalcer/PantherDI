@@ -4,7 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.Comparers;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 using PantherDI.Tests.Helpers;
@@ -65,7 +65,7 @@ namespace PantherDI.Tests.Resolvers
             result[0].ResultType.Should().Be(typeof(Func<string>));
 
             registrations[0].InvocationCounter.Should().Be(0);
-            var instance = result[0].CreateInstance(new Dictionary<IDependency, object>());
+            var instance = result[0].CreateInstance(new Dictionary<Dependency, object>());
             instance.Should().BeAssignableTo<Func<string>>();
             registrations[0].InvocationCounter.Should().Be(0);
             instance.As<Func<string>>()().Should().Be("1");
@@ -110,7 +110,7 @@ namespace PantherDI.Tests.Resolvers
             }
 
             registrations.Should().OnlyContain(x => x.InvocationCounter == 0);
-            var instances = result.Select(x => x.CreateInstance(new Dictionary<IDependency, object>())).ToArray();
+            var instances = result.Select(x => x.CreateInstance(new Dictionary<Dependency, object>())).ToArray();
             instances.Should().AllBeAssignableTo<Func<string>>();
             registrations.Should().OnlyContain(x => x.InvocationCounter == 0);
             instances.Cast<Func<string>>().Select(x => x()).Should().BeEquivalentTo("1", "2");
@@ -180,7 +180,7 @@ namespace PantherDI.Tests.Resolvers
             }
 
 
-            var instances = result.Select(x => x.CreateInstance(new Dictionary<IDependency, object>())).ToArray();
+            var instances = result.Select(x => x.CreateInstance(new Dictionary<Dependency, object>())).ToArray();
 
             instances.Should().AllBeAssignableTo<Func<string>>();
             registrations.Should().OnlyContain(x => x.InvocationCounter == 0);

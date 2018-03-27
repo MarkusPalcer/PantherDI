@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PantherDI.Comparers;
 using PantherDI.Extensions;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
@@ -16,13 +16,13 @@ namespace PantherDI.Resolvers
 
         private class InnerResolver<T> : IResolver
         {
-            public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+            public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
             {
                 var result = new List<EnumerableProvider<T>>();
 
                 foreach (var provider in dependencyResolver(dependency.ReplaceExpectedType<T>()))
                 {
-                    var enumerableProvider = result.FirstOrDefault(x => SetComparer<IDependency>.Instance.Equals(x.UnresolvedDependencies, provider.UnresolvedDependencies));
+                    var enumerableProvider = result.FirstOrDefault(x => SetComparer<Dependency>.Instance.Equals(x.UnresolvedDependencies, provider.UnresolvedDependencies));
                     if (enumerableProvider == null)
                     {
                         result.Add(new EnumerableProvider<T>(provider));
@@ -74,7 +74,7 @@ namespace PantherDI.Resolvers
 
             public ISet<object> FulfilledContracts { get; }
 
-            public HashSet<IDependency> UnresolvedDependencies => _innerProviders[0].UnresolvedDependencies;
+            public HashSet<Dependency> UnresolvedDependencies => _innerProviders[0].UnresolvedDependencies;
 
             public Type ResultType => typeof(IEnumerable<>).MakeGenericType(_innerProviders[0].ResultType);
 
@@ -83,7 +83,7 @@ namespace PantherDI.Resolvers
 
             private Dictionary<string, object> Metadata { get; }
 
-            public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
+            public object CreateInstance(Dictionary<Dependency, object> resolvedDependencies)
             {
                 IEnumerable<object> Creator()
                 {

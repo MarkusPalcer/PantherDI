@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using PantherDI.Registry.Registration.Dependency;
 
 namespace PantherDI.Registry.Registration.Factory
 {
@@ -9,7 +8,7 @@ namespace PantherDI.Registry.Registration.Factory
     {
         private readonly Func<object[], object> _delegate;
 
-        public DelegateFactory(Func<object[], object> @delegate, IEnumerable<object> contracts, IEnumerable<IDependency> dependencies)
+        public DelegateFactory(Func<object[], object> @delegate, IEnumerable<object> contracts, IEnumerable<Dependency> dependencies)
         {
             FulfilledContracts = contracts;
             _delegate = @delegate;
@@ -17,11 +16,11 @@ namespace PantherDI.Registry.Registration.Factory
         }
 
         private DelegateFactory(Func<object[], object> @delegate, IEnumerable<object> contracts, IEnumerable<Type> types)
-            : this(@delegate, contracts, types.Select(x => new Dependency.Dependency(x))) { }
+            : this(@delegate, contracts, types.Select(x => new Dependency(x))) { }
 
         public static DelegateFactory Create<T>(Func<T> @delegate, params object[] contracts)
         {
-            return new DelegateFactory(_ => @delegate(), contracts, Enumerable.Empty<Dependency.Dependency>());
+            return new DelegateFactory(_ => @delegate(), contracts, Enumerable.Empty<Dependency>());
         }
 
         #region Implementation of IFactory
@@ -31,7 +30,7 @@ namespace PantherDI.Registry.Registration.Factory
             return _delegate(resolvedDependencies);
         }
 
-        public IEnumerable<IDependency> Dependencies { get; }
+        public IEnumerable<Dependency> Dependencies { get; }
 
         public IEnumerable<object> FulfilledContracts { get; }
 

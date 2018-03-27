@@ -5,7 +5,7 @@ using PantherDI.ContainerCreation;
 using PantherDI.Exceptions;
 using PantherDI.Extensions;
 using PantherDI.Registry.Catalog;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 using PantherDI.Resolved;
@@ -42,7 +42,7 @@ namespace PantherDI
                 throw new TooManySuitableRegistrationsException();
             }
 
-            return (T)providers.Single().CreateInstance(new Dictionary<IDependency, object>());
+            return (T)providers.Single().CreateInstance(new Dictionary<Dependency, object>());
         }
         
 
@@ -56,12 +56,12 @@ namespace PantherDI
             return new ContainerCatalog(this);
         }
 
-        private IEnumerable<IProvider> ResolveInternal(IDependency dependency)
+        private IEnumerable<IProvider> ResolveInternal(Dependency dependency)
         {
             return ResolveInternal(dependency, ResolveInternal);
         }
 
-        internal IEnumerable<IProvider> ResolveInternal(IDependency dependency, Func<IDependency, IEnumerable<IProvider>> dependencyResolver)
+        internal IEnumerable<IProvider> ResolveInternal(Dependency dependency, Func<Dependency, IEnumerable<IProvider>> dependencyResolver)
         {
             var result = _cache[dependency];
             if (result != null)
@@ -128,7 +128,7 @@ namespace PantherDI
 
             #region Implementation of IResolver
 
-            public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+            public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
             {
                 return _cnt.ResolveInternal(dependency, dependencyResolver).SelectMany(resolver => RegistrationConverter.ProcessProvider(resolver, dependencyResolver));
             }
@@ -232,7 +232,7 @@ namespace PantherDI
                     return _provider.CreateInstance(Dependencies.Zip(resolvedDependencies, Tuple.Create).ToDictionary(x => x.Item1, x => x.Item2));
                 }
 
-                public IEnumerable<IDependency> Dependencies { get; }
+                public IEnumerable<Dependency> Dependencies { get; }
                 public IEnumerable<object> FulfilledContracts { get; }
 
                 #endregion

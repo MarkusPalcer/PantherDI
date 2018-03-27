@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PantherDI.ContainerCreation;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
@@ -18,7 +18,7 @@ namespace PantherDI.Resolvers
 
         #region Implementation of IResolver
 
-        public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+        public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
         {
             Converter.ProcessContract(dependency.RequiredContracts.First(), dependencyResolver);
             return Converter.KnowledgeBase.Resolve(dependencyResolver, dependency);

@@ -4,7 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.Attributes;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 using PantherDI.Tests.Helpers;
@@ -20,7 +20,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestAbstractType()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ =>
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ =>
             {
                 Assert.Fail();
                 return Enumerable.Empty<IProvider>();
@@ -36,7 +36,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestInterface()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ =>
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ =>
             {
                 Assert.Fail();
                 return Enumerable.Empty<IProvider>();
@@ -52,7 +52,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestPlainType()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ =>
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ =>
             {
                 Assert.Fail();
                 return Enumerable.Empty<IProvider>();
@@ -68,7 +68,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestWithInterfaceWithoutImplementation()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ =>
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ =>
             {
                 Assert.Fail();
                 return Enumerable.Empty<IProvider>();
@@ -84,7 +84,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestWithInterfaceWithImplementation()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ =>
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ =>
             {
                 Assert.Fail();
                 return Enumerable.Empty<IProvider>();
@@ -100,7 +100,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestWithAbstractWithoutImplementation()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ =>
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ =>
             {
                 Assert.Fail();
                 return Enumerable.Empty<IProvider>();
@@ -116,7 +116,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestWithAbstractWithImplementation()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ =>
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ =>
             {
                 Assert.Fail();
                 return Enumerable.Empty<IProvider>();
@@ -138,7 +138,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestWithUnresolvedDependency()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ => Enumerable.Empty<IProvider>());
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ => Enumerable.Empty<IProvider>());
 
             var sut = new ReflectionResolver();
             var result = sut.Resolve(recursiveResolver, new Dependency(typeof(TestClass4))).ToArray();
@@ -153,7 +153,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestWithResolvedDependency()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ => new IProvider[]{new TestProvider(new TestClass2())});
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ => new IProvider[]{new TestProvider(new TestClass2())});
 
             var sut = new ReflectionResolver();
             var result = sut.Resolve(recursiveResolver, new Dependency(typeof(TestClass4))).ToArray();
@@ -168,7 +168,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestWithCustomContractAndUnfittingType()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ =>
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ =>
             {
                 Assert.Fail();
                 return Enumerable.Empty<IProvider>();
@@ -182,7 +182,7 @@ namespace PantherDI.Tests.Resolvers
         [TestMethod]
         public void RequestWithCustomContractAndFittingType()
         {
-            var recursiveResolver = new Func<IDependency, IEnumerable<IProvider>>(_ =>
+            var recursiveResolver = new Func<Dependency, IEnumerable<IProvider>>(_ =>
             {
                 Assert.Fail();
                 return Enumerable.Empty<IProvider>();

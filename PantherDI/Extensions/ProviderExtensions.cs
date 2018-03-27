@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Extensions
 {
     public static class ProviderExtensions
     {
-        public static IProvider AddDependencies(this IProvider provider, Dictionary<IDependency, IProvider> dependencyProviders)
+        public static IProvider AddDependencies(this IProvider provider, Dictionary<Dependency, IProvider> dependencyProviders)
         {
             var originalUnresolvedDependencies = provider.UnresolvedDependencies;
-            var unresolvedDependencies = new HashSet<IDependency>(originalUnresolvedDependencies, new Dependency.EqualityComparer());
+            var unresolvedDependencies = new HashSet<Dependency>(originalUnresolvedDependencies);
             unresolvedDependencies.ExceptWith(dependencyProviders.Keys);
 
-            object ProviderImplementation(Dictionary<IDependency, object> resolvedDependencies)
+            object ProviderImplementation(Dictionary<Dependency, object> resolvedDependencies)
             {
                 resolvedDependencies = resolvedDependencies.ToDictionary(x => x.Key, x => x.Value);
                 foreach (var dependency in originalUnresolvedDependencies)

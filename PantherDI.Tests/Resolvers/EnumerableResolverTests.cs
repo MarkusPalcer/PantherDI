@@ -4,7 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.Comparers;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 using PantherDI.Resolvers;
 using PantherDI.Tests.Helpers;
@@ -50,7 +50,7 @@ namespace PantherDI.Tests.Resolvers
             result[0].ResultType.Should().Be(typeof(IEnumerable<string>));
 
             registrations[0].InvocationCounter.Should().Be(0);
-            var instance = result[0].CreateInstance(new Dictionary<IDependency, object>());
+            var instance = result[0].CreateInstance(new Dictionary<Dependency, object>());
             instance.Should().BeAssignableTo<IEnumerable<string>>();
             instance.As<IEnumerable<string>>().Should().HaveCount(1);
             instance.As<IEnumerable<string>>().Should().BeEquivalentTo("1");
@@ -120,7 +120,7 @@ namespace PantherDI.Tests.Resolvers
             result[0].ResultType.Should().Be(typeof(IEnumerable<string>));
             
             registrations[0].InvocationCounter.Should().Be(0);
-            var instance = result[0].CreateInstance(new Dictionary<IDependency, object>());
+            var instance = result[0].CreateInstance(new Dictionary<Dependency, object>());
             instance.Should().BeAssignableTo<IEnumerable<string>>();
             instance.As<IEnumerable<string>>().Should().HaveCount(2);
             instance.As<IEnumerable<string>>().Should().BeEquivalentTo("1", "2");
@@ -192,17 +192,17 @@ namespace PantherDI.Tests.Resolvers
             result[0].Singleton.Should().BeFalse();
             result[0].ResultType.Should().Be(typeof(IEnumerable<string>));
 
-            var instance = result[0].CreateInstance(new Dictionary<IDependency, object>());
+            var instance = result[0].CreateInstance(new Dictionary<Dependency, object>());
             instance.Should().BeAssignableTo<IEnumerable<string>>();
             instance.As<IEnumerable<string>>().Should().HaveCount(2);
             instance.As<IEnumerable<string>>().Should().BeEquivalentTo("1", "2");
 
             result[1].FulfilledContracts.Should().BeEquivalentTo(typeof(IEnumerable<string>));
             result[1].UnresolvedDependencies.Should().HaveCount(1);
-            new Dependency.EqualityComparer().Equals(result[1].UnresolvedDependencies.ElementAt(0), new Dependency(typeof(IContainer))).Should().BeTrue();
+            result[1].UnresolvedDependencies.ElementAt(0).Should().Be(new Dependency(typeof(IContainer)));
             result[1].Singleton.Should().BeFalse();
             result[1].ResultType.Should().Be(typeof(IEnumerable<string>));
-            instance = result[1].CreateInstance(new Dictionary<IDependency, object>());
+            instance = result[1].CreateInstance(new Dictionary<Dependency, object>());
             instance.As<IEnumerable<string>>().Should().HaveCount(2);
             instance.As<IEnumerable<string>>().Should().BeEquivalentTo("3", "4");
 

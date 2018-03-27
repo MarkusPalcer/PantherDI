@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 
 namespace PantherDI.Resolved.Providers
 {
@@ -8,11 +8,11 @@ namespace PantherDI.Resolved.Providers
     {
         private readonly IProvider _originalProvider;
         private readonly Dictionary<Type, object> _cache;
-        public HashSet<IDependency> UnresolvedDependencies => _originalProvider.UnresolvedDependencies;
+        public HashSet<Dependency> UnresolvedDependencies => _originalProvider.UnresolvedDependencies;
         public Type ResultType => _originalProvider.ResultType;
         public ISet<object> FulfilledContracts => _originalProvider.FulfilledContracts;
 
-        public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
+        public object CreateInstance(Dictionary<Dependency, object> resolvedDependencies)
         {
             if (_cache.TryGetValue(ResultType, out var instance))
             {

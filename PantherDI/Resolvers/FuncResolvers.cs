@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using PantherDI.Extensions;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
@@ -21,7 +21,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1) };
 				
@@ -30,7 +30,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1) => 
 							func(objects)(new object[] { p1 });
@@ -41,7 +41,7 @@ namespace PantherDI.Resolvers
 					var dependenciesLeftUnresolved = provider.UnresolvedDependencies 
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn1).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -55,7 +55,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2) };
 				
@@ -64,7 +64,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2) => 
 							func(objects)(new object[] { p1, p2 });
@@ -76,7 +76,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn1).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn2).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -90,7 +90,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3) };
 				
@@ -99,7 +99,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3) => 
 							func(objects)(new object[] { p1, p2, p3 });
@@ -112,7 +112,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn2).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn3).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -126,7 +126,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4) };
 				
@@ -135,7 +135,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4) => 
 							func(objects)(new object[] { p1, p2, p3, p4 });
@@ -149,7 +149,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn3).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn4).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -163,7 +163,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5) };
 				
@@ -172,7 +172,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5 });
@@ -187,7 +187,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn4).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn5).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -201,7 +201,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6) };
 				
@@ -210,7 +210,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6 });
@@ -226,7 +226,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn5).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn6).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -240,7 +240,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6), typeof(TIn7) };
 				
@@ -249,7 +249,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6, p7) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6, p7 });
@@ -266,7 +266,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn6).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn7).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -280,7 +280,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6), typeof(TIn7), typeof(TIn8) };
 				
@@ -289,7 +289,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6, p7, p8) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6, p7, p8 });
@@ -307,7 +307,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn7).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn8).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -321,7 +321,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6), typeof(TIn7), typeof(TIn8), typeof(TIn9) };
 				
@@ -330,7 +330,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6, p7, p8, p9) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6, p7, p8, p9 });
@@ -349,7 +349,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn8).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn9).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -363,7 +363,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6), typeof(TIn7), typeof(TIn8), typeof(TIn9), typeof(TIn10) };
 				
@@ -372,7 +372,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6, p7, p8, p9, p10) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 });
@@ -392,7 +392,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn9).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn10).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -406,7 +406,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6), typeof(TIn7), typeof(TIn8), typeof(TIn9), typeof(TIn10), typeof(TIn11) };
 				
@@ -415,7 +415,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 });
@@ -436,7 +436,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn10).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn11).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -450,7 +450,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6), typeof(TIn7), typeof(TIn8), typeof(TIn9), typeof(TIn10), typeof(TIn11), typeof(TIn12) };
 				
@@ -459,7 +459,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 });
@@ -481,7 +481,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn11).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn12).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -495,7 +495,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6), typeof(TIn7), typeof(TIn8), typeof(TIn9), typeof(TIn10), typeof(TIn11), typeof(TIn12), typeof(TIn13) };
 				
@@ -504,7 +504,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 });
@@ -527,7 +527,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn12).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn13).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -541,7 +541,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13, TIn14,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6), typeof(TIn7), typeof(TIn8), typeof(TIn9), typeof(TIn10), typeof(TIn11), typeof(TIn12), typeof(TIn13), typeof(TIn14) };
 				
@@ -550,7 +550,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13, TIn14,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13, TIn14,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14 });
@@ -574,7 +574,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn13).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn14).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -588,7 +588,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13, TIn14, TIn15,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6), typeof(TIn7), typeof(TIn8), typeof(TIn9), typeof(TIn10), typeof(TIn11), typeof(TIn12), typeof(TIn13), typeof(TIn14), typeof(TIn15) };
 				
@@ -597,7 +597,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13, TIn14, TIn15,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13, TIn14, TIn15,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 });
@@ -622,7 +622,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn14).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn15).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}
@@ -636,7 +636,7 @@ namespace PantherDI.Resolvers
 		
 		public class InnerResolver<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13, TIn14, TIn15, TIn16,T> : IResolver 
 		{
-			public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+			public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
 			{
 				var types = new[] { typeof(TIn1), typeof(TIn2), typeof(TIn3), typeof(TIn4), typeof(TIn5), typeof(TIn6), typeof(TIn7), typeof(TIn8), typeof(TIn9), typeof(TIn10), typeof(TIn11), typeof(TIn12), typeof(TIn13), typeof(TIn14), typeof(TIn15), typeof(TIn16) };
 				
@@ -645,7 +645,7 @@ namespace PantherDI.Resolvers
 					var func = FuncResolver.ProcessProvider<T>(types, provider);
 					if (func == null) continue;
 
-					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13, TIn14, TIn15, TIn16,T> Delegate(Dictionary<IDependency, object> objects)
+					Func<TIn1, TIn2, TIn3, TIn4, TIn5, TIn6, TIn7, TIn8, TIn9, TIn10, TIn11, TIn12, TIn13, TIn14, TIn15, TIn16,T> Delegate(Dictionary<Dependency, object> objects)
 					{
 						return (p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16) => 
 							func(objects)(new object[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16 });
@@ -671,7 +671,7 @@ namespace PantherDI.Resolvers
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn15).GetTypeInfo()))
 															 .Where(x => !x.ExpectedType.GetTypeInfo().IsAssignableFrom(typeof(TIn16).GetTypeInfo()));
 
-					result.UnresolvedDependencies = new HashSet<IDependency>(dependenciesLeftUnresolved, new Dependency.EqualityComparer());
+					result.UnresolvedDependencies = new HashSet<Dependency>(dependenciesLeftUnresolved);
 
                     yield return result;
 				}

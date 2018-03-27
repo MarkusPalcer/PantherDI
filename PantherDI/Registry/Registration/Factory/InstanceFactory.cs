@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using PantherDI.Registry.Registration.Dependency;
 
 namespace PantherDI.Registry.Registration.Factory
 {
@@ -25,7 +24,7 @@ namespace PantherDI.Registry.Registration.Factory
             return _instance;
         }
 
-        public IEnumerable<IDependency> Dependencies => Enumerable.Empty<IDependency>();
+        public IEnumerable<Dependency> Dependencies => Enumerable.Empty<Dependency>();
 
         public IEnumerable<object> FulfilledContracts { get; }
 

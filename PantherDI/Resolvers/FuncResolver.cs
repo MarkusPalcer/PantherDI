@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using PantherDI.Extensions;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {
     public static class FuncResolver
     {
-        internal static Func<Dictionary<IDependency, object>, Func<object[], T>> ProcessProvider<T>(Type[] givenTypes, IProvider provider)
+        internal static Func<Dictionary<Dependency, object>, Func<object[], T>> ProcessProvider<T>(Type[] givenTypes, IProvider provider)
         {
             var matches = true;
-            var givenDependencies = new Dictionary<IDependency, int>();
+            var givenDependencies = new Dictionary<Dependency, int>();
 
             foreach (var type in givenTypes.Select((x, i) => new {Type = x, Index = i}))
             {
@@ -37,7 +37,7 @@ namespace PantherDI.Resolvers
                 return null;
             }
 
-            Func<object[], T> Result(Dictionary<IDependency, object> objects)
+            Func<object[], T> Result(Dictionary<Dependency, object> objects)
             {
                 T Creator(object[] @params)
                 {

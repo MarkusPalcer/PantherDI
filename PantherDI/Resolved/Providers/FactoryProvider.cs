@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PantherDI.Exceptions;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 
@@ -15,39 +15,51 @@ namespace PantherDI.Resolved.Providers
     public class FactoryProvider : IProvider
     {
         private readonly IFactory _factory;
-        private readonly Dictionary<IDependency, IProvider> _dependencyProviders;
+        private readonly Dictionary<Dependency, IProvider> _dependencyProviders;
 
-        public HashSet<IDependency> UnresolvedDependencies { get; }
+        public HashSet<Dependency> UnresolvedDependencies { get; }
 
         public Type ResultType { get; }
 
         public ISet<object> FulfilledContracts { get; }
 
 
-        public FactoryProvider(IRegistration providedRegistration, IFactory factory, Dictionary<IDependency, IProvider> dependencyProviders) 
+        public FactoryProvider(IRegistration providedRegistration, IFactory factory, Dictionary<Dependency, IProvider> dependencyProviders) 
         {
             _factory = factory;
-            _dependencyProviders = new Dictionary<IDependency, IProvider>(dependencyProviders, new Dependency.EqualityComparer());
+            _dependencyProviders = new Dictionary<Dependency, IProvider>(dependencyProviders);
 
-            UnresolvedDependencies = new HashSet<IDependency>(new Dependency.EqualityComparer());
+            UnresolvedDependencies = new HashSet<Dependency>();
             
             foreach (var dependency in _factory.Dependencies)
             {
-                // Sadly using the dictionary is not possible
-                var dependencyProvider = _dependencyProviders.FirstOrDefault(x => new Dependency.EqualityComparer().Equals(dependency, x.Key));
-
-                if (dependencyProvider.Key == null)
-                {
-                    UnresolvedDependencies.Add(dependency);
-                }
-                else
+                if (_dependencyProviders.TryGetValue(dependency, out var provider))
                 {
                     // Add the dependencies of the provider to my dependencies
-                    foreach (var unresolvedDependency in dependencyProvider.Value.UnresolvedDependencies)
+                    foreach (var unresolvedDependency in provider.UnresolvedDependencies)
                     {
                         UnresolvedDependencies.Add(unresolvedDependency);
                     }
                 }
+                else
+                {
+                    UnresolvedDependencies.Add(dependency);
+                }
+                //// Sadly using the dictionary is not possible
+                //var dependencyProvider = _dependencyProviders.FirstOrDefault(x => dependency.Equals(x.Key));
+
+                //if (dependencyProvider.Value == null)
+                //{
+                //    UnresolvedDependencies.Add(dependency);
+                //}
+                //else
+                //{
+                //    // Add the dependencies of the provider to my dependencies
+                //    foreach (var unresolvedDependency in dependencyProvider.Value.UnresolvedDependencies)
+                //    {
+                //        UnresolvedDependencies.Add(unresolvedDependency);
+                //    }
+                //}
             }
 
             ResultType = providedRegistration.RegisteredType;
@@ -59,21 +71,21 @@ namespace PantherDI.Resolved.Providers
             Metadata = providedRegistration.Metadata;
         }
 
-        public object CreateInstance(Dictionary<IDependency, object> resolvedDependencies)
+        public object CreateInstance(Dictionary<Dependency, object> resolvedDependencies)
         {
-            resolvedDependencies = new Dictionary<IDependency, object>(resolvedDependencies, new Dependency.EqualityComparer());
+            resolvedDependencies = new Dictionary<Dependency, object>(resolvedDependencies);
 
             var resolvedParameters = new List<object>();
             foreach (var dependency in _factory.Dependencies)
             {
                 var resolvedParameter = resolvedDependencies
-                    .Where(x => new Dependency.EqualityComparer().Equals(dependency, x.Key))
+                    .Where(x => dependency.Equals(x.Key))
                     .Select(x => x.Value)
                     .FirstOrDefault();
                 if (resolvedParameter == null)
                 {
                     resolvedParameter = _dependencyProviders
-                        .Where(x => new Dependency.EqualityComparer().Equals(dependency, x.Key))
+                        .Where(x => dependency.Equals(x.Key))
                         .Select(x => x.Value.CreateInstance(resolvedDependencies))
                         .FirstOrDefault();
                 }

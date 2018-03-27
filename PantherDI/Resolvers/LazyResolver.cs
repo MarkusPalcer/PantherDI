@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using PantherDI.Extensions;
-using PantherDI.Registry.Registration.Dependency;
+using PantherDI.Registry.Registration;
 using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
@@ -14,7 +14,7 @@ namespace PantherDI.Resolvers
 
         private class InnerResolver<T> : IResolver
         {
-            public IEnumerable<IProvider> Resolve(Func<IDependency, IEnumerable<IProvider>> dependencyResolver, IDependency dependency)
+            public IEnumerable<IProvider> Resolve(Func<Dependency, IEnumerable<IProvider>> dependencyResolver, Dependency dependency)
             {
                 foreach (var provider in dependencyResolver(dependency.ReplaceExpectedType<T>()))
                 {

@@ -76,6 +76,7 @@
     <Compile Include="Reflection\ConstructorFactoryTests.cs" />
     <Compile Include="Reflection\TypeCatalogTests.cs" />
     <Compile Include="Reflection\TypeRegistrationTests.cs" />
+    <Compile Include="Registry\Registration\DependencyTests.cs" />
     <Compile Include="Registry\Registration\Factory\DelegateFactoryTests.cs" />
     <Compile Include="Resolved\KnowledgeBaseTests.cs" />
     <Compile Include="Resolved\Providers\FactoryProviderTests.cs" />
