@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using PantherDI.Attributes;
+using PantherDI.ContainerCreation.CatalogBuilderHelpers;
 using PantherDI.ContainerCreation.ContainerBuilderHelpers;
 using PantherDI.Extensions;
 using PantherDI.Registry.Catalog;
@@ -291,7 +292,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Registers a type to the container
         /// </summary>
-        public TypeRegistrationHelper Register(Type t)
+        public TypeCatalogBuilderHelper Register(Type t)
         {
             return _catalogBuilder.Register(t);
         }
@@ -299,7 +300,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Registers a type to the container
         /// </summary>
-        public TypeRegistrationHelper Register<T>()
+        public TypeCatalogBuilderHelper Register<T>()
         {
             return _catalogBuilder.Register<T>();
         }
@@ -307,7 +308,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Registers an instance to the container
         /// </summary>
-        public InstanceRegistrationHelper<T> Register<T>(T instance)
+        public InstanceCatalogBuilderHelper<T> Register<T>(T instance)
         {
             return _catalogBuilder.Register(instance);
         }

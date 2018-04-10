@@ -2,19 +2,19 @@
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 
-namespace PantherDI.ContainerCreation
+namespace PantherDI.ContainerCreation.CatalogBuilderHelpers
 {
-    public class InstanceRegistrationHelper<T> : IRegistrationHelper {
+    public class InstanceCatalogBuilderHelper<T> : ICatalogBuilderHelper {
         private readonly T _instance;
 
         private readonly List<object> _contracts = new List<object>();
 
-        internal InstanceRegistrationHelper(T instance)
+        internal InstanceCatalogBuilderHelper(T instance)
         {
             _instance = instance;
         }
 
-        void IRegistrationHelper.RegisterTo(ICatalogBuilder builder)
+        void ICatalogBuilderHelper.RegisterTo(ICatalogBuilder builder)
         {
             builder.WithRegistration(new ManualRegistration(new HashSet<object>(),
                                                new HashSet<IFactory>(new[] {new InstanceFactory<T>(_instance, _contracts.ToArray())}),
@@ -25,7 +25,7 @@ namespace PantherDI.ContainerCreation
             });
         }
 
-        public InstanceRegistrationHelper<T> WithContract(object contract)
+        public InstanceCatalogBuilderHelper<T> WithContract(object contract)
         {
             _contracts.Add(contract);
             return this;

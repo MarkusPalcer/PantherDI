@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using PantherDI.ContainerCreation.CatalogBuilderHelpers;
 using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
@@ -14,7 +15,7 @@ namespace PantherDI.ContainerCreation
 
         public List<IRegistration> Registrations { get; } = new List<IRegistration>();
 
-        private List<IRegistrationHelper> RegistrationHelpers { get; } = new List<IRegistrationHelper>();
+        private List<ICatalogBuilderHelper> RegistrationHelpers { get; } = new List<ICatalogBuilderHelper>();
 
         public List<Type> Types { get; } = new List<Type>();
 
@@ -32,21 +33,21 @@ namespace PantherDI.ContainerCreation
             return new MergedCatalog(catalogs);
         }
 
-        public TypeRegistrationHelper Register(Type t)
+        public TypeCatalogBuilderHelper Register(Type t)
         {
-            var result = new TypeRegistrationHelper(t);
+            var result = new TypeCatalogBuilderHelper(t);
             RegistrationHelpers.Add(result);
             return result;
         }
 
-        public TypeRegistrationHelper Register<T>()
+        public TypeCatalogBuilderHelper Register<T>()
         {
             return Register(typeof(T));
         }
 
-        public InstanceRegistrationHelper<T> Register<T>(T instance)
+        public InstanceCatalogBuilderHelper<T> Register<T>(T instance)
         {
-            var instanceRegistrationHelper = new InstanceRegistrationHelper<T>(instance);
+            var instanceRegistrationHelper = new InstanceCatalogBuilderHelper<T>(instance);
             RegistrationHelpers.Add(instanceRegistrationHelper);
             return instanceRegistrationHelper;
         }

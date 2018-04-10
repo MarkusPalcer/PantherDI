@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using PantherDI.ContainerCreation.CatalogBuilderHelpers;
 using PantherDI.Registry.Catalog;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
@@ -117,16 +118,16 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Registers a type to the container
         /// </summary>
-        TypeRegistrationHelper Register<T>();
+        TypeCatalogBuilderHelper Register<T>();
 
         /// <summary>
         /// Registers a type to the container
         /// </summary>
-        TypeRegistrationHelper Register(Type t);
+        TypeCatalogBuilderHelper Register(Type t);
 
         /// <summary>
         /// Registers an instance to the container
         /// </summary>
-        InstanceRegistrationHelper<T> Register<T>(T instance);
+        InstanceCatalogBuilderHelper<T> Register<T>(T instance);
         }
 }

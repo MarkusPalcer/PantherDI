@@ -6,16 +6,16 @@ using PantherDI.Extensions;
 using PantherDI.Registry.Registration.Factory;
 using PantherDI.Registry.Registration.Registration;
 
-namespace PantherDI.ContainerCreation
+namespace PantherDI.ContainerCreation.CatalogBuilderHelpers
 {
     /// <summary>
     /// Provides a fluent interface for configuring a registered type
     /// </summary>
-    public class TypeRegistrationHelper : IRegistrationHelper
+    public class TypeCatalogBuilderHelper : ICatalogBuilderHelper
     {
         private readonly Type _type;
 
-        internal TypeRegistrationHelper(Type type)
+        internal TypeCatalogBuilderHelper(Type type)
         {
             _type = type;
             _registration = new ManualRegistration()
@@ -61,7 +61,7 @@ namespace PantherDI.ContainerCreation
         /// </summary>
         public ISet<IFactory> Factories => _registration.Factories;
 
-        void IRegistrationHelper.RegisterTo(ICatalogBuilder cb)
+        void ICatalogBuilderHelper.RegisterTo(ICatalogBuilder cb)
         {
             if (UseReflectionForContracts)
             {
@@ -92,7 +92,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Adds the given type as contract
         /// </summary>
-        public TypeRegistrationHelper As<TContract>()
+        public TypeCatalogBuilderHelper As<TContract>()
         {
             if (_type.GetTypeInfo().IsSubclassOf(typeof(TContract)))
             {
@@ -107,7 +107,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Adds a contract to the list of fulfilled contracts
         /// </summary>
-        public TypeRegistrationHelper WithContract(object contract)
+        public TypeCatalogBuilderHelper WithContract(object contract)
         {
             Contracts.Add(contract);
 
@@ -117,7 +117,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Enables the use of reflection to determine fulfilled contracts
         /// </summary>
-        public TypeRegistrationHelper WithContractsViaReflection()
+        public TypeCatalogBuilderHelper WithContractsViaReflection()
         {
             UseReflectionForContracts = true;
             return this;
@@ -126,7 +126,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Enables the use of reflection to add the types' constructors as factories
         /// </summary>
-        public TypeRegistrationHelper WithConstructors()
+        public TypeCatalogBuilderHelper WithConstructors()
         {
             UseConstructorsAsFactories = true;
             return this;
@@ -135,7 +135,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Flags the type as singleton
         /// </summary>
-        public TypeRegistrationHelper AsSingleton()
+        public TypeCatalogBuilderHelper AsSingleton()
         {
             IsSingleton = true;
             return this;
@@ -144,7 +144,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Adds a factory for the registered type
         /// </summary>
-        public TypeRegistrationHelper WithFactory(IFactory factory)
+        public TypeCatalogBuilderHelper WithFactory(IFactory factory)
         {
             Factories.Add(factory);
             return this;
@@ -153,7 +153,7 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Enables searching for metadata via reflection
         /// </summary>
-        public TypeRegistrationHelper WithMetadataViaReflection()
+        public TypeCatalogBuilderHelper WithMetadataViaReflection()
         {
             UseReflectionForMetadata = true;
             return this;
@@ -162,13 +162,13 @@ namespace PantherDI.ContainerCreation
         /// <summary>
         /// Adds a metadata entry 
         /// </summary>
-        public TypeRegistrationHelper WithMetadata(string key, object value)
+        public TypeCatalogBuilderHelper WithMetadata(string key, object value)
         {
             Metadata[key] = value;
             return this;
         }
 
-        public TypeRegistrationHelper WithFactory<T>(Func<T> factory, params object[] contracts)
+        public TypeCatalogBuilderHelper WithFactory<T>(Func<T> factory, params object[] contracts)
         {
             if (!_type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()))
             {
