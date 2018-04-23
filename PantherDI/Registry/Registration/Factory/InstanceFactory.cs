@@ -27,6 +27,7 @@ namespace PantherDI.Registry.Registration.Factory
         public IEnumerable<Dependency> Dependencies => Enumerable.Empty<Dependency>();
 
         public IEnumerable<object> FulfilledContracts { get; }
+        public int? Priority { get; set; }
 
         #endregion
     }

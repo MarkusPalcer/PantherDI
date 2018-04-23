@@ -40,5 +40,6 @@ namespace PantherDI.Resolved.Providers
 
         public bool Singleton { get; internal set; }
         public IReadOnlyDictionary<string, object> Metadata { get; }
+        public int Priority { get; set; } = 0;
     }
 }

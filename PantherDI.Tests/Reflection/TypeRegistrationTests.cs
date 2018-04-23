@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PantherDI.Attributes;
@@ -22,6 +23,7 @@ namespace PantherDI.Tests.Reflection
             sut.RegisteredType.Should().Be(typeof(TestClass1));
             sut.Singleton.Should().BeFalse();
             sut.Metadata.Should().BeEmpty();
+            sut.Priority.Should().Be(0);
         }
 
         [Contract, Contract("A")]
@@ -247,6 +249,17 @@ namespace PantherDI.Tests.Reflection
             sut.Metadata["Entry3"].Should().Be(typeof(TestClass14));
         }
 
+        [Attributes.Priority(1)]
+        private class TestClass15
+        {
+        }
+
+        [TestMethod]
+        public void PriorityAttribute()
+        {
+            var sut = new TypeRegistration(typeof(TestClass15).GetTypeInfo());
+            sut.Priority.Should().Be(1);
+        }
 
     }
 }

@@ -34,6 +34,8 @@ namespace PantherDI.Registry.Registration.Factory
 
         public IEnumerable<object> FulfilledContracts { get; }
 
+        public int? Priority { get; set;  }
+
         #endregion
     }
 }

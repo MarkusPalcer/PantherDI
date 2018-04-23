@@ -40,5 +40,10 @@ namespace PantherDI.Resolved.Providers
         /// Gets a dictionary of all metadata associated with the created type
         /// </summary>
         IReadOnlyDictionary<string, object> Metadata { get; }
+
+        /// <summary>
+        /// Gets the priority of this provider
+        /// </summary>
+        int Priority { get; }
     }
 }

@@ -24,5 +24,11 @@ namespace PantherDI.Registry.Registration.Factory
         /// Gets an <see cref="IEnumerable{T}"/> containing contracts additional to the type itself
         /// </summary>
         IEnumerable<object> FulfilledContracts { get; }
+
+        /// <summary>
+        /// Gets the Priority of this factory.
+        /// </summary>
+        /// <remarks>If not given the priority of the registration will be used</remarks>
+        int? Priority { get; }
     }
 }

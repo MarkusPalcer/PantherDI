@@ -22,7 +22,8 @@ namespace PantherDI.Resolvers
 
                 foreach (var provider in dependencyResolver(dependency.ReplaceExpectedType<T>()))
                 {
-                    var enumerableProvider = result.FirstOrDefault(x => SetComparer<Dependency>.Instance.Equals(x.UnresolvedDependencies, provider.UnresolvedDependencies));
+                    var enumerableProvider = result.FirstOrDefault(x => SetComparer<Dependency>.Instance.Equals(x.UnresolvedDependencies, provider.UnresolvedDependencies) && x.Priority.Equals(provider.Priority));
+
                     if (enumerableProvider == null)
                     {
                         result.Add(new EnumerableProvider<T>(provider));
@@ -48,6 +49,7 @@ namespace PantherDI.Resolvers
                 FulfilledContracts.Remove(_innerProviders[0].ResultType);
                 FulfilledContracts.Add(ResultType);
                 Metadata = provider.Metadata.ToDictionary(x => x.Key, x => x.Value);
+                Priority = provider.Priority;
             }
 
             public void Add(IProvider provider)
@@ -80,6 +82,8 @@ namespace PantherDI.Resolvers
 
             public bool Singleton => _innerProviders.All(x => x.Singleton);
             IReadOnlyDictionary<string, object> IProvider.Metadata => Metadata;
+
+            public int Priority { get; }
 
             private Dictionary<string, object> Metadata { get; }
 

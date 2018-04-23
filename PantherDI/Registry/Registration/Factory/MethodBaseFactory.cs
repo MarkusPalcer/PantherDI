@@ -30,10 +30,13 @@ namespace PantherDI.Registry.Registration.Factory
                                   }).ToArray();
 
             FulfilledContracts = new HashSet<object>(method.GetCustomAttributes<ContractAttribute>().Select(x => x.Contract ?? method.DeclaringType));
+
+            Priority = method.GetCustomAttributes<PriorityAttribute>().FirstOrDefault()?.Priority;
         }
 
         public IEnumerable<Dependency> Dependencies { get; }
         public IEnumerable<object> FulfilledContracts { get; }
+        public int? Priority { get; } 
 
         public abstract object Execute(object[] resolvedDependencies);
     }

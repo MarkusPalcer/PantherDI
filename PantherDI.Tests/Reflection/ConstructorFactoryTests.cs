@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -95,5 +96,32 @@ namespace PantherDI.Tests.Reflection
             dependencies[0].RequiredContracts.Should().BeEquivalentTo((object)typeof(int));
             dependencies[0].Ignored.Should().BeTrue();
         }
+
+        private class TestClass6
+        {
+            [Attributes.Priority(3)]
+            public TestClass6() {}
+
+            [Attributes.Priority(2)]
+            public TestClass6(String dependency) {}
+
+            public TestClass6(object value, String dependency) {}
+        }
+
+        [TestMethod]
+        public void PriorityIsTakenFromAttribute()
+        {
+            var suts = typeof(TestClass6).GetTypeInfo().DeclaredConstructors.Select(x => new ConstructorFactory(x)).ToArray();
+
+            suts[0].Priority.Should().Be(3);
+            suts[0].Dependencies.Should().HaveCount(0);
+
+            suts[1].Priority.Should().Be(2);
+            suts[1].Dependencies.Should().HaveCount(1);
+
+            suts[2].Priority.Should().Be(null);
+            suts[2].Dependencies.Should().HaveCount(2);
+        }
+        
     }
 }

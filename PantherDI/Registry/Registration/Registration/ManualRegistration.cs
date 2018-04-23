@@ -11,6 +11,7 @@ namespace PantherDI.Registry.Registration.Registration
         public ISet<object> FulfilledContracts { get; }
         public ISet<IFactory> Factories { get; }
         public bool Singleton { get; set; }
+        public int Priority { get; set; } = 0;
 
         public Dictionary<string, object> Metadata { get; }
 

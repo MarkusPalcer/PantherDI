@@ -24,6 +24,7 @@ namespace PantherDI.Registry.Registration.Registration
                                            .Select(x => new ConstructorFactory(x));
             Factories = new HashSet<IFactory>(constructorFactories);
             Singleton = type.GetCustomAttributes<SingletonAttribute>().Any();
+            Priority = type.GetCustomAttributes<PriorityAttribute>().FirstOrDefault()?.Priority ?? 0;
             CollectMetadata(RegisteredType, _metadata);
         }
 
@@ -67,6 +68,7 @@ namespace PantherDI.Registry.Registration.Registration
         public bool Singleton { get; }
 
         public IReadOnlyDictionary<string, object> Metadata => _metadata;
+        public int Priority { get; }
 
         public static TypeRegistration Create<T>() 
         {

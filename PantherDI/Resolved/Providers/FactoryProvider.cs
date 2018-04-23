@@ -69,6 +69,8 @@ namespace PantherDI.Resolved.Providers
 
             Singleton = providedRegistration.Singleton;
             Metadata = providedRegistration.Metadata;
+
+            Priority = _factory.Priority ?? providedRegistration.Priority;
         }
 
         public object CreateInstance(Dictionary<Dependency, object> resolvedDependencies)
@@ -103,5 +105,6 @@ namespace PantherDI.Resolved.Providers
 
         public bool Singleton { get; }
         public IReadOnlyDictionary<string, object> Metadata { get; }
+        public int Priority { get; }
     }
 }

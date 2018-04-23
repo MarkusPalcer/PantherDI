@@ -36,6 +36,7 @@ namespace PantherDI.Tests.Helpers
         public bool Singleton { get; set; }
 
         public Dictionary<string, object> Metadata { get; } = new Dictionary<string, object>();
+        public int Priority { get; set; } = 0;
 
         IReadOnlyDictionary<string, object> IProvider.Metadata => Metadata;
     }

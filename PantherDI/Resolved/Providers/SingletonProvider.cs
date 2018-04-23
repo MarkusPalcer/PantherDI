@@ -28,11 +28,13 @@ namespace PantherDI.Resolved.Providers
         public bool Singleton => false;
 
         public IReadOnlyDictionary<string, object> Metadata => _originalProvider.Metadata;
+        public int Priority { get; }
 
         public SingletonProvider(IProvider originalProvider, Dictionary<Type, object> cache)
         {
             _originalProvider = originalProvider;
             _cache = cache;
+            Priority = originalProvider.Priority;
         }
     }
 }

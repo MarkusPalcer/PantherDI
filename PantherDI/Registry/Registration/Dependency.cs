@@ -26,10 +26,22 @@ namespace PantherDI.Registry.Registration
 
         private string DebuggerDisplay => (Ignored ? "Ignored" : "") + $"Dependency<{ExpectedType}>({String.Join(",", RequiredContracts.Select(x =>x.ToString()))})";
 
+        /// <summary>
+        /// The type the resolved object will be cast to
+        /// </summary>
         public Type ExpectedType { get; }
 
+        /// <summary>
+        /// All contracts the resolved object must fulfill
+        /// </summary>
         public ISet<object> RequiredContracts { get; }
 
+        /// <summary>
+        /// Allows to not resolve this dependency when no suitable registration was found
+        /// </summary>
+        /// <remarks>
+        /// Two <code>Dependency</code>s are considered equal even when they differ in this field, as this field only marks the dependency as optional.
+        /// </remarks>
         public bool Ignored { get; set; }
 
 
@@ -56,7 +68,6 @@ namespace PantherDI.Registry.Registration
                 {
                     hashCode = (hashCode * 397) ^ contract.GetHashCode();
                 }
-                hashCode = (hashCode * 397) ^ Ignored.GetHashCode();
                 return hashCode;
             }
         }

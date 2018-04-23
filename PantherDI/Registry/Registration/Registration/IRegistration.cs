@@ -33,5 +33,11 @@ namespace PantherDI.Registry.Registration.Registration
         ///  Gets the metadata for this registered type
         /// </summary>
         IReadOnlyDictionary<string, object> Metadata { get; }
+
+        /// <summary>
+        /// The priority of this registration.
+        /// </summary>
+        /// <remarks>This priority value can be overridden in a specific factory</remarks>
+        int Priority { get; }
     }
 }

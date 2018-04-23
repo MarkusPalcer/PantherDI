@@ -234,6 +234,7 @@ namespace PantherDI
 
                 public IEnumerable<Dependency> Dependencies { get; }
                 public IEnumerable<object> FulfilledContracts { get; }
+                public int? Priority => _provider.Priority;
 
                 #endregion
             }
