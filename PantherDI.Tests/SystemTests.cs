@@ -649,5 +649,48 @@ namespace PantherDI.Tests
 
             cnt.Invoking(x => x.Resolve<IContainerBuilder>().Build()).ShouldThrow<MaximumNumberOfGenerationsExceededException>();
         }
+
+        [Contract]
+        private interface TestInterface1 {}
+
+        private class TestClass17 : TestInterface1
+        {
+        }
+
+        [Attributes.Priority(-1)]
+        private class TestClass16 : TestInterface1
+        {
+        }
+
+        [Attributes.Priority(1)]
+        private class TestClass18 : TestInterface1
+        {
+        }
+
+        [TestMethod]
+        public void OverrideWithPriority()
+        {
+            var sut = new ContainerBuilder()
+                      .WithType<TestClass17>()
+                      .WithType<TestClass16>()
+                      .Build();
+
+            var result = sut.Resolve<TestInterface1>();
+
+            result.Should().BeOfType<TestClass16>();
+        }
+
+        [TestMethod]
+        public void FallbackWithPriority()
+        {
+            var sut = new ContainerBuilder()
+                      .WithType<TestClass17>()
+                      .WithType<TestClass18>()
+                      .Build();
+
+            var result = sut.Resolve<TestInterface1>();
+
+            result.Should().BeOfType<TestClass17>();
+        }
     }
 }

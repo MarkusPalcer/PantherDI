@@ -12,7 +12,8 @@ namespace PantherDI.Extensions
             return new ManualRegistration(new HashSet<object>(x.FulfilledContracts) { x.RegisteredType }, new HashSet<IFactory>(x.Factories), x.Metadata.ToDictionary(m => m.Key, m => m.Value))
             {
                 RegisteredType = x.RegisteredType,
-                Singleton = x.Singleton
+                Singleton = x.Singleton,
+                Priority = x.Priority
             };
         }
     }

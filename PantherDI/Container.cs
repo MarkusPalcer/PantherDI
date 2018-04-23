@@ -29,9 +29,18 @@ namespace PantherDI
 
         public T Resolve<T>(params object[] contracts)
         {
-            var providers = ResolveInternal(new Dependency(typeof(T),contracts))
-                .Where(p => !p.UnresolvedDependencies.Any())
-                .ToArray();
+            var providers = ResolveInternal(new Dependency(typeof(T), contracts))
+                            .Where(p => !p.UnresolvedDependencies.Any())
+                            .ToArray();
+            var providerGroups = providers
+                            .GroupBy(x => x.Priority)
+                            .ToArray();
+            providers = (providerGroups
+                            .OrderBy(x => x.Key)
+                            .FirstOrDefault() ??
+                            Enumerable.Empty<IProvider>())
+                            .ToArray();
+                           
 
             if (providers.Length == 0)
             {

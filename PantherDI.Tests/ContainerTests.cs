@@ -293,5 +293,61 @@ namespace PantherDI.Tests
             registration.Singleton.Should().BeFalse();
             registration.Factories.Single().Dependencies.Should().BeEquivalentTo(new Dependency(typeof(TestType1)));
         }
+
+        [TestMethod]
+        public void LowerPrioritiesAreNotReturned()
+        {
+            var kb = new Mock<IKnowledgeBase>(MockBehavior.Strict);
+            var provider1 = new TestProvider(ProviderResult + "1")
+            {
+                FulfilledContracts = { typeof(string) },
+                ResultType = typeof(string).GetTypeInfo(),
+                Priority = 0
+            };
+            var provider2 = new TestProvider(ProviderResult + "2")
+            {
+                FulfilledContracts = { typeof(string) },
+                ResultType = typeof(string).GetTypeInfo(),
+                Priority = 1
+            };
+            
+            kb
+                .Setup(x => x.Resolve(
+                                      It.IsAny<Func<Dependency, IEnumerable<IProvider>>>(),
+                                      It.Is<Dependency>(d => d.Equals(new Dependency(typeof(string))))))
+                .Returns(new IProvider[] { provider1, provider2 });
+
+            var sut = new Container(kb.Object);
+
+            sut.Resolve<string>().Should().Be(ProviderResult + "1");
+        }
+
+        [TestMethod]
+        public void HigherPrioritiesAreOnlyReturned()
+        {
+            var kb = new Mock<IKnowledgeBase>(MockBehavior.Strict);
+            var provider1 = new TestProvider(ProviderResult + "1")
+            {
+                FulfilledContracts = { typeof(string) },
+                ResultType = typeof(string).GetTypeInfo(),
+                Priority = 0
+            };
+            var provider2 = new TestProvider(ProviderResult + "2")
+            {
+                FulfilledContracts = { typeof(string) },
+                ResultType = typeof(string).GetTypeInfo(),
+                Priority = -1
+            };
+            
+            kb
+                .Setup(x => x.Resolve(
+                                      It.IsAny<Func<Dependency, IEnumerable<IProvider>>>(),
+                                      It.Is<Dependency>(d => d.Equals(new Dependency(typeof(string))))))
+                .Returns(new IProvider[] { provider1, provider2 });
+
+            var sut = new Container(kb.Object);
+
+            sut.Resolve<string>().Should().Be(ProviderResult + "2");
+        }
     }
 }
