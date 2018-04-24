@@ -13,7 +13,7 @@
     <tags>DependencyInjection DI</tags>
 
     <dependencies>
-        <dependency id="PantherDI" version="[1.0,2.0)" />
+        <dependency id="PantherDI" version="[2.0,3.0)" />
     </dependencies>
   </metadata>
 </package>
