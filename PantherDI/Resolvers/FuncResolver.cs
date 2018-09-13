@@ -8,6 +8,10 @@ using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {
+    /// <summary>
+    /// Resolves generic <code>Func&lt;...,TResult&gt;</code> types by returning a function
+    /// for each provider that has the given input types as leftover dependencies
+    /// </summary>
     public static class FuncResolver
     {
         internal static Func<Dictionary<Dependency, object>, Func<object[], T>> ProcessProvider<T>(Type[] givenTypes, IProvider provider)

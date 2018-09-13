@@ -7,6 +7,9 @@ using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Registry.Catalog
 {
+    /// <summary>
+    /// A catalog that merges multiple catalogs together
+    /// </summary>
     public class MergedCatalog : ICatalog
     {
         public MergedCatalog(params ICatalog[] catalogs) : this(MergeRegistrations(catalogs.SelectMany(x => x.Registrations)))

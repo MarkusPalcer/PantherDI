@@ -8,8 +8,11 @@ using PantherDI.Registry.Registration.Factory;
 
 namespace PantherDI.Registry.Registration.Registration
 {
+    /// <summary>
+    /// A registration that analyzes a given <see cref="Type"/> using reflection to scan for
+    /// metadata, fulfilled contracts and 
+    /// </summary>
     public class TypeRegistration : IRegistration
-
     {
         private readonly Dictionary<string, object> _metadata = new Dictionary<string, object>();
 

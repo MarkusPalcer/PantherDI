@@ -34,7 +34,7 @@ namespace PantherDI.Registry.Registration
         /// <summary>
         /// All contracts the resolved object must fulfill
         /// </summary>
-        public ISet<object> RequiredContracts { get; }
+        public ISet<object> RequiredContracts { get; } // Only String and Type allowed
 
         /// <summary>
         /// Allows to not resolve this dependency when no suitable registration was found

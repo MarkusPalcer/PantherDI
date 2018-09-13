@@ -7,6 +7,9 @@ using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {
+    /// <summary>
+    /// Lazily processes all registrations needed for the type upon type resolution.
+    /// </summary>
     public class RegistrationProcessingResolver : IResolver
     {
         internal readonly RegistrationConverter Converter;

@@ -7,6 +7,9 @@ using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Registry.Catalog
 {
+    /// <summary>
+    /// A catalog containing a list of registered types, returning a <see cref="TypeRegistration"/> for each entry
+    /// </summary>
     public class TypeCatalog : ICollection<Type>, ICatalog
     {
         private readonly List<Type> _types;

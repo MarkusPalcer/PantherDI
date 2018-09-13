@@ -8,6 +8,10 @@ using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {
+    /// <summary>
+    /// Resolves <see cref="IEnumerable{T}"/> automatically by creating one instance
+    /// for each found <see cref="IProvider"/> that provides <code>T</code>
+    /// </summary>
     public class EnumerableResolver : GenericResolver
     {
         public EnumerableResolver() : base(typeof(IEnumerable<>), typeof(InnerResolver<>))

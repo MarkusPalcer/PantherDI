@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace PantherDI.Registry.Registration.Factory
 {
+    /// <summary>
+    /// A factory that invokes a delegate when executed
+    /// </summary>
     public partial class DelegateFactory : IFactory
     {
         private readonly Func<object[], object> _delegate;

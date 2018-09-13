@@ -6,6 +6,10 @@ using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {
+    /// <summary>
+    /// Resolves <see cref="Lazy{T}"/> by returning a <see cref="Lazy{T}"/> instance for each provider for <code>T</code>
+    /// that has no leftover dependencies.
+    /// </summary>
     public class LazyResolver : GenericResolver
     {
         public LazyResolver() : base(typeof(Lazy<>), typeof(InnerResolver<>))

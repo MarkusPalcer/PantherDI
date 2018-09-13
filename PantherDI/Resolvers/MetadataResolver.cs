@@ -9,6 +9,10 @@ using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {
+    /// <summary>
+    /// Resolves <see cref="Lazy{T,TMetadata}"/> by returning a <see cref="Lazy{T,TMetadata}"/> for each provider for <code>T</code>
+    /// that has no leftover dependencies and mapping the registration metadata to <code>TMetadata</code>
+    /// </summary>
     public class MetadataResolver : GenericResolver
     {
         public MetadataResolver() : base(typeof(Lazy<,>), typeof(InnerResolver<,>)) { }

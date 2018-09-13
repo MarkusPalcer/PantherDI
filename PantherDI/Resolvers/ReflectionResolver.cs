@@ -9,6 +9,9 @@ using PantherDI.Resolved.Providers;
 
 namespace PantherDI.Resolvers
 {
+    /// <summary>
+    /// Tries to resolve a given type by processing its constructors and attributes via reflection.
+    /// </summary>
     public class ReflectionResolver : IResolver
     {
         #region Implementation of IResolver

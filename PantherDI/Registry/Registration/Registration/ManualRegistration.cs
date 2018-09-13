@@ -5,6 +5,9 @@ using PantherDI.Registry.Registration.Factory;
 
 namespace PantherDI.Registry.Registration.Registration
 {
+    /// <summary>
+    /// A registration that is filled manually with information
+    /// </summary>
     internal class ManualRegistration : IRegistration
     {
         public Type RegisteredType { get; set; }

@@ -2,6 +2,9 @@
 
 namespace PantherDI.Registry.Registration.Factory
 {
+    /// <summary>
+    /// A factory that invokes a method specified by its <see cref="MethodInfo"/>
+    /// </summary>
     public class MethodFactory : MethodBaseFactory
     {
         private readonly MethodInfo _method;

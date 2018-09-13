@@ -9,6 +9,9 @@ using PantherDI.Registry.Registration.Registration;
 
 namespace PantherDI.Registry.Catalog
 {
+    /// <summary>
+    /// A catalog that scans an <see cref="Assembly"/> for registrations using reflection and attributes
+    /// </summary>
     public class AssemblyCatalog : ICatalog
     {
         public AssemblyCatalog(Assembly assembly)
