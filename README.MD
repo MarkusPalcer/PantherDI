@@ -10,6 +10,10 @@ My aim was to learn about DI by trying to create a my own DI-Container and try t
 To achieve the first and most important goal and share the gained knowledge I decided to keep a developer diary in my blog. 
 I haven't checked yet, whether I achieved the second goal.
 
+**Warning:** This means that this project has been created using explorative programming and it is by no means _made_ for productive use.
+One example is that the interface is not as intuitive as I thought. \\
+If you plan to use this in a serious project, please read the Dev Diary first, try to understand the code and _then_ decide whether to use this DI-Container or one of the "well established", but also "proven" ones (like Autofac or MEF).
+
 ## Dev Diary
 
 The developer diary can be found on my blog (http://markuspalcer.blogspot.de/ ):
